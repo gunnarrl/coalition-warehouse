@@ -11,25 +11,56 @@ const customers = [
 
 const CustomerPage = () => {
     const [isPopupOpen, setIsPopupOpen] = React.useState(false);
+    const [currentRow, setCurrentRow] = React.useState(null);
+
+    const handleEdit = (row) => {
+        setCurrentRow(row); // Save the row data
+        setIsPopupOpen(true);
+    };
+
+    const handleAdd = () => {
+        setCurrentRow(null); // Clear the data
+        setIsPopupOpen(true);
+    };
+
+    const handleDelete = (row) => {
+        if (window.confirm(`Are you sure you want to delete ${row.name}?`)) {
+            // talk to backend to delete
+        }
+    };
 
     return (
         <div>
             <h1>Customer Page</h1>
             <Table data={customers}
-            columns={['id', 'name', 'email', 'phone']} />
-            <button onClick={() => setIsPopupOpen(true)}><HiUserAdd /> Add Customer</button>
+            columns={['id', 'name', 'email', 'phone']}
+            onEdit={handleEdit}
+            onDelete={handleDelete} />
+            <button onClick={handleAdd}><HiUserAdd /> Add Customer</button>
             <PopupForm 
                 isOpen={isPopupOpen} 
                 onClose={() => setIsPopupOpen(false)} 
-                title="Add Customer"
+                title={currentRow ? 'Edit Customer' : 'Add Customer'}
             >
                 <form>
                     <label>Name:</label>
-                    <input type="text" name="name" />
+                    <input 
+                        type="text"
+                        defaultValue={currentRow?.name || ''}
+                        name="name" 
+                    />
                     <label>Email:</label>
-                    <input type="email" name="email" />
+                    <input 
+                        type="email" 
+                        defaultValue={currentRow?.email || ''}
+                        name="email" 
+                    />
                     <label>Phone:</label>
-                    <input type="text" name="phone" />
+                    <input 
+                        type="text"
+                        defaultValue={currentRow?.phone || ''}
+                        name="phone" 
+                    />
                     <button type="submit">Submit</button>
                 </form>
             </PopupForm>
