@@ -7,7 +7,7 @@ function SimpleTable({ columns, data, onEdit, onDelete }) {
             <thead>
                 <tr>
                     {columns.map((col, i) => (
-                        <th key={i}>{col}</th>
+                        <th key={i}>{col.label}</th>
                     ))}
                     <th>Edit</th>
                     <th>Delete</th>
@@ -17,10 +17,10 @@ function SimpleTable({ columns, data, onEdit, onDelete }) {
                 {data.map((row, index) => (
                     <tr key={index}>
                         {columns.map((col) => (
-                            <td key={col}>{row[col]}</td>
+                            <td key={col}>{row[col.key]}</td>
                         ))}
                         <td><button onClick={() => onEdit(row)}><MdEdit /></button></td>
-                        <td><button onClick={() => onDelete(row.id)}><MdDelete /></button></td>
+                        <td><button onClick={() => onDelete(row)}><MdDelete /></button></td>
                     </tr>
                 ))}
             </tbody>

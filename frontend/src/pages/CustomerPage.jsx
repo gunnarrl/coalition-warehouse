@@ -1,31 +1,40 @@
 import React from 'react';
-import Table from '../components/SimpleTable';
+import SimpleTable from '../components/SimpleTable';
 import { HiUserAdd } from "react-icons/hi";
 import PopupForm from '../components/PopupForm';
 
 const customers = [
-    { id: 1, name: 'Alice Jones', email: 'alice@abc.com', phone: '555-1234' },
-    { id: 2, name: 'Bob Smith', email: 'bob@abc.com', phone: '555-5678' },
-    { id: 3, name: 'Charlie Brown', email: 'charlie@abc.com', phone: '555-9012' },
+    { customerId: 1, customerName: 'Alice Jones', customerEmail: 'alice@abc.com', customerAddr: '111 1st Street' },
+    { customerId: 2, customerName: 'Bob Smith', customerEmail: 'bob@abc.com', customerAddr: '222 2nd Street' },
+    { customerId: 3, customerName: 'Charlie Brown', customerEmail: 'charlie@abc.com', customerAddr: '333 3rd Street' },
 ];
 
 const CustomerPage = () => {
     const [isPopupOpen, setIsPopupOpen] = React.useState(false);
     const [currentRow, setCurrentRow] = React.useState(null);
 
+    // Columns for the SimpleTable, maps the DB fields to user-friendly names
+    const columns = [
+        { key: 'customerId', label: 'ID' },
+        { key: 'customerName', label: 'Name' },
+        { key: 'customerEmail', label: 'Email' },
+        { key: 'customerAddr', label: 'Address' }
+    ];
+
     const handleEdit = (row) => {
-        setCurrentRow(row); // Save the row data
+        setCurrentRow(row);
         setIsPopupOpen(true);
     };
 
     const handleAdd = () => {
-        setCurrentRow(null); // Clear the data
+        setCurrentRow(null);
         setIsPopupOpen(true);
     };
 
     const handleDelete = (row) => {
-        if (window.confirm(`Are you sure you want to delete ${row.name}?`)) {
-            // talk to backend to delete
+        if (window.confirm(`Are you sure you want to delete ${row.customerName}?`)) {
+            console.log("Deleting ID:", row.customerId);
+            // TODO: Call API to delete customer, then refresh data
         }
     };
 
@@ -34,11 +43,13 @@ const CustomerPage = () => {
             <h1>Customer Page</h1>
             <SimpleTable 
                 data={customers}
-                columns={['id', 'name', 'email', 'phone']}
+                columns={columns}
                 onEdit={handleEdit}
                 onDelete={handleDelete} 
             />
-            <button onClick={handleAdd}><HiUserAdd /> Add Customer</button>
+            <button onClick={handleAdd} style={{ marginTop: '1rem' }}>
+                <HiUserAdd /> Add Customer
+            </button>
             <PopupForm 
                 isOpen={isPopupOpen} 
                 onClose={() => setIsPopupOpen(false)} 
@@ -48,20 +59,20 @@ const CustomerPage = () => {
                     <label>Name:</label>
                     <input 
                         type="text"
-                        defaultValue={currentRow?.name || ''}
-                        name="name" 
+                        defaultValue={currentRow?.customerName || ''}
+                        name="customerName" 
                     />
                     <label>Email:</label>
                     <input 
                         type="email" 
-                        defaultValue={currentRow?.email || ''}
-                        name="email" 
+                        defaultValue={currentRow?.customerEmail || ''}
+                        name="customerEmail" 
                     />
-                    <label>Phone:</label>
+                    <label>Address:</label>
                     <input 
                         type="text"
-                        defaultValue={currentRow?.phone || ''}
-                        name="phone" 
+                        defaultValue={currentRow?.customerAddr || ''}
+                        name="customerAddr" 
                     />
                     <button type="submit">Submit</button>
                 </form>
