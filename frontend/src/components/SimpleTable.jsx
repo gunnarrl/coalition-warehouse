@@ -1,9 +1,9 @@
 import React from 'react';
-import { FaEdit, FaTrash } from 'react-icons/fa';
+import { MdEdit, MdDelete } from 'react-icons/md';
 
-const Table = ({ columns, data, onEdit, onDelete}) => {
+function SimpleTable({ columns, data, onEdit, onDelete }) {
     return (
-        <table>
+        <table className="table">
             <thead>
                 <tr>
                     {columns.map((col, i) => (
@@ -19,13 +19,13 @@ const Table = ({ columns, data, onEdit, onDelete}) => {
                         {columns.map((col) => (
                             <td key={col}>{row[col]}</td>
                         ))}
-                        <td><button onClick={() => onEdit(row)}><FaEdit/></button></td>
-                        <td><button onClick={() => onDelete(row)}><FaTrash/></button></td>   
+                        <td><button onClick={() => onEdit(row)}><MdEdit /></button></td>
+                        <td><button onClick={() => onDelete(row.id)}><MdDelete /></button></td>
                     </tr>
                 ))}
             </tbody>
         </table>
     );
-};
+}
 
-export default Table;
+export default SimpleTable;

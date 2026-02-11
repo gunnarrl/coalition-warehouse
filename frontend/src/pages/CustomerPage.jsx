@@ -1,5 +1,5 @@
 import React from 'react';
-import Table from '../components/Table';
+import Table from '../components/SimpleTable';
 import { HiUserAdd } from "react-icons/hi";
 import PopupForm from '../components/PopupForm';
 
@@ -32,10 +32,12 @@ const CustomerPage = () => {
     return (
         <div>
             <h1>Customer Page</h1>
-            <Table data={customers}
-            columns={['id', 'name', 'email', 'phone']}
-            onEdit={handleEdit}
-            onDelete={handleDelete} />
+            <SimpleTable 
+                data={customers}
+                columns={['id', 'name', 'email', 'phone']}
+                onEdit={handleEdit}
+                onDelete={handleDelete} 
+            />
             <button onClick={handleAdd}><HiUserAdd /> Add Customer</button>
             <PopupForm 
                 isOpen={isPopupOpen} 
