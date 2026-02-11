@@ -1,22 +1,34 @@
 import React from 'react';
+import Select from 'react-select';
 
-const Dropdown = ({ label, name, options, valueKey, labelKey, selectedValue }) => {
+// labelkey: the property name in the options objects to use as the display label
+// valuekey: the property name in the options objects to use as the value (usually a FK ID)
+const Dropdown = ({ label, options, valueKey, labelKey, selectedValue, onChange }) => {
+    
+    // data must be formated for react-select: { value: ..., label: ... }
+    const selectOptions = options.map(opt => ({
+        value: opt[valueKey],
+        label: opt[labelKey]
+    }));
+
+    const handleChange = (selectedOption) => {
+        // When user selects an option, we call onChange with the value (ID)
+        onChange(selectedOption ? selectedOption.value : null);
+    }
+    // Find the currently selected option object based on the selectedValue (which is the ID)
+    const currentOption = selectOptions.find(opt => opt.value === selectedValue);
+
     return (
         <div className="flex flex-col">
-            <label className="font-bold">{label}:</label>
-            <select 
-                name={name} 
-                defaultValue={selectedValue} 
-                className="border p-2 rounded"
-                required
-            >
-                <option value="" disabled>Select {label}...</option>
-                {options.map((option) => (
-                    <option key={option[valueKey]} value={option[valueKey]}>
-                        {option[labelKey]} 
-                    </option>
-                ))}
-            </select>
+            <label className="font-bold mb-1">{label}:</label>
+            <Select
+                options={selectOptions}
+                value={currentOption}
+                onChange={handleChange}
+                placeholder={`Search ${label}...`}
+                isClearable
+                isSearchable
+            />
         </div>
     );
 };
