@@ -13,7 +13,7 @@ const inventory = [
     { name: 'Gadget', qty: 20 },
 ];
 
-function WarehousesPage() {
+function WarehousePage() {
 
     const [warehouses, setWarehouses] = useState(initialWarehouses);
     const [isPopupOpen, setIsPopupOpen] = useState(false);
@@ -91,4 +91,4 @@ function WarehousesPage() {
     );
 }
 
-export default WarehousesPage;
+export default WarehousePage;
