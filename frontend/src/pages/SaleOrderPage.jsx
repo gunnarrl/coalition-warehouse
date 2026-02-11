@@ -19,6 +19,11 @@ const mockWarehouses = [
     { warehouseID: 102, warehouseName: 'South Fulfillment' },
 ];
 
+const salesOrderItems = [
+    { name: 'Widget', qty: 50, price: 10.00 },
+    { name: 'Gadget', qty: 20, price: 15.00 },
+];
+
 const SalesOrdersPage = () => {
 
     const columns = [
@@ -53,16 +58,22 @@ const SalesOrdersPage = () => {
         window.alert(`Delete Sale Order ID: ${rowData.saleID}`);
     }
 
-    // TODO: Add logic to show each item in an order when it is clicked, and a button to add items to the order
+    // TODO: Add logic to add/remove items to the order
     const renderSaleItems = (row) => (
-        <div className="p-4 bg-gray-50 border rounded">
+        <div>
             <h4>Items in Sale #{row.saleID}</h4>
-            <p>Not Complete</p>
-            <button className="bg-blue-500 text-white px-2 py-1 rounded mt-2">Add Item</button>
+            <ul>
+                {salesOrderItems.map((item, i) => (
+                    <li key={i}>{item.qty}x {item.name} @ ${item.price}</li>
+                ))}
+            </ul>
+            <button>Add Item</button>
+            <button>Remove Item</button>
         </div>
     );
+
     return (
-        <div className="p-6">
+        <div>
             <h1>Sales Orders</h1>
             <DetailTable
                 columns={columns}
@@ -71,19 +82,17 @@ const SalesOrdersPage = () => {
                 onDelete={handleDelete}
                 renderDetails={renderSaleItems}
             />
-            <button onClick={handleAdd} className="bg-green-600 text-white p-2 mt-4">Add Sale Order</button>
+            <button onClick={handleAdd}>Add Sale Order</button>
 
             <PopupForm 
                 isOpen={isPopupOpen} 
                 onClose={() => setIsPopupOpen(false)} 
                 title={currentRow ? "Edit Sale" : "Create Sale"}
             >
-                <form onSubmit={handleSave} className="flex flex-col gap-4">
+                <form onSubmit={handleSave}>
                     
                     <label className="font-bold">Date:</label>
-                    <input type="date" name="saleDate" defaultValue={currentRow?.saleDate} className="border p-2" />
-
-                    {/* --- DROPDOWN 1: CUSTOMER --- */}
+                    <input type="date" name="saleDate" defaultValue={currentRow?.saleDate}/>
                     <Dropdown
                         label="Customer"
                         options={mockCustomers}
@@ -91,17 +100,15 @@ const SalesOrdersPage = () => {
                         labelKey="customerName"  // What to show user (Name)
                         selectedValue={currentRow?.customerID}
                     />
-
-                    {/* --- DROPDOWN 2: WAREHOUSE --- */}
                     <Dropdown
                         label="Warehouse"
                         options={mockWarehouses}
-                        valueKey="warehouseID"     // Unique ID for this list
-                        labelKey="warehouseName"   // Unique Name for this list
+                        valueKey="warehouseID"    
+                        labelKey="warehouseName"  
                         selectedValue={currentRow?.warehouseID}
                     />
 
-                    <button type="submit" className="bg-blue-600 text-white p-2 mt-2">Save</button>
+                    <button type="submit">Save</button>
                 </form>
             </PopupForm>
         </div>
