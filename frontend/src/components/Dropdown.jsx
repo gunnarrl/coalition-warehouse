@@ -1,5 +1,5 @@
 import React from 'react';
-import Select from 'react-select';
+import Select from 'react-select'; // react-select is a good dropdown library that I found
 
 // labelkey: the property name in the options objects to use as the display label
 // valuekey: the property name in the options objects to use as the value (usually a FK ID)
@@ -16,11 +16,11 @@ const Dropdown = ({ label, name, options, valueKey, labelKey, selectedValue, onC
         onChange(selectedOption ? selectedOption.value : null);
     }
     // Find the currently selected option object based on the selectedValue (which is the ID)
-    const currentOption = selectOptions.find(opt => opt.value === selectedValue);
+    const currentOption = selectOptions.find(opt => opt.value == selectedValue);
 
     return (
-        <div className="flex flex-col">
-            <label className="font-bold mb-1">{label}:</label>
+        <div>
+            <label>{label}:</label>
             <Select
                 options={selectOptions}
                 value={currentOption}
