@@ -4,6 +4,7 @@ import { HiUserAdd } from "react-icons/hi";
 import PopupForm from '../components/PopupForm';
 
 const customers = [
+    // customerName will be the combination of fname and lname in the DB. For processing, we can split it back into fname/lname when sending to the API
     { customerId: 1, customerName: 'Alice Jones', customerEmail: 'alice@abc.com', customerAddr: '111 1st Street' },
     { customerId: 2, customerName: 'Bob Smith', customerEmail: 'bob@abc.com', customerAddr: '222 2nd Street' },
     { customerId: 3, customerName: 'Charlie Brown', customerEmail: 'charlie@abc.com', customerAddr: '333 3rd Street' },
@@ -47,7 +48,7 @@ const CustomerPage = () => {
                 onEdit={handleEdit}
                 onDelete={handleDelete} 
             />
-            <button onClick={handleAdd} style={{ marginTop: '1rem' }}>
+            <button onClick={handleAdd}>
                 <HiUserAdd /> Add Customer
             </button>
             <PopupForm 
