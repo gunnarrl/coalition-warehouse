@@ -3,7 +3,7 @@ import Select from 'react-select';
 
 // labelkey: the property name in the options objects to use as the display label
 // valuekey: the property name in the options objects to use as the value (usually a FK ID)
-const Dropdown = ({ label, options, valueKey, labelKey, selectedValue, onChange }) => {
+const Dropdown = ({ label, name, options, valueKey, labelKey, selectedValue, onChange }) => {
     
     // data must be formated for react-select: { value: ..., label: ... }
     const selectOptions = options.map(opt => ({
@@ -29,6 +29,8 @@ const Dropdown = ({ label, options, valueKey, labelKey, selectedValue, onChange 
                 isClearable
                 isSearchable
             />
+            <input type="hidden" name={name} value={selectedValue || ''} /> 
+            {/* Hidden input to include the selected value in form submissions */}
         </div>
     );
 };
