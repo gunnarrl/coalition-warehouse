@@ -4,13 +4,18 @@ import PopupForm from '../components/PopupForm';
 
 // Sample data before we connect to the backend API
 const initialWarehouses = [
-    { warehouseID: 1, warehouseName: 'North Distribution', warehouseAddr: '541 Monroe Ave' },
-    { warehouseID: 2, warehouseName: 'South Fulfillment', warehouseAddr: '456 8th Street' },
+    { warehouseID: 1, warehouseName: 'North Distribution', warehouseAddr: '123 Frozen Lane, Anchorage, AK' },
+    { warehouseID: 2, warehouseName: 'South Fulfillment', warehouseAddr: '456 Sunny Blvd, Miami, FL' },
+    { warehouseID: 3, warehouseName: 'East Coast Hub', warehouseAddr: '789 Metro Way, New York, NY' },
+    { warehouseID: 4, warehouseName: 'West Coast Depot', warehouseAddr: '101 Tech Drive, San Francisco, CA' },
 ];
 
+// Not yet connected to the DB, so using the same inventory for all warehouses for now. Will be linked to warehouseID in the DB later.
 const inventory = [
-    { name: 'Widget', qty: 50 },
-    { name: 'Gadget', qty: 20 },
+    { name: 'Steel Desk 473', qty: 189 },     
+    { name: 'Premium Keyboard 591', qty: 414 }, 
+    { name: 'Plastic Drawer 653', qty: 334 },  
+    { name: 'Ergonomic Mouse 654', qty: 445 }, 
 ];
 
 function WarehousePage() {
