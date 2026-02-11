@@ -6,10 +6,10 @@ import PopupForm from '../components/PopupForm';
 // Much of the code is reused from CustomerPage, but adapted for products. 
 // The main differences are the fields we display and edit, and the API endpoints we would call (not implemented yet).
 const products = [
-    // customerName will be the combination of fname and lname in the DB. For processing, we can split it back into fname/lname when sending to the API
-    { productId: 1, productName: 'Multivitamin', listCost: 9.99 },
-    { productId: 2, productName: 'Air Fryer', listCost: 49.99 },
-    { productId: 3, productName: 'Trash Can', listCost: 24.99 },
+    { productId: 1, productName: 'Premium Keyboard 591', listCost: 299.89 },
+    { productId: 2, productName: 'Plastic Drawer 653', listCost: 297.88 },
+    { productId: 3, productName: 'Steel Desk 473', listCost: 441.74 },
+    { productId: 4, productName: 'Ergonomic Mouse 654', listCost: 220.62 },
 ];
 
 const ProductPage = () => {
