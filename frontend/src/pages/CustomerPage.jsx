@@ -5,9 +5,10 @@ import PopupForm from '../components/PopupForm';
 
 const customers = [
     // customerName will be the combination of fname and lname in the DB. For processing, we can split it back into fname/lname when sending to the API
-    { customerId: 1, customerName: 'Alice Jones', customerEmail: 'alice@abc.com', customerAddr: '111 1st Street' },
-    { customerId: 2, customerName: 'Bob Smith', customerEmail: 'bob@abc.com', customerAddr: '222 2nd Street' },
-    { customerId: 3, customerName: 'Charlie Brown', customerEmail: 'charlie@abc.com', customerAddr: '333 3rd Street' },
+    { customerId: 1, customerName: 'Anna Hernandez', customerEmail: 'anna.hernandez1@example.com', customerAddr: '213 Park Rd, Los Angeles, CA' },
+    { customerId: 2, customerName: 'Brenda White', customerEmail: 'brenda.white2@example.com', customerAddr: '493 Elm St, Houston, TX' },
+    { customerId: 3, customerName: 'Amanda Campbell', customerEmail: 'amanda.campbell3@example.com', customerAddr: '229 Pine St, Philadelphia, PA' },
+    { customerId: 4, customerName: 'Betty Martin', customerEmail: 'betty.martin4@example.com', customerAddr: '389 Lakeview Dr, San Jose, CA' },
 ];
 
 const CustomerPage = () => {
