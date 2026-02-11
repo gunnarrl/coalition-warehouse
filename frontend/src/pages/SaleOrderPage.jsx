@@ -5,23 +5,30 @@ import Dropdown from '../components/Dropdown';
 
 // Mock Data
 const mockSalesOrders = [
-    { saleID: 1, saleDate: '2024-06-01', customerID: 1, warehouseID: 101 },
-    { saleID: 2, saleDate: '2024-06-02', customerID: 2, warehouseID: 102 },
+    { saleID: 1, saleDate: '2024-12-05', customerID: 1, warehouseID: 4 },
+    { saleID: 2, saleDate: '2024-05-20', customerID: 3, warehouseID: 3 },
+    { saleID: 3, saleDate: '2024-12-12', customerID: 2, warehouseID: 1 },
+    { saleID: 4, saleDate: '2024-02-08', customerID: 4, warehouseID: 2 },
 ];
 
 const mockCustomers = [
-    { customerID: 1, customerName: 'Alice Jones' },
-    { customerID: 2, customerName: 'Bob Smith' },
+    { customerID: 1, customerName: 'Anna Hernandez' },
+    { customerID: 2, customerName: 'Brenda White' },
+    { customerID: 3, customerName: 'Amanda Campbell' },
+    { customerID: 4, customerName: 'Betty Martin' },
 ];
 
 const mockWarehouses = [
-    { warehouseID: 101, warehouseName: 'North Distribution' },
-    { warehouseID: 102, warehouseName: 'South Fulfillment' },
+    { warehouseID: 1, warehouseName: 'North Distribution' },
+    { warehouseID: 2, warehouseName: 'South Fulfillment' },
+    { warehouseID: 3, warehouseName: 'East Coast Hub' },
+    { warehouseID: 4, warehouseName: 'West Coast Depot' },
 ];
 
+// For simplicity, using the same items for all sales orders. These would be linked to the saleID in the DB.
 const salesOrderItems = [
-    { name: 'Widget', qty: 50, price: 10.00 },
-    { name: 'Gadget', qty: 20, price: 15.00 },
+    { name: 'Ergonomic Mouse 654', qty: 4, price: 250.00 }, 
+    { name: 'Steel Desk 473', qty: 5, price: 450.00 },     
 ];
 
 const SalesOrdersPage = () => {
