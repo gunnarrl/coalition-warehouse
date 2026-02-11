@@ -9,8 +9,8 @@ const HomePage = () => {
 
     return (
         <div>
-            <h1>Coalition Warehouse Manager Home Page</h1>
-            <button onClick={handleReset}></button>
+            <h1>Coalition Warehouse Manager</h1>
+            <button className='danger' onClick={handleReset}>Reset Sample Data</button>
         </div>
     );
 }

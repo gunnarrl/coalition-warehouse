@@ -43,12 +43,6 @@ const ProductPage = () => {
     return (
         <div>
             <h1>Products Page</h1>
-            <SimpleTable 
-                data={products}
-                columns={columns}
-                onEdit={handleEdit}
-                onDelete={handleDelete} 
-            />
             <button onClick={handleAdd}>
                 <HiUserAdd /> Add Customer
             </button>
@@ -73,6 +67,12 @@ const ProductPage = () => {
                     <button type="submit">Submit</button>
                 </form>
             </PopupForm>
+            <SimpleTable 
+                data={products}
+                columns={columns}
+                onEdit={handleEdit}
+                onDelete={handleDelete} 
+            />
         </div>
     );
 }

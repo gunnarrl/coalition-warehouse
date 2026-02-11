@@ -43,12 +43,6 @@ const CustomerPage = () => {
     return (
         <div>
             <h1>Customer Page</h1>
-            <SimpleTable 
-                data={customers}
-                columns={columns}
-                onEdit={handleEdit}
-                onDelete={handleDelete} 
-            />
             <button onClick={handleAdd}>
                 <HiUserAdd /> Add Customer
             </button>
@@ -79,6 +73,12 @@ const CustomerPage = () => {
                     <button type="submit">Submit</button>
                 </form>
             </PopupForm>
+            <SimpleTable 
+                data={customers}
+                columns={columns}
+                onEdit={handleEdit}
+                onDelete={handleDelete} 
+            />
         </div>
     );
 }

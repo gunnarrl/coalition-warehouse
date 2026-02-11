@@ -51,6 +51,7 @@ const PurchaseOrdersPage = () => {
     // TODO: Connect these to the backend API and refresh the data after changes
     const handleSave = (e) => {
         e.preventDefault();
+        setIsPopupOpen(false);
     }
 
     const handleEdit = (rowData) => {
@@ -77,21 +78,13 @@ const PurchaseOrdersPage = () => {
                 ))}
             </ul>
             <button>Add Item</button>
-            <button>Remove Item</button>
+            <button className='danger'>Remove Item</button>
         </div>
     );
     return (
         <div>
             <h1>Purchases Orders</h1>
-            <DetailTable
-                columns={columns}
-                data={salesOrders}
-                onEdit={handleEdit}
-                onDelete={handleDelete}
-                renderDetails={renderPurchaseItems}
-            />
             <button onClick={handleAdd}>Add Purchase Order</button>
-
             <PopupForm 
                 isOpen={isPopupOpen} 
                 onClose={() => setIsPopupOpen(false)} 
@@ -118,6 +111,13 @@ const PurchaseOrdersPage = () => {
                     <button type="submit">Save</button>
                 </form>
             </PopupForm>
+            <DetailTable
+                columns={columns}
+                data={salesOrders}
+                onEdit={handleEdit}
+                onDelete={handleDelete}
+                renderDetails={renderPurchaseItems}
+            />
         </div>
     );
 };

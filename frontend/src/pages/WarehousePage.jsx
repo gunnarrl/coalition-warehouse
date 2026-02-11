@@ -42,6 +42,7 @@ function WarehousePage() {
                     ))}
                 </ul>
                 <button>Add Stock +</button>
+                <button className="danger">Remove Stock -</button>
             </div>
         );
     };
@@ -72,13 +73,6 @@ function WarehousePage() {
         <div className="page-container">
             <h1>Warehouses</h1>
             <button onClick={handleAdd}>Add New Warehouse</button>
-            <DetailTable 
-                columns={columns} 
-                data={warehouses} 
-                onEdit={handleEdit} 
-                onDelete={handleDelete}
-                renderDetails={renderInventory}
-            />
             <PopupForm 
                 isOpen={isPopupOpen} 
                 onClose={() => setIsPopupOpen(false)}
@@ -92,6 +86,13 @@ function WarehousePage() {
                     <button type="submit">Save</button>
                 </form>
             </PopupForm>
+            <DetailTable 
+                columns={columns} 
+                data={warehouses} 
+                onEdit={handleEdit} 
+                onDelete={handleDelete}
+                renderDetails={renderInventory}
+            />
         </div>
     );
 }

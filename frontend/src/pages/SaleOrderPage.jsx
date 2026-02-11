@@ -49,6 +49,7 @@ const SalesOrdersPage = () => {
     // TODO: Connect these to the backend API and refresh the data after changes
     const handleSave = (e) => {
         e.preventDefault();
+        setIsPopupOpen(false);
     }
 
     const handleEdit = (rowData) => {
@@ -75,29 +76,20 @@ const SalesOrdersPage = () => {
                 ))}
             </ul>
             <button>Add Item</button>
-            <button>Remove Item</button>
+            <button className='danger'>Remove Item</button>
         </div>
     );
 
     return (
         <div>
             <h1>Sales Orders</h1>
-            <DetailTable
-                columns={columns}
-                data={salesOrders}
-                onEdit={handleEdit}
-                onDelete={handleDelete}
-                renderDetails={renderSaleItems}
-            />
             <button onClick={handleAdd}>Add Sale Order</button>
-
             <PopupForm 
                 isOpen={isPopupOpen} 
                 onClose={() => setIsPopupOpen(false)} 
                 title={currentRow ? "Edit Sale" : "Create Sale"}
             >
                 <form onSubmit={handleSave}>
-                    
                     <label className="font-bold">Date:</label>
                     <input type="date" name="saleDate" defaultValue={currentRow?.saleDate}/>
                     <Dropdown
@@ -114,10 +106,16 @@ const SalesOrdersPage = () => {
                         labelKey="warehouseName"  
                         selectedValue={currentRow?.warehouseID}
                     />
-
                     <button type="submit">Save</button>
                 </form>
             </PopupForm>
+            <DetailTable
+                columns={columns}
+                data={salesOrders}
+                onEdit={handleEdit}
+                onDelete={handleDelete}
+                renderDetails={renderSaleItems}
+            />
         </div>
     );
 };
