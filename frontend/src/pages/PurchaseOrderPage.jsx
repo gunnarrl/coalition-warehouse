@@ -3,26 +3,36 @@ import DetailTable from '../components/DetailTable';
 import PopupForm from '../components/PopupForm';
 import Dropdown from '../components/Dropdown'; 
 
-// Mock Data
 const mockPurchasesOrders = [
-    { saleID: 1, saleDate: '2024-06-01', vendorID: 1, warehouseID: 101 },
-    { saleID: 2, saleDate: '2024-06-02', vendorID: 2, warehouseID: 102 },
+    { saleID: 1, saleDate: '2023-11-19', vendorID: 4, warehouseID: 1 },
+    { saleID: 2, saleDate: '2024-09-12', vendorID: 1, warehouseID: 3 },
+    { saleID: 3, saleDate: '2024-05-12', vendorID: 3, warehouseID: 4 },
+    { saleID: 4, saleDate: '2023-07-31', vendorID: 2, warehouseID: 1 },
 ];
 
 const mockVendors = [
-    { vendorID: 1, vendorName: 'Mass Supply Co' },
-    { vendorID: 2, vendorName: 'The Little Boutique Shop' },
+    { vendorID: 1, vendorName: 'Martin GmbH' },
+    { vendorID: 2, vendorName: 'King Group' },
+    { vendorID: 3, vendorName: 'Nelson Group' },
+    { vendorID: 4, vendorName: 'White Ltd' },
+    { vendorID: 5, vendorName: 'Carter Group' },
 ];
 
 const mockWarehouses = [
-    { warehouseID: 101, warehouseName: 'North Distribution' },
-    { warehouseID: 102, warehouseName: 'South Fulfillment' },
+    { warehouseID: 1, warehouseName: 'North Distribution' },
+    { warehouseID: 2, warehouseName: 'South Fulfillment' },
+    { warehouseID: 3, warehouseName: 'East Coast Hub' },
+    { warehouseID: 4, warehouseName: 'West Coast Depot' },
 ];
 
+// For simplicity, using the same items for all purchase orders. These would be linked to the saleID in the DB.
 const purchaseOrderItems = [
-    { name: 'Widget', qty: 50, price: 10.00 },
-    { name: 'Gadget', qty: 20, price: 15.00 },
+    { name: 'Ergonomic Mouse 654', qty: 98, price: 9.90 },
+    { name: 'Steel Desk 473', qty: 71, price: 84.09 },
+    { name: 'Plastic Drawer 653', qty: 92, price: 60.62 },
+    { name: 'Premium Keyboard 591', qty: 45, price: 96.75 },
 ];
+
 const PurchaseOrdersPage = () => {
 
     const columns = [
