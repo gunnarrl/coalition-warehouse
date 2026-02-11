@@ -29,8 +29,6 @@ const Dropdown = ({ label, name, options, valueKey, labelKey, selectedValue, onC
                 isClearable
                 isSearchable
             />
-            <input type="hidden" name={name} value={selectedValue || ''} /> 
-            {/* Hidden input to include the selected value in form submissions */}
         </div>
     );
 };
