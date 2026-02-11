@@ -38,10 +38,9 @@ function DetailTable({ columns, data, onEdit, onDelete, renderDetails }) {
                                 <button onClick={(e) => {e.stopPropagation(); onEdit(row)}}><MdEdit /></button>
                             </td>
                             <td>
-                                <button onClick={(e) => {e.stopPropagation(); onDelete(row.id)}}><MdDelete /></button>
+                                <button className="danger" onClick={(e) => {e.stopPropagation(); onDelete(row.id)}}><MdDelete /></button>
                             </td>
                         </tr>
-
                         {/* EXPANDED ROW */}
                         {openRowId === i && (
                             <tr>

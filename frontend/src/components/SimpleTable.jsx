@@ -20,7 +20,7 @@ function SimpleTable({ columns, data, onEdit, onDelete }) {
                             <td key={col}>{row[col.key]}</td>
                         ))}
                         <td><button onClick={() => onEdit(row)}><MdEdit /></button></td>
-                        <td><button onClick={() => onDelete(row)}><MdDelete /></button></td>
+                        <td><button className="danger" onClick={() => onDelete(row)}><MdDelete /></button></td>
                     </tr>
                 ))}
             </tbody>

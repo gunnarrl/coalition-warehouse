@@ -42,6 +42,8 @@ function VendorPage() {
                     ))}
                 </ul>
                 <button>Add Product to Catalog +</button>
+                <button className="danger">Remove Product from Catalog -</button>
+                
             </div>
         );
     };
@@ -72,13 +74,6 @@ function VendorPage() {
         <div className="page-container">
             <h1>Vendors</h1>
             <button onClick={handleAdd}>Add New Vendor</button>
-            <DetailTable 
-                columns={columns} 
-                data={vendors} 
-                onEdit={handleEdit} 
-                onDelete={handleDelete}
-                renderDetails={renderInventory}
-            />
             <PopupForm 
                 isOpen={isPopupOpen} 
                 onClose={() => setIsPopupOpen(false)}
@@ -94,6 +89,13 @@ function VendorPage() {
                     <button type="submit">Save</button>
                 </form>
             </PopupForm>
+            <DetailTable 
+                columns={columns} 
+                data={vendors} 
+                onEdit={handleEdit} 
+                onDelete={handleDelete}
+                renderDetails={renderCatalog}
+            />
         </div>
     );
 }
