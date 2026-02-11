@@ -1,42 +1,202 @@
+/*
+Gemini 3 Pro was used to help with the CSS after setting up the page layouts.
+Prompt:  [Attached the components and PurchaseOrderPage.jsx file] 
+"I have a react frontend for a warehouse management system with the attached components and pages following the PurchaseOrderPage.jsx structure.
+Please write a simple CSS file to make the website look simple and clean. Keep it minimal and do not overcomplicate things.
+Explain your design choices and any non-obvious CSS rules you add."
+
+I then editted the file to add a red danger button, fix the navbar to to top of the page, and minor style changes to look better.
+*/
+:root {
+  --primary: #2563eb;     
+  --primary-hover: #1d4ed8;
+  --bg-color: #f8fafc;     
+  --surface: #ffffff;     
+  --text-main: #1e293b;    
+  --text-muted: #64748b;  
+  --border: #e2e8f0;       
+  --danger: #ef4444;      
+}
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-main);
+  margin: 0;
+  padding: 0;
+  line-height: 1.6;
+}
+
+/* Center the app content */
 #root {
-  max-width: 1280px;
+  max-width: 1200px;
   margin: 0 auto;
   padding: 2rem;
-  text-align: center;
+  margin-top: 80px;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+h1, h2, h3, h4 {
+  margin-top: 0;
+  font-weight: 600;
+  color: var(--text-main);
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+/* Navigation Bar */
+nav {
+  position: fixed;          
+  top: 0;
+  left: 0;
+  width: 100%;            
+  z-index: 1000;            
+  box-sizing: border-box;  
+  
+  background-color: var(--surface);
+  padding: 1rem 2rem;       
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  border-radius: 0;         
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+nav a {
+  text-decoration: none;
+  color: var(--text-muted);
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  transition: all 0.2s ease;
 }
 
-.card {
-  padding: 2em;
+nav a:hover {
+  background-color: #f1f5f9;
+  color: var(--primary);
 }
 
-.read-the-docs {
-  color: #888;
+nav a.active {
+  background-color: var(--primary);
+  color: white;
+}
+
+/* Tables (SimpleTable & DetailTable) */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--surface);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  margin-bottom: 2rem;
+}
+
+thead {
+  background-color: #f1f5f9;
+  border-bottom: 2px solid var(--border);
+}
+
+th {
+  text-align: left;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  padding: 1rem;
+}
+
+td {
+  padding: 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+tr:last-child td {
+  border-bottom: none;
+}
+
+tr:hover td {
+  background-color: #f8fafc;
+}
+
+/* Buttons */
+button {
+  cursor: pointer;
+  background-color: var(--primary);
+  color: white;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  font-weight: 500;
+  font-size: 0.95rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: opacity 0.2s;
+}
+
+button:hover {
+  opacity: 0.9;
+}
+
+button.danger {
+  background-color: var(--danger);
+}
+
+button + button {
+  margin-left: 0.5rem;
+}
+
+/* Forms (Inputs & Labels) */
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  min-width: 300px;
+}
+
+label {
+  font-weight: 500;
+  font-size: 0.9rem;
+  color: var(--text-main);
+  margin-bottom: -0.5rem;
+}
+
+input, select {
+  padding: 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 1rem;
+  transition: border-color 0.2s;
+}
+
+input:focus, select:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+/* Utility & Specific Component Styles */
+.catalog-box, .inventory-box {
+  background-color: #f8fafc;
+  padding: 1.5rem;
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+  margin: 1rem 0;
+}
+
+.catalog-box h4, .inventory-box h4 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  color: var(--text-muted);
+}
+
+.catalog-box ul, .inventory-box ul {
+  list-style: none;
+  padding: 0;
+  margin-bottom: 1rem;
+}
+
+.catalog-box li, .inventory-box li {
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
 }
