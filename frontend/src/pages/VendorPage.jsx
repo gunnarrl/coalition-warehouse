@@ -4,13 +4,17 @@ import PopupForm from '../components/PopupForm';
 
 // Sample data before we connect to the backend API
 const initialVendors = [
-    { vendorID: 1, vendorName: 'Mass Supply Company', vendorAddr: '541 Monroe Ave', vendorEmail: 'supply@gmail.com' },
-    { vendorID: 2, vendorName: 'The Little Boutique Shop', vendorAddr: '456 8th Street', vendorEmail: 'boutique@gmail.com' },
+    { vendorID: 1, vendorName: 'Martin GmbH', vendorAddr: '602 Road 93, Dublin, Ireland', vendorEmail: 'sales@martingmbh.com' },
+    { vendorID: 2, vendorName: 'King Group', vendorAddr: '429 Road 86, Munich, Germany', vendorEmail: 'sales@kinggroup.com' },
+    { vendorID: 3, vendorName: 'Nelson Group', vendorAddr: '344 Street 70, Singapore, Singapore', vendorEmail: 'sales@nelsongroup.com' },
+    { vendorID: 4, vendorName: 'White Ltd', vendorAddr: '542 Strasse 81, Seoul, South Korea', vendorEmail: 'sales@whiteltd.com' },
+    { vendorID: 5, vendorName: 'Carter Group', vendorAddr: '829 Ave 19, Amsterdam, Netherlands', vendorEmail: 'sales@cartergroup.com' },
 ];
 
+// Same for all vendors for now, will be linked to vendorID in the DB.
 const catalog = [
-    { name: 'Widget', qty: 50 },
-    { name: 'Gadget', qty: 20 },
+    { name: 'Premium Keyboard 591', qty: 0, price: 96.75 }, 
+    { name: 'Ergonomic Mouse 654', qty: 0, price: 9.90 }, 
 ];
 
 function VendorPage() {
