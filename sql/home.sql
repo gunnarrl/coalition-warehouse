@@ -132,9 +132,11 @@ CREATE TABLE `PurchaseOrderItems` (
  `purchasePrice`		decimal(10,2) NOT NULL,
 PRIMARY KEY (`purchaseOrderItemID`),
 CONSTRAINT FK_Purchase_Order_Items_purchaseOrderID FOREIGN KEY (`purchaseOrderID`)
-REFERENCES `PurchaseOrders` (`purchaseOrderID`),
+REFERENCES `PurchaseOrders` (`purchaseOrderID`)
+ON DELETE CASCADE,
 CONSTRAINT FK_Purchase_Order_Items_productID FOREIGN KEY (`productID`)
 REFERENCES `Products` (`productID`)
+ON DELETE SET NULL
 );
 
 -- Create table [SalesOrderItems]: Records specific items and quantities included in a sales order

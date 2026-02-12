@@ -35,7 +35,7 @@ JOIN Products ON VendorProducts.productID = Products.productID
 WHERE Vendors.vendorID = :vendorID_selected;
 
 -- Add a specific product and amount to an existing order --
-INSERT INTO PurchaseOrderItems (puchaseOrderID, productID, quantity, purchasePrice) VALUES
+INSERT INTO PurchaseOrderItems (purchaseOrderID, productID, quantity, purchasePrice) VALUES
 (:purchaseOrderID_Input, :productID_Input, :quantity_Input, :purchasePrice_Input);
 
 -- Delete a specific product/amount from an existing order --

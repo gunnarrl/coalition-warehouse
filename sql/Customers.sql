@@ -9,11 +9,11 @@ SELECT * FROM Customers;
 -- Read Customer Specific Details --
 SELECT customerID, customerLN, customerFN, customerAddr, customerEmail
 FROM Customers
-WHERE customerID = :customerID_selected_from_browse_customer_page
+WHERE customerID = :customerID_selected_from_browse_customer_page;
 
 -- Update --
 UPDATE Customers SET customerLN = :customerLN_Input, customerFN = :customerFN_Input, customerAddr = :customerAddr_Input, customerEmail = :customerEmail_Input
-WHERE customerID = :customerID_from_update_form
+WHERE customerID = :customerID_from_update_form;
 
 -- Delete --
 DELETE FROM Customers WHERE customerID = :customerID_selected_from_browse_customer_page;

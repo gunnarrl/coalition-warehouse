@@ -12,7 +12,7 @@ FROM Products
 WHERE productID = :productID_selected_from_browse_product_page;
 
 -- Update --
-UPDATE Products SET productName = :productName_Input, listCost = :listCost_Input WHERE id= :productID_from_update_form;
+UPDATE Products SET productName = :productName_Input, listCost = :listCost_Input WHERE productID= :productID_from_update_form;
 
 -- Delete --
 DELETE FROM Products WHERE productID = :productID_selected_from_browse_product_page;
