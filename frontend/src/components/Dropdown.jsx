@@ -1,3 +1,5 @@
+// Gemini 3 Pro was used to help bugfix why the Placeholder wasn't updating after selecting an option.
+// Gave it the component and explained the issue, helped me realize I needed a state variable and should use a hidden form.
 import React, { useState, useEffect } from 'react';
 import Select from 'react-select'; // react-select is a good dropdown library that I found
 
@@ -17,6 +19,7 @@ const Dropdown = ({ label, name, options, valueKey, labelKey, selectedValue, onC
         label: opt[labelKey]
     }));
 
+    // update state and call onChange when user selects an option
     const handleChange = (option) => {
         const newVal = option ? option.value : null;
         setCurrentValue(newVal);
@@ -25,7 +28,6 @@ const Dropdown = ({ label, name, options, valueKey, labelKey, selectedValue, onC
         };
     }
 
-    // Find the currently selected option object based on the selectedValue (which is the ID)
     const currentOption = selectOptions.find(opt => opt.value == currentValue);
 
     return (
