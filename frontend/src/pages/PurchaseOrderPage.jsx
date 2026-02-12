@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import DetailTable from '../components/DetailTable';
+import SimpleTable from '../components/SimpleTable';
 import PopupForm from '../components/PopupForm';
 import Dropdown from '../components/Dropdown'; 
 
 const mockPurchasesOrders = [
-    { saleID: 1, saleDate: '2023-11-19', vendorID: 4, warehouseID: 1 },
-    { saleID: 2, saleDate: '2024-09-12', vendorID: 1, warehouseID: 3 },
-    { saleID: 3, saleDate: '2024-05-12', vendorID: 3, warehouseID: 4 },
-    { saleID: 4, saleDate: '2023-07-31', vendorID: 2, warehouseID: 1 },
+    { purchaseOrderID: 1, purchaseDate: '2023-11-19', vendorID: 4, vendorName: 'White Ltd', warehouseID: 1, warehouseName: 'North Distribution' },
+    { purchaseOrderID: 2, purchaseDate: '2024-09-12', vendorID: 1, vendorName: 'Martin GmbH', warehouseID: 3, warehouseName: 'East Coast Hub' },
+    { purchaseOrderID: 3, purchaseDate: '2024-05-12', vendorID: 3, vendorName: 'Nelson Group', warehouseID: 4, warehouseName: 'West Coast Depot' },
+    { purchaseOrderID: 4, purchaseDate: '2023-07-31', vendorID: 2, vendorName: 'King Group', warehouseID: 1, warehouseName: 'North Distribution' }
 ];
 
 const mockVendors = [
@@ -35,16 +36,22 @@ const purchaseOrderItems = [
 
 const PurchaseOrdersPage = () => {
 
-    const columns = [
-        { label: 'ID', key: 'saleID' },
-        { label: 'Date', key: 'saleDate' },
-        { label: 'Vendor', key: 'vendorID' }, // We'll show the name in the table, but save the ID
-        { label: 'Warehouse', key: 'warehouseID' } // Same for warehouse
-    ];
+   const columns = [
+    { label: 'ID', key: 'purchaseOrderID' },
+    { label: 'Date', key: 'purchaseDate' },
+    { label: 'Vendor', key: 'vendorName' },    
+    { label: 'Warehouse', key: 'warehouseName' } 
+];
 
     const [salesOrders, setPurchasesOrders] = useState(mockPurchasesOrders);
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [currentRow, setCurrentRow] = useState(null);
+
+    const [orderItems, setOrderItems] = useState(purchaseOrderItems);
+    const [isItemsPopupOpen, setIsItemsPopupOpen] = useState(false);
+    const [currentItem, setCurrentItem] = useState(null);
+    const [targetSaleID, setTargetSaleID] = useState(null);
+
 
 
     // Handlers for Add/Edit/Delete
@@ -68,19 +75,53 @@ const PurchaseOrdersPage = () => {
         window.alert(`Delete Purchase Order ID: ${rowData.saleID}`);
     }
 
+    // Inner table handlers
+
+    const handleAddItem = (saleID) => {
+        setTargetSaleID(saleID);
+        setCurrentItem(null);
+        setIsItemsPopupOpen(true);
+    };
+
+    const handleEditItem = (saleID, itemRow) => {
+        setTargetSaleID(saleID);
+        setCurrentItem(itemRow);
+        setIsItemsPopupOpen(true);
+    };
+
+    const handleDeleteItem = (saleID, itemRow) => {
+        window.alert(`Delete Item ${itemRow.name} from Sale ID: ${saleID}`);
+    };
+
+    const handleSaveItem = (e) => {
+        e.preventDefault();
+        setIsItemsPopupOpen(false);
+    }
+
     // TODO: Add logic to add/remove items to the order
-    const renderPurchaseItems = (row) => (
-        <div>
-            <h4>Items Purchased in #{row.saleID}</h4>
-            <ul>
-                {purchaseOrderItems.map((item, i) => (
-                    <li key={i}>{item.qty}x {item.name} @ ${item.price} </li>
-                ))}
-            </ul>
-            <button>Add Item</button>
-            <button className='danger'>Remove Item</button>
-        </div>
-    );
+    const renderPurchaseItems = (row) => {
+        const specificItems = orderItems; // In a real app, filter items by row.saleID
+
+        const itemColumns = [
+            { label: 'Product Name', key: 'name' },
+            { label: 'Quantity', key: 'qty' },
+            { label: 'Unit Price', key: 'price' }
+        ];
+
+        return (
+            <div>
+                <h4>Items for Purchase Order {row.saleID}</h4>
+                <button onClick={() => handleAddItem(row.saleID)}>+ Add Item</button>
+                <SimpleTable 
+                    columns={itemColumns} 
+                    data={specificItems} 
+                    onEdit={(itemRow) => handleEditItem(row.saleID, itemRow)}
+                    onDelete={(itemRow) => handleDeleteItem(row.saleID, itemRow)}
+                />
+            </div>
+        );
+    };
+
     return (
         <div>
             <h1>Purchases Orders</h1>
@@ -88,13 +129,14 @@ const PurchaseOrdersPage = () => {
             <PopupForm 
                 isOpen={isPopupOpen} 
                 onClose={() => setIsPopupOpen(false)} 
-                title={currentRow ? "Edit Purchase" : "Create Purchase"}
+                title={currentItem ? "Edit Purchase" : "Create Purchase"}
             >
-                <form onSubmit={handleSave}>
+                <form key={currentItem?.name || 'new-order'} onSubmit={handleSave}>
                     <label>Date:</label>
                     <input type="date" name="saleDate" defaultValue={currentRow?.saleDate}/>
                     <Dropdown
                         label="Vendor"
+                        name="vendorID"
                         options={mockVendors}
                         valueKey="vendorID"    // What to save to DB (ID)
                         labelKey="vendorName"  // What to show user (Name)
@@ -102,13 +144,28 @@ const PurchaseOrdersPage = () => {
                     />
                     <Dropdown
                         label="Warehouse"
+                        name="warehouseID"
                         options={mockWarehouses}
                         valueKey="warehouseID"   
                         labelKey="warehouseName" 
                         selectedValue={currentRow?.warehouseID}
                     />
-
                     <button type="submit">Save</button>
+                </form>
+            </PopupForm>
+            <PopupForm
+                isOpen={isItemsPopupOpen}
+                onClose={() => setIsItemsPopupOpen(false)}
+                title={currentItem ? "Edit Order Item" : "Add Item to Order"}
+            >
+                <form key={currentItem?.name || 'new-item'} onSubmit={handleSaveItem}>
+                    <label>Product Name:</label>
+                    <input name="name" defaultValue={currentItem?.name || ''} />
+                    <label>Quantity:</label>
+                    <input name="qty" type="number" defaultValue={currentItem?.qty || 0} />
+                    <label>Unit Price:</label>
+                    <input name="price" type="number" step="0.01" defaultValue={currentItem?.price || 0} />
+                    <button type="submit">Save Item</button>
                 </form>
             </PopupForm>
             <DetailTable
