@@ -25,7 +25,7 @@ function WarehousePage() {
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [currentWarehouse, setCurrentWarehouse] = useState(null);
     // inner table states
-    const [inventoryItems, setInventoryItems] = useState(initialInventory);
+    const [inventoryItems, setInventoryItems] = useState(inventory);
     const [isItemPopupOpen, setIsItemPopupOpen] = useState(false);
     const [currentItem, setCurrentItem] = useState(null);
     const [targetWarehouseID, setTargetWarehouseID] = useState(null);

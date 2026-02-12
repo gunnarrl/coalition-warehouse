@@ -114,7 +114,7 @@ function VendorPage() {
                 onClose={() => setIsPopupOpen(false)}
                 title={currentVendor ? "Edit Vendor" : "Add Vendor"}
             >
-                <form key={currentVendor?.vendorID || 'new-vendor'} onSubmit={handleSaveVendor}>
+                <form key={currentVendor?.vendorID || 'new-vendor'} onSubmit={handleSave}>
                     <label>Name:</label>
                     <input name="vendorName" defaultValue={currentVendor?.vendorName || ''} />
                     <label>Address:</label>
