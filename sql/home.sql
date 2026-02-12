@@ -116,9 +116,11 @@ CREATE TABLE `VendorProducts` (
  `priceFromVendor`	decimal(10,2) NOT NULL,
 PRIMARY KEY (`vendorProductID`),
 CONSTRAINT FK_Vendor_Products_vendorID FOREIGN KEY (`vendorID`)
-REFERENCES `Vendors` (`vendorID`),
+REFERENCES `Vendors` (`vendorID`)
+ON DELETE CASCADE,
 CONSTRAINT FK_Vendor_Products_productID FOREIGN KEY (`productID`)
 REFERENCES `Products` (`productID`)
+ON DELETE CASCADE
 );
 
 -- Create table [PurchaseOrderItems]: Records specific items and quantities included in a restocking order from vendors
