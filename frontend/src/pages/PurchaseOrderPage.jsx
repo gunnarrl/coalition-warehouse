@@ -98,9 +98,8 @@ const PurchaseOrdersPage = () => {
         setIsItemsPopupOpen(false);
     }
 
-    // TODO: Add logic to add/remove items to the order
     const renderPurchaseItems = (row) => {
-        const specificItems = orderItems; // In a real app, filter items by row.saleID
+        const specificItems = orderItems; 
 
         const itemColumns = [
             { label: 'Product Name', key: 'name' },
@@ -129,9 +128,9 @@ const PurchaseOrdersPage = () => {
             <PopupForm 
                 isOpen={isPopupOpen} 
                 onClose={() => setIsPopupOpen(false)} 
-                title={currentItem ? "Edit Purchase" : "Create Purchase"}
+                title={currentRow ? "Edit Purchase" : "Create Purchase"}
             >
-                <form key={currentItem?.name || 'new-order'} onSubmit={handleSave}>
+                <form key={currentRow?.purchaseOrderID || 'new-order'} onSubmit={handleSave}>
                     <label>Date:</label>
                     <input type="date" name="saleDate" defaultValue={currentRow?.saleDate}/>
                     <Dropdown
