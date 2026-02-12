@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import DetailTable from '../components/DetailTable';
+import SimpleTable from '../components/SimpleTable';
 import PopupForm from '../components/PopupForm';
 
 // Sample data before we connect to the backend API
@@ -12,10 +13,10 @@ const initialWarehouses = [
 
 // Not yet connected to the DB, so using the same inventory for all warehouses for now. Will be linked to warehouseID in the DB later.
 const inventory = [
-    { name: 'Steel Desk 473', qty: 189 },     
-    { name: 'Premium Keyboard 591', qty: 414 }, 
-    { name: 'Plastic Drawer 653', qty: 334 },  
-    { name: 'Ergonomic Mouse 654', qty: 445 }, 
+    { name: 'Steel Desk 473', qty: 189, price: 84.09 },     
+    { name: 'Premium Keyboard 591', qty: 414, price: 96.75 }, 
+    { name: 'Plastic Drawer 653', qty: 334, price: 60.62 },  
+    { name: 'Ergonomic Mouse 654', qty: 445, price: 9.90 }, 
 ];
 
 function WarehousePage() {
@@ -23,6 +24,11 @@ function WarehousePage() {
     const [warehouses, setWarehouses] = useState(initialWarehouses);
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [currentWarehouse, setCurrentWarehouse] = useState(null);
+    // inner table states
+    const [inventoryItems, setInventoryItems] = useState(initialInventory);
+    const [isItemPopupOpen, setIsItemPopupOpen] = useState(false);
+    const [currentItem, setCurrentItem] = useState(null);
+    const [targetWarehouseID, setTargetWarehouseID] = useState(null);
 
     // Columns for the DetailTable, maps the DB fields to user-friendly names
     const columns = [
@@ -31,22 +37,29 @@ function WarehousePage() {
         { label: 'Address', key: 'warehouseAddr' }
     ];
 
-    // Passed to DetailTable to render the inventory details for each warehouse
     const renderInventory = (row) => {
+    // Passed to DetailTable to render the inventory details for each warehouse
+        const specificItems = inventoryItems; 
+
+        const itemColumns = [
+            { label: 'Item Name', key: 'name' },
+            { label: 'Qty', key: 'qty' },
+            { label: 'Price', key: 'price' }
+        ];
+
         return (
-            <div className="inventory-box">
-                <h4>Inventory at {row.warehouseName}</h4>
-                <ul>
-                    {inventory.map((item, i) => (
-                        <li key={i}>{item.qty}x {item.name}</li>
-                    ))}
-                </ul>
-                <button>Add Stock +</button>
-                <button className="danger">Remove Stock -</button>
+            <div>
+                <h4>Order Items</h4>
+                <button onClick={() => handleAddItem(row.warehouseID)}>+ Add Inventory</button>
+                <SimpleTable 
+                    data={specificItems}
+                    columns={itemColumns}
+                    onEdit={(itemRow) => handleEditItem(row.warehouseID, itemRow)}
+                    onDelete={(itemRow) => handleDeleteItem(row.warehouseID, itemRow)}
+                />
             </div>
         );
     };
-
     // Handlers for Add/Edit/Delete, 
     // TODO: Connect these to the backend API and refresh the data after changes
     const handleAdd = () => {
@@ -69,8 +82,31 @@ function WarehousePage() {
         setIsPopupOpen(false);
     };
 
+    // Handlers for Inner table actions
+    const handleAddItem = (warehouseID) => {
+        setTargetWarehouseID(warehouseID);
+        setCurrentItem(null);
+        setIsItemPopupOpen(true);
+    };
+
+    const handleEditItem = (warehouseID, itemRow) => {
+        setTargetWarehouseID(warehouseID);
+        setCurrentItem(itemRow);
+        setIsItemPopupOpen(true);
+    };
+
+    const handleDeleteItem = (warehouseID, itemRow) => {
+        alert(`Delete Item ${itemRow.name} from Warehouse ID: ${warehouseID}`);
+    };
+
+    const handleSaveItem = (e) => {
+        e.preventDefault();
+        alert("Saved Item!");
+        setIsItemPopupOpen(false);
+    }
+
     return (
-        <div className="page-container">
+        <div>
             <h1>Warehouses</h1>
             <button onClick={handleAdd}>Add New Warehouse</button>
             <PopupForm 
@@ -78,11 +114,27 @@ function WarehousePage() {
                 onClose={() => setIsPopupOpen(false)}
                 title={currentWarehouse ? "Edit Warehouse" : "Add Warehouse"}
             >
-                <form onSubmit={handleSave}>
+                { /* Use key so that form data gets refreshed when you change it. Gemini 3 pro helped bugfix */}
+                <form key={currentWarehouse?.warehouseID || 'new-wh'} onSubmit={handleSave}>
                     <label>Name:</label>
-                    <input defaultValue={currentWarehouse?.warehouseName || ''} />
+                    <input name='name' defaultValue={currentWarehouse?.warehouseName || ''} />
                     <label>Address:</label>
-                    <input defaultValue={currentWarehouse?.warehouseAddr || ''} />
+                    <input name='address' defaultValue={currentWarehouse?.warehouseAddr || ''} />
+                    <button type="submit">Save</button>
+                </form>
+            </PopupForm>
+            <PopupForm
+                isOpen={isItemPopupOpen}
+                onClose={() => setIsItemPopupOpen(false)}
+                title={currentItem ? "Edit Inventory Item" : "Add Inventory Item"}
+            >
+                <form key={currentItem?.name || 'new-item'} onSubmit={handleSaveItem}>
+                    <label>Item Name:</label>
+                    <input name='name' defaultValue={currentItem?.name || ''} />
+                    <label>Quantity:</label>
+                    <input name='qty' type="number" defaultValue={currentItem?.qty || 0} />
+                    <label>Price:</label>
+                    <input name='price' type="number" step="0.01" defaultValue={currentItem?.price || 0} />
                     <button type="submit">Save</button>
                 </form>
             </PopupForm>
