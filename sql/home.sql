@@ -25,7 +25,7 @@ DROP TABLE IF EXISTS `SalesOrderItems`;
 CREATE TABLE `Products` (
  `productID` 		int(11) AUTO_INCREMENT UNIQUE NOT NULL,
  `productName`  	varchar(255) NOT NULL,
- `listCost` 		decimal(10,2) NOT NULL,
+ `listPrice` 		decimal(10,2) NOT NULL,
  PRIMARY KEY (`productID`)
  );
  
