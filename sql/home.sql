@@ -62,7 +62,7 @@ PRIMARY KEY (`customerID`)
 -- Create table [SalesOrders]: Records individual sales by Coalition Warehouse LLC to customers
 CREATE TABLE `SalesOrders` (
  `saleOrderID`		int(11) AUTO_INCREMENT UNIQUE NOT NULL,
- `customerID` 		int(11) NULL,
+ `customerID` 		int(11) NOT NULL,
  `warehouseID`		int(11) NULL,
  `saleDate`			DATE DEFAULT CURRENT_TIMESTAMP NOT NULL,
 PRIMARY KEY (`saleOrderID`),
@@ -113,7 +113,7 @@ CREATE TABLE `VendorProducts` (
  `vendorProductID`	int(11) AUTO_INCREMENT UNIQUE NOT NULL,
  `vendorID`			int(11) NOT NULL,
  `productID`		int(11) NOT NULL,
- `priceFromVendor`	decimal(10,2) NOT NULL,
+ `costFromVendor`	decimal(10,2) NOT NULL,
 PRIMARY KEY (`vendorProductID`),
 CONSTRAINT FK_Vendor_Products_vendorID FOREIGN KEY (`vendorID`)
 REFERENCES `Vendors` (`vendorID`)
@@ -127,7 +127,7 @@ ON DELETE CASCADE
 CREATE TABLE `PurchaseOrderItems` (
  `purchaseOrderItemID`	int(11) AUTO_INCREMENT UNIQUE NOT NULL,
  `purchaseOrderID`		int(11) NOT NULL, 
- `productID`			int(11) NOT NULL,
+ `productID`			int(11) NULL,
  `quantity`				int(11) NOT NULL,
  `purchasePrice`		decimal(10,2) NOT NULL,
 PRIMARY KEY (`purchaseOrderItemID`),
