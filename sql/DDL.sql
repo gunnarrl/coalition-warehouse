@@ -207,7 +207,7 @@ INSERT INTO Inventory (inventoryID, productID, warehouseID, quantity) VALUES
 (4, 4, 4, 445);
 
 -- VENDOR PRODUCTS --
-INSERT INTO VendorProducts (vendorProductID, vendorID, productID, priceFromVendor) VALUES 
+INSERT INTO VendorProducts (vendorProductID, vendorID, productID, costFromVendor) VALUES 
 (1, 4, 1, 96.75),
 (2, 3, 2, 60.62),
 (3, 2, 3, 84.09),
