@@ -77,7 +77,7 @@ DELETE FROM Warehouses WHERE warehouseID = :warehouseID_selected_from_browse_war
 INSERT INTO PurchaseOrders (vendorID, warehouseID, purchaseDate) VALUES
 (:vendorID_Input, :warehouseID_Input, :purchaseDate_Input);
 INSERT INTO PurchaseOrderItems (purchaseOrderID, productID, quantity, purchasePrice)
-SELECT :purchaseOrderID_Input, :productID_Input, :quantity_Input, (VendorProducts.priceFromVendor * :quantity_Input)
+SELECT :purchaseOrderID_Input, :productID_Input, :quantity_Input, (VendorProducts.costFromVendor * :quantity_Input)
 FROM VendorProducts 
 WHERE VendorProducts.productID = :productID_Input;
 UPDATE Inventory SET quantity = quantity + :quantity_Input
@@ -98,6 +98,10 @@ LEFT JOIN PurchaseOrderItems ON PurchaseOrders.purchaseOrderID = PurchaseOrderIt
 LEFT JOIN Products ON PurchaseOrderItems.productID = Products.productID
 WHERE PurchaseOrders.purchaseOrderID= :purchaseOrderID_selected_from_browse_purchaseOrder_page;
 
+-- Update Purchase Order --
+UPDATE PurchaseOrders SET vendorID = :vendorID_Input, warehouseID = :warehouseID_Input, purchaseDate = :purchaseDate_Input
+WHERE purchaseOrderID = :purchaseOrderID_from_update_form;
+
 -- Delete Purchase Order --
 DELETE FROM PurchaseOrders WHERE purchaseOrderID= :purchaseOrderID_selected_from_browse_purchaseOrder_page;
 
@@ -105,12 +109,16 @@ DELETE FROM PurchaseOrders WHERE purchaseOrderID= :purchaseOrderID_selected_from
 INSERT INTO PurchaseOrderItems (purchaseOrderID, productID, quantity, purchasePrice) VALUES
 (:purchaseOrderID_Input, :productID_Input, :quantity_Input, :purchasePrice_Input);
 
+-- Update a specific item in a purchase order --
+UPDATE PurchaseOrderItems SET productID = :productID_Input, quantity = :quantity_Input, purchasePrice = :purchasePrice_Input
+WHERE purchaseOrderItemID = :purchaseOrderItemID_from_update_form;
+
 -- Delete a specific product/amount from an existing order --
 DELETE FROM PurchaseOrderItems WHERE purchaseOrderID = :purchaseOrderID_selected AND productID = :productID_selected;
 
 -- Add Item to Purchase Order --
 INSERT INTO PurchaseOrderItems (purchaseOrderID, productID, quantity, purchasePrice)
-SELECT :purchaseOrderID_Input, :productID_Input, :quantity_Input, (VendorProducts.priceFromVendor * :quantity_Input)
+SELECT :purchaseOrderID_Input, :productID_Input, :quantity_Input, (VendorProducts.costFromVendor * :quantity_Input)
 FROM VendorProducts 
 WHERE VendorProducts.productID = :productID_Input;
 
@@ -145,6 +153,10 @@ LEFT JOIN SalesOrderItems ON SalesOrders.saleOrderID = SalesOrderItems.saleOrder
 LEFT JOIN Products ON SalesOrderItems.productID = Products.productID
 WHERE SalesOrders.saleOrderID = :saleOrderID_selected_from_browse_salesorders_page;
 
+-- Update Sales Order --
+UPDATE SalesOrders SET customerID = :customerID_Input, warehouseID = :warehouseID_Input, saleDate = :saleDate_Input
+WHERE saleOrderID = :saleOrderID_from_update_form;
+
 -- Delete Sales Order--
 DELETE FROM SalesOrders WHERE saleOrderID = :saleOrderID_selected_from_browse_salesorders_page;
 
@@ -154,9 +166,16 @@ SELECT :saleOrderID_Input, :productID_Input, :quantity_Input, (Products.listCost
 FROM Products
 WHERE Products.productID = :productID_Input;
 
+-- Update a specific item in a sale order --
+UPDATE SalesOrderItems SET productID = :productID_Input, quantity = :quantity_Input, salePrice = :salePrice_Input
+WHERE saleOrderItemID = :saleOrderItemID_from_update_form;
+
+-- Delete a specific item from a sale order --
+DELETE FROM SalesOrderItems WHERE saleOrderItemID = :saleOrderItemID_selected;
+
 -- Vendor Catalog --
 -- Read all products sold by specific vendor --
-SELECT Vendors.vendorName, Products.productID, Products.productName, VendorProducts.priceFromVendor
+SELECT Vendors.vendorName, Products.productID, Products.productName, VendorProducts.costFromVendor
 FROM VendorProducts
 JOIN Vendors ON VendorProducts.vendorID = Vendors.vendorID
 JOIN Products on VendorProducts.productID = Products.productID 
@@ -165,6 +184,10 @@ WHERE Vendors.vendorID= :vendorID_selected_from_browse_vendor_page;
 -- Create Product to Vendor Catalog --
 INSERT INTO VendorProducts (vendorID, productID, costFromVendor) VALUES
 (:vendorID_Input, :productID_Input, :costFromVendor_Input);
+
+-- Update Product in Vendor Catalog --
+UPDATE VendorProducts SET costFromVendor = :costFromVendor_Input
+WHERE vendorProductID = :vendorProductID_from_update_form;
 
 -- Remove Product from Vendor Catalog --
 DELETE FROM VendorProducts WHERE VendorProducts.vendorID= :vendorID_Selected AND VendorProducts.productID = :productID_Selected;
@@ -181,11 +204,15 @@ WHERE Inventory.warehouseID = :warehouseID_selected_from_browse_warehouse_invent
 INSERT INTO Inventory (productID, warehouseID, quantity) VALUES
 (:productID_Input, :warehouseID_Input, :quantity_Input);
 
+-- Update quantity of a product in a warehouse --
+UPDATE Inventory SET quantity = :quantity_Input
+WHERE warehouseID = :warehouseID_selected AND productID = :productID_selected;
+
 -- Remove product and quantity from warehouse --
 DELETE FROM Inventory WHERE warehouseID = :warehouseID_selected AND productID = :productID_selected;
 
 -- Warehouse Stock Valuation --
-SELECT Warehouses.warehouseName, SUM(Inventory.quantity), SUM(Inventory.quantity * Products.listcost)
+SELECT Warehouses.warehouseName, SUM(Inventory.quantity), SUM(Inventory.quantity * Products.listCost)
 FROM Inventory
 JOIN Products ON Inventory.productID = Products.productID
 JOIN Warehouses ON Inventory.warehouseID = Warehouses.warehouseID
