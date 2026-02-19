@@ -44,7 +44,7 @@ const ProductPage = () => {
         <div>
             <h1>Products Page</h1>
             <button onClick={handleAdd}>
-                <HiUserAdd /> Add Customer
+                <HiUserAdd /> Add Product
             </button>
             <PopupForm 
                 isOpen={isPopupOpen} 
