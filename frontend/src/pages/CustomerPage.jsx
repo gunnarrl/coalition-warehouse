@@ -42,42 +42,42 @@ const CustomerPage = () => {
 
     return (
         <div>
-            <h1>Customer Page</h1>
+            <h1>Manage Customers</h1>
             <button onClick={handleAdd}>
                 <HiUserAdd /> Add Customer
             </button>
-            <PopupForm 
-                isOpen={isPopupOpen} 
-                onClose={() => setIsPopupOpen(false)} 
+            <PopupForm
+                isOpen={isPopupOpen}
+                onClose={() => setIsPopupOpen(false)}
                 title={currentRow ? 'Edit Customer' : 'Add Customer'}
             >
                 <form>
                     <label>Name:</label>
-                    <input 
+                    <input
                         type="text"
                         defaultValue={currentRow?.customerName || ''}
-                        name="customerName" 
+                        name="customerName"
                     />
                     <label>Email:</label>
-                    <input 
-                        type="email" 
+                    <input
+                        type="email"
                         defaultValue={currentRow?.customerEmail || ''}
-                        name="customerEmail" 
+                        name="customerEmail"
                     />
                     <label>Address:</label>
-                    <input 
+                    <input
                         type="text"
                         defaultValue={currentRow?.customerAddr || ''}
-                        name="customerAddr" 
+                        name="customerAddr"
                     />
                     <button type="submit">Submit</button>
                 </form>
             </PopupForm>
-            <SimpleTable 
+            <SimpleTable
                 data={customers}
                 columns={columns}
                 onEdit={handleEdit}
-                onDelete={handleDelete} 
+                onDelete={handleDelete}
             />
         </div>
     );

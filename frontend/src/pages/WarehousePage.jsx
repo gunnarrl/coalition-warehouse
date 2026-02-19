@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import DetailTable from '../components/DetailTable';
 import SimpleTable from '../components/SimpleTable';
 import PopupForm from '../components/PopupForm';
+import Dropdown from '../components/Dropdown';
 
 // Sample data before we connect to the backend API
 const initialWarehouses = [
@@ -13,10 +14,17 @@ const initialWarehouses = [
 
 // Not yet connected to the DB, so using the same inventory for all warehouses for now. Will be linked to warehouseID in the DB later.
 const inventory = [
-    { name: 'Steel Desk 473', qty: 189, price: 84.09 },     
-    { name: 'Premium Keyboard 591', qty: 414, price: 96.75 }, 
-    { name: 'Plastic Drawer 653', qty: 334, price: 60.62 },  
-    { name: 'Ergonomic Mouse 654', qty: 445, price: 9.90 }, 
+    { name: 'Steel Desk 473', qty: 189, price: 84.09 },
+    { name: 'Premium Keyboard 591', qty: 414, price: 96.75 },
+    { name: 'Plastic Drawer 653', qty: 334, price: 60.62 },
+    { name: 'Ergonomic Mouse 654', qty: 445, price: 9.90 },
+];
+
+const mockProducts = [
+    { productID: 1, productName: 'Premium Keyboard 591' },
+    { productID: 2, productName: 'Plastic Drawer 653' },
+    { productID: 3, productName: 'Steel Desk 473' },
+    { productID: 4, productName: 'Ergonomic Mouse 654' },
 ];
 
 function WarehousePage() {
@@ -38,8 +46,8 @@ function WarehousePage() {
     ];
 
     const renderInventory = (row) => {
-    // Passed to DetailTable to render the inventory details for each warehouse
-        const specificItems = inventoryItems; 
+        // Passed to DetailTable to render the inventory details for each warehouse
+        const specificItems = inventoryItems;
 
         const itemColumns = [
             { label: 'Item Name', key: 'name' },
@@ -51,7 +59,7 @@ function WarehousePage() {
             <div>
                 <h4>Warehouse Inventory</h4>
                 <button onClick={() => handleAddItem(row.warehouseID)}>+ Add Inventory</button>
-                <SimpleTable 
+                <SimpleTable
                     data={specificItems}
                     columns={itemColumns}
                     onEdit={(itemRow) => handleEditItem(row.warehouseID, itemRow)}
@@ -107,10 +115,10 @@ function WarehousePage() {
 
     return (
         <div>
-            <h1>Warehouses</h1>
+            <h1>Manage Warehouses</h1>
             <button onClick={handleAdd}>Add New Warehouse</button>
-            <PopupForm 
-                isOpen={isPopupOpen} 
+            <PopupForm
+                isOpen={isPopupOpen}
                 onClose={() => setIsPopupOpen(false)}
                 title={currentWarehouse ? "Edit Warehouse" : "Add Warehouse"}
             >
@@ -129,8 +137,14 @@ function WarehousePage() {
                 title={currentItem ? "Edit Inventory Item" : "Add Inventory Item"}
             >
                 <form key={currentItem?.name || 'new-item'} onSubmit={handleSaveItem}>
-                    <label>Item Name:</label>
-                    <input name='name' defaultValue={currentItem?.name || ''} />
+                    <Dropdown
+                        label="Product"
+                        name="productID"
+                        options={mockProducts}
+                        valueKey="productID"
+                        labelKey="productName"
+                        selectedValue={currentItem?.productID}
+                    />
                     <label>Quantity:</label>
                     <input name='qty' type="number" defaultValue={currentItem?.qty || 0} />
                     <label>Price:</label>
@@ -138,10 +152,10 @@ function WarehousePage() {
                     <button type="submit">Save</button>
                 </form>
             </PopupForm>
-            <DetailTable 
-                columns={columns} 
-                data={warehouses} 
-                onEdit={handleEdit} 
+            <DetailTable
+                columns={columns}
+                data={warehouses}
+                onEdit={handleEdit}
                 onDelete={handleDelete}
                 renderDetails={renderInventory}
             />

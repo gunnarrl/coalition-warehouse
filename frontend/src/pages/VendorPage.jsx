@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import DetailTable from '../components/DetailTable';
-import SimpleTable from '../components/SimpleTable'; 
+import SimpleTable from '../components/SimpleTable';
 import PopupForm from '../components/PopupForm';
+import Dropdown from '../components/Dropdown';
 
 // Basically the same as WarehousePage but for Vendors. 
 // Most of the code is reused with variable name changes and different table references.
@@ -14,13 +15,20 @@ const initialVendors = [
 ];
 
 const initialCatalog = [
-    { name: 'Premium Keyboard 591', qty: 50, price: 96.75 }, 
-    { name: 'Ergonomic Mouse 654', qty: 200, price: 9.90 }, 
+    { name: 'Premium Keyboard 591', qty: 50, price: 96.75 },
+    { name: 'Ergonomic Mouse 654', qty: 200, price: 9.90 },
+];
+
+const mockProducts = [
+    { productID: 1, productName: 'Premium Keyboard 591' },
+    { productID: 2, productName: 'Plastic Drawer 653' },
+    { productID: 3, productName: 'Steel Desk 473' },
+    { productID: 4, productName: 'Ergonomic Mouse 654' },
 ];
 
 function VendorPage() {
     const [vendors, setVendors] = useState(initialVendors);
-    
+
     // --- Vendor Popup State ---
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [currentVendor, setCurrentVendor] = useState(null);
@@ -43,7 +51,7 @@ function VendorPage() {
 
         const catalogColumns = [
             { label: 'Product Name', key: 'name' },
-            { label: 'Min Quantity', key: 'qty' }, 
+            { label: 'Min Quantity', key: 'qty' },
             { label: 'Unit Price', key: 'price' }
         ];
 
@@ -51,7 +59,7 @@ function VendorPage() {
             <div>
                 <h4>Catalog for {row.vendorName}</h4>
                 <button onClick={() => handleAddCatalogItem(row.vendorID)}>+ Add Product to Catalog</button>
-                <SimpleTable 
+                <SimpleTable
                     data={specificCatalog}
                     columns={catalogColumns}
                     onEdit={(itemRow) => handleEditCatalogItem(row.vendorID, itemRow)}
@@ -107,10 +115,10 @@ function VendorPage() {
 
     return (
         <div>
-            <h1>Vendors</h1>
+            <h1>Manage Vendors</h1>
             <button onClick={handleAdd}>Add New Vendor</button>
-            <PopupForm 
-                isOpen={isPopupOpen} 
+            <PopupForm
+                isOpen={isPopupOpen}
                 onClose={() => setIsPopupOpen(false)}
                 title={currentVendor ? "Edit Vendor" : "Add Vendor"}
             >
@@ -124,14 +132,20 @@ function VendorPage() {
                     <button type="submit">Save Vendor</button>
                 </form>
             </PopupForm>
-            <PopupForm 
-                isOpen={isCatalogPopupOpen} 
+            <PopupForm
+                isOpen={isCatalogPopupOpen}
                 onClose={() => setIsCatalogPopupOpen(false)}
                 title={currentCatalogItem ? "Edit Catalog Product" : "Add Product to Catalog"}
             >
                 <form key={currentCatalogItem?.name || 'new-cat-item'} onSubmit={handleSaveCatalogItem}>
-                    <label>Product Name:</label>
-                    <input name="name" defaultValue={currentCatalogItem?.name || ''} />
+                    <Dropdown
+                        label="Product"
+                        name="productID"
+                        options={mockProducts}
+                        valueKey="productID"
+                        labelKey="productName"
+                        selectedValue={currentCatalogItem?.productID}
+                    />
                     <label>Min Qty:</label>
                     <input name="qty" type="number" defaultValue={currentCatalogItem?.qty || 0} />
                     <label>Unit Price:</label>
@@ -139,10 +153,10 @@ function VendorPage() {
                     <button type="submit">Save Product</button>
                 </form>
             </PopupForm>
-            <DetailTable 
-                columns={columns} 
-                data={vendors} 
-                onEdit={handleEdit} 
+            <DetailTable
+                columns={columns}
+                data={vendors}
+                onEdit={handleEdit}
                 onDelete={handleDelete}
                 renderDetails={renderCatalog}
             />

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import DetailTable from '../components/DetailTable';
 import SimpleTable from '../components/SimpleTable';
 import PopupForm from '../components/PopupForm';
-import Dropdown from '../components/Dropdown'; 
+import Dropdown from '../components/Dropdown';
 
 const mockPurchasesOrders = [
     { purchaseOrderID: 1, purchaseDate: '2023-11-19', vendorID: 4, vendorName: 'White Ltd', warehouseID: 1, warehouseName: 'North Distribution' },
@@ -26,6 +26,13 @@ const mockWarehouses = [
     { warehouseID: 4, warehouseName: 'West Coast Depot' },
 ];
 
+const mockProducts = [
+    { productID: 1, productName: 'Premium Keyboard 591' },
+    { productID: 2, productName: 'Plastic Drawer 653' },
+    { productID: 3, productName: 'Steel Desk 473' },
+    { productID: 4, productName: 'Ergonomic Mouse 654' },
+];
+
 // For simplicity, using the same items for all purchase orders. These would be linked to the saleID in the DB.
 const purchaseOrderItems = [
     { name: 'Ergonomic Mouse 654', qty: 98, price: 9.90 },
@@ -36,12 +43,12 @@ const purchaseOrderItems = [
 
 const PurchaseOrdersPage = () => {
 
-   const columns = [
-    { label: 'ID', key: 'purchaseOrderID' },
-    { label: 'Date', key: 'purchaseDate' },
-    { label: 'Vendor', key: 'vendorName' },    
-    { label: 'Warehouse', key: 'warehouseName' } 
-];
+    const columns = [
+        { label: 'ID', key: 'purchaseOrderID' },
+        { label: 'Date', key: 'purchaseDate' },
+        { label: 'Vendor', key: 'vendorName' },
+        { label: 'Warehouse', key: 'warehouseName' }
+    ];
 
     const [salesOrders, setPurchasesOrders] = useState(mockPurchasesOrders);
     const [isPopupOpen, setIsPopupOpen] = useState(false);
@@ -99,7 +106,7 @@ const PurchaseOrdersPage = () => {
     }
 
     const renderPurchaseItems = (row) => {
-        const specificItems = orderItems; 
+        const specificItems = orderItems;
 
         const itemColumns = [
             { label: 'Product Name', key: 'name' },
@@ -111,9 +118,9 @@ const PurchaseOrdersPage = () => {
             <div>
                 <h4>Items for Purchase Order {row.saleID}</h4>
                 <button onClick={() => handleAddItem(row.saleID)}>+ Add Item</button>
-                <SimpleTable 
-                    columns={itemColumns} 
-                    data={specificItems} 
+                <SimpleTable
+                    columns={itemColumns}
+                    data={specificItems}
                     onEdit={(itemRow) => handleEditItem(row.saleID, itemRow)}
                     onDelete={(itemRow) => handleDeleteItem(row.saleID, itemRow)}
                 />
@@ -123,16 +130,16 @@ const PurchaseOrdersPage = () => {
 
     return (
         <div>
-            <h1>Purchases Orders</h1>
+            <h1>Manage Purchase Orders</h1>
             <button onClick={handleAdd}>Add Purchase Order</button>
-            <PopupForm 
-                isOpen={isPopupOpen} 
-                onClose={() => setIsPopupOpen(false)} 
+            <PopupForm
+                isOpen={isPopupOpen}
+                onClose={() => setIsPopupOpen(false)}
                 title={currentRow ? "Edit Purchase" : "Create Purchase"}
             >
                 <form key={currentRow?.purchaseOrderID || 'new-order'} onSubmit={handleSave}>
                     <label>Date:</label>
-                    <input type="date" name="saleDate" defaultValue={currentRow?.saleDate}/>
+                    <input type="date" name="saleDate" defaultValue={currentRow?.saleDate} />
                     <Dropdown
                         label="Vendor"
                         name="vendorID"
@@ -145,8 +152,8 @@ const PurchaseOrdersPage = () => {
                         label="Warehouse"
                         name="warehouseID"
                         options={mockWarehouses}
-                        valueKey="warehouseID"   
-                        labelKey="warehouseName" 
+                        valueKey="warehouseID"
+                        labelKey="warehouseName"
                         selectedValue={currentRow?.warehouseID}
                     />
                     <button type="submit">Save</button>
@@ -158,8 +165,14 @@ const PurchaseOrdersPage = () => {
                 title={currentItem ? "Edit Order Item" : "Add Item to Order"}
             >
                 <form key={currentItem?.name || 'new-item'} onSubmit={handleSaveItem}>
-                    <label>Product Name:</label>
-                    <input name="name" defaultValue={currentItem?.name || ''} />
+                    <Dropdown
+                        label="Product"
+                        name="productID"
+                        options={mockProducts}
+                        valueKey="productID"
+                        labelKey="productName"
+                        selectedValue={currentRow?.productID}
+                    />
                     <label>Quantity:</label>
                     <input name="qty" type="number" defaultValue={currentItem?.qty || 0} />
                     <label>Unit Price:</label>

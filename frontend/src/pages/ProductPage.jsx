@@ -35,43 +35,43 @@ const ProductPage = () => {
     };
 
     const handleDelete = (row) => {
-        if (window.confirm(`Are you sure you want to delete ${row.customerName}?`)) {
-            console.log("Deleting ID:", row.customerId);
+        if (window.confirm(`Are you sure you want to delete ${row.productName}?`)) {
+            console.log("Deleting ID:", row.productId);
         }
     };
 
     return (
         <div>
-            <h1>Products Page</h1>
+            <h1>Manage Products</h1>
             <button onClick={handleAdd}>
                 <HiUserAdd /> Add Product
             </button>
-            <PopupForm 
-                isOpen={isPopupOpen} 
-                onClose={() => setIsPopupOpen(false)} 
+            <PopupForm
+                isOpen={isPopupOpen}
+                onClose={() => setIsPopupOpen(false)}
                 title={currentRow ? 'Edit Product' : 'Add Product'}
             >
                 <form>
                     <label>Name:</label>
-                    <input 
+                    <input
                         type="text"
                         defaultValue={currentRow?.productName || ''}
-                        name="ProductName" 
+                        name="ProductName"
                     />
                     <label>Price:</label>
-                    <input 
-                        type="text" 
+                    <input
+                        type="text"
                         defaultValue={currentRow?.listCost || ''}
-                        name="listCost" 
+                        name="listCost"
                     />
                     <button type="submit">Submit</button>
                 </form>
             </PopupForm>
-            <SimpleTable 
+            <SimpleTable
                 data={products}
                 columns={columns}
                 onEdit={handleEdit}
-                onDelete={handleDelete} 
+                onDelete={handleDelete}
             />
         </div>
     );
