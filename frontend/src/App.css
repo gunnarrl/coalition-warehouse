@@ -32,7 +32,7 @@ body {
   max-width: 1200px;
   margin: 0 auto;
   padding: 2rem;
-  margin-top: 80px;
+  margin-top: 90px;
 }
 
 h1, h2, h3, h4 {
@@ -50,32 +50,36 @@ nav {
   z-index: 1000;            
   box-sizing: border-box;  
   
-  background-color: var(--surface);
+  background-color: var(--primary);
   padding: 1rem 2rem;       
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  box-shadow: 0 3px 10px rgba(0,0,0,0.25);
+  border-bottom: 3px solid var(--primary-hover);
   display: flex;
-  gap: 1rem;
+  align-items: center;
+  gap: 0.5rem;
   flex-wrap: wrap;
   border-radius: 0;         
 }
 
 nav a {
   text-decoration: none;
-  color: var(--text-muted);
+  color: rgba(255,255,255,0.82);
   font-weight: 500;
+  font-size: 0.95rem;
   padding: 0.5rem 1rem;
   border-radius: 6px;
   transition: all 0.2s ease;
 }
 
 nav a:hover {
-  background-color: #f1f5f9;
-  color: var(--primary);
+  background-color: rgba(255,255,255,0.15);
+  color: white;
 }
 
 nav a.active {
-  background-color: var(--primary);
+  background-color: rgba(255,255,255,0.2);
   color: white;
+  font-weight: 700;
 }
 
 /* Tables (SimpleTable & DetailTable) */
