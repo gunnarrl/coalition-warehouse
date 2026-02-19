@@ -49,7 +49,7 @@ function WarehousePage() {
 
         return (
             <div>
-                <h4>Order Items</h4>
+                <h4>Warehouse Inventory</h4>
                 <button onClick={() => handleAddItem(row.warehouseID)}>+ Add Inventory</button>
                 <SimpleTable 
                     data={specificItems}
