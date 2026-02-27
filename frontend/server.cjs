@@ -1,14 +1,26 @@
 // Modified from app.js in activity 2
 const express = require('express');
-const path = require('path');
+const db = require('./db-connector');
 const app = express();
 const PORT = 30905;
 
-// Use static files for now
-app.use(express.static(path.join(__dirname, 'dist')));
+app.get('/customers', async function (req, res) {
+    try {
 
-app.get(/.*/, (req, res) => {
-    res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+        // Execute each query synchronously (await).
+        const query = "SELECT * FROM Customers;"
+        // We want each query to finish before the next one starts.
+        const [rows] = await db.query(query); // Store the results
+
+        // Send the results to the browser
+        res.send(JSON.stringify(rows));
+
+    } catch (error) {
+        console.error("Error executing query:", error);
+
+        // Send a generic error message to the browser
+        res.status(500).send("An error occurred while executing the database query.");
+    }
 });
 
 app.listen(PORT, () => {
