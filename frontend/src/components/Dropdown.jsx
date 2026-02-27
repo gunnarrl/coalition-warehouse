@@ -3,6 +3,7 @@
 // Prompt: Gave it the component and explained the issue of the placeholder values not updating, 
 // helped me realize I needed a state variable and should use a hidden form.
 // AI Source URL: https://marketplace.visualstudio.com/items?itemName=Google.geminicodeassist
+
 import React, { useState, useEffect } from 'react';
 import Select from 'react-select'; // react-select is a good dropdown library that I found
 
