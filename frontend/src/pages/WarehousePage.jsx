@@ -1,3 +1,10 @@
+// Citation for use of AI Tools: VS Code's Gemini Code Assist to set up CUD for inner tables
+// Date: 02/11/2026
+// Prompt: [Attached the WarehousePage.jsx]
+// "I have a this page which currently renders a list of warehouses in a DetailTable component, when you click on a warehouse it expands to show the inventory in that warehouse.
+// Please help me set up the state and handlers for the Add/Edit/Delete buttons for the inventory items, similar to how the warehouses CUD operations are handled."
+// AI Source URL: https://marketplace.visualstudio.com/items?itemName=Google.geminicodeassist
+
 import React, { useState } from 'react';
 import DetailTable from '../components/DetailTable';
 import SimpleTable from '../components/SimpleTable';

@@ -1,5 +1,8 @@
-// Gemini 3 Pro was used to help bugfix why the Placeholder wasn't updating after selecting an option.
-// Gave it the component and explained the issue, helped me realize I needed a state variable and should use a hidden form.
+// Citation for use of AI Tools: VS Code's Gemini Code Assist to help fix a bug in the Dropdown.jsx component.
+// Date: 02/11/2026
+// Prompt: Gave it the component and explained the issue of the placeholder values not updating, 
+// helped me realize I needed a state variable and should use a hidden form.
+// AI Source URL: https://marketplace.visualstudio.com/items?itemName=Google.geminicodeassist
 import React, { useState, useEffect } from 'react';
 import Select from 'react-select'; // react-select is a good dropdown library that I found
 

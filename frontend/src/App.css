@@ -1,11 +1,13 @@
 /*
-Gemini 3 Pro was used to help with the CSS after setting up the page layouts.
+Citation for use of AI Tools: VS Code's Gemini Code Assist
+Date: 02/11/2026
+Prompt: Gemini 3 Pro was used to help with the CSS after setting up the page layouts.
 Prompt:  [Attached the components and PurchaseOrderPage.jsx file] 
 "I have a react frontend for a warehouse management system with the attached components and pages following the PurchaseOrderPage.jsx structure.
 Please write a simple CSS file to make the website look simple and clean. Keep it minimal and do not overcomplicate things.
 Explain your design choices and any non-obvious CSS rules you add."
-
 I then editted the file to add a red danger button, fix the navbar to to top of the page, and minor style changes to look better.
+AI Source URL: https://marketplace.visualstudio.com/items?itemName=Google.geminicodeassist
 */
 :root {
   --primary: #2563eb;     
