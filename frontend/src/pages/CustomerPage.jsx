@@ -14,11 +14,11 @@ const CustomerPage = () => {
                 const res = await fetch('/customers');
                 const data = await res.json();
 
-                const formattedData = data.map(({ customerID, fname, lname, email, address }) => ({
+                const formattedData = data.map(({ customerID, customerFN, customerLN, customerEmail, customerAddr }) => ({
                     customerId: customerID,
-                    customerName: `${fname} ${lname}`,
-                    customerEmail: email,
-                    customerAddr: address
+                    customerName: `${customerFN} ${customerLN}`,
+                    customerEmail: customerEmail,
+                    customerAddr: customerAddr
                 }));
 
                 setCustomers(formattedData);
