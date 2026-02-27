@@ -1,19 +1,33 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import SimpleTable from '../components/SimpleTable';
 import { HiUserAdd } from "react-icons/hi";
 import PopupForm from '../components/PopupForm';
 
-const customers = [
-    // customerName will be the combination of fname and lname in the DB. For processing, we can split it back into fname/lname when sending to the API
-    { customerId: 1, customerName: 'Anna Hernandez', customerEmail: 'anna.hernandez1@example.com', customerAddr: '213 Park Rd, Los Angeles, CA' },
-    { customerId: 2, customerName: 'Brenda White', customerEmail: 'brenda.white2@example.com', customerAddr: '493 Elm St, Houston, TX' },
-    { customerId: 3, customerName: 'Amanda Campbell', customerEmail: 'amanda.campbell3@example.com', customerAddr: '229 Pine St, Philadelphia, PA' },
-    { customerId: 4, customerName: 'Betty Martin', customerEmail: 'betty.martin4@example.com', customerAddr: '389 Lakeview Dr, San Jose, CA' },
-];
-
 const CustomerPage = () => {
-    const [isPopupOpen, setIsPopupOpen] = React.useState(false);
-    const [currentRow, setCurrentRow] = React.useState(null);
+    const [customers, setCustomers] = useState([]);
+    const [isPopupOpen, setIsPopupOpen] = useState(false);
+    const [currentRow, setCurrentRow] = useState(null);
+
+    useEffect(() => { // citation: https://maxrozen.com/fetching-data-react-with-useeffect
+        const fetchCustomers = async () => {
+            try {
+                const res = await fetch('/customers');
+                const data = await res.json();
+
+                const formattedData = data.map(({ customerID, fname, lname, email, address }) => ({
+                    customerId: customerID,
+                    customerName: `${fname} ${lname}`,
+                    customerEmail: email,
+                    customerAddr: address
+                }));
+
+                setCustomers(formattedData);
+            } catch (error) {
+                console.error('Error fetching customers:', error);
+            }
+        };
+        fetchCustomers();
+    }, []);
 
     // Columns for the SimpleTable, maps the DB fields to user-friendly names
     const columns = [
