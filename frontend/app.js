@@ -85,6 +85,21 @@ JOIN Warehouses ON Inventory.warehouseID = Warehouses.warehouseID;`;
     }
 });
 
+app.get("/catalog", async function (req, res) {
+    try {
+        const query = `
+SELECT Vendors.vendorID, Vendors.vendorName, Products.productID, Products.productName, VendorProducts.costFromVendor
+FROM VendorProducts
+JOIN Vendors ON VendorProducts.vendorID = Vendors.vendorID
+JOIN Products on VendorProducts.productID = Products.productID;`;
+        const [rows] = await db.query(query);
+        res.send(JSON.stringify(rows));
+    } catch (error) {
+        console.error("Error executing query:", error);
+        res.status(500).send("An error occurred while executing the database query.");
+    }
+});
+
 // Catch-all route to serve the React app
 app.get('/{*path}', function (req, res) {
     res.sendFile(path.join(__dirname, 'dist', 'index.html'));

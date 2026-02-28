@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import DetailTable from '../components/DetailTable';
 import SimpleTable from '../components/SimpleTable';
 import PopupForm from '../components/PopupForm';
@@ -6,38 +6,78 @@ import Dropdown from '../components/Dropdown';
 
 // Basically the same as WarehousePage but for Vendors. 
 // Most of the code is reused with variable name changes and different table references.
-const initialVendors = [
-    { vendorID: 1, vendorName: 'Martin GmbH', vendorAddr: '602 Road 93, Dublin, Ireland', vendorEmail: 'sales@martingmbh.com' },
-    { vendorID: 2, vendorName: 'King Group', vendorAddr: '429 Road 86, Munich, Germany', vendorEmail: 'sales@kinggroup.com' },
-    { vendorID: 3, vendorName: 'Nelson Group', vendorAddr: '344 Street 70, Singapore, Singapore', vendorEmail: 'sales@nelsongroup.com' },
-    { vendorID: 4, vendorName: 'White Ltd', vendorAddr: '542 Strasse 81, Seoul, South Korea', vendorEmail: 'sales@whiteltd.com' },
-    { vendorID: 5, vendorName: 'Carter Group', vendorAddr: '829 Ave 19, Amsterdam, Netherlands', vendorEmail: 'sales@cartergroup.com' },
-];
-
-const initialCatalog = [
-    { name: 'Premium Keyboard 591', qty: 50, price: 96.75 },
-    { name: 'Ergonomic Mouse 654', qty: 200, price: 9.90 },
-];
-
-const mockProducts = [
-    { productID: 1, productName: 'Premium Keyboard 591' },
-    { productID: 2, productName: 'Plastic Drawer 653' },
-    { productID: 3, productName: 'Steel Desk 473' },
-    { productID: 4, productName: 'Ergonomic Mouse 654' },
-];
 
 function VendorPage() {
-    const [vendors, setVendors] = useState(initialVendors);
+    const [vendors, setVendors] = useState([]);
 
-    // --- Vendor Popup State ---
+    // Vendor Popup State
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [currentVendor, setCurrentVendor] = useState(null);
 
-    // --- Catalog Popup State (New) ---
-    const [catalogItems, setCatalogItems] = useState(initialCatalog);
+    // Catalog Popup State
+    const [catalogItems, setCatalogItems] = useState([]);
     const [isCatalogPopupOpen, setIsCatalogPopupOpen] = useState(false);
     const [currentCatalogItem, setCurrentCatalogItem] = useState(null);
     const [targetVendorID, setTargetVendorID] = useState(null);
+
+    // products for dropdown
+    const [products, setProducts] = useState([]);
+
+    useEffect(() => {
+        const fetchVendors = async () => {
+            try {
+                const res = await fetch('/vendors');
+                const data = await res.json();
+                const formattedData = data.map(({ vendorID, vendorName, vendorAddr, vendorEmail }) => ({
+                    vendorID: vendorID,
+                    vendorName: vendorName,
+                    vendorAddr: vendorAddr,
+                    vendorEmail: vendorEmail
+                }));
+                setVendors(formattedData);
+            } catch (error) {
+                console.error('Error fetching vendors:', error);
+            }
+        };
+        fetchVendors();
+    }, []);
+
+    useEffect(() => {
+        const fetchCatalog = async () => {
+            try {
+                const res = await fetch('/catalog');
+                const data = await res.json();
+                const formattedData = data.map(({ vendorID, vendorName, productID, productName, costFromVendor }) => ({
+                    vendorID: vendorID,
+                    vendorName: vendorName,
+                    productID: productID,
+                    productName: productName,
+                    costFromVendor: costFromVendor
+                }));
+                setCatalogItems(formattedData);
+            } catch (error) {
+                console.error('Error fetching catalog:', error);
+            }
+        };
+        fetchCatalog();
+    }, []);
+
+    useEffect(() => {
+        const fetchProducts = async () => {
+            try {
+                const res = await fetch('/products');
+                const data = await res.json();
+                const formattedData = data.map(({ productID, productName }) => ({
+                    productID: productID,
+                    productName: productName
+                }));
+                setProducts(formattedData);
+            } catch (error) {
+                console.error('Error fetching products:', error);
+            }
+        };
+        fetchProducts();
+    }, []);
 
     const columns = [
         { label: 'ID', key: 'vendorID' },
@@ -50,9 +90,8 @@ function VendorPage() {
         const specificCatalog = catalogItems;
 
         const catalogColumns = [
-            { label: 'Product Name', key: 'name' },
-            { label: 'Min Quantity', key: 'qty' },
-            { label: 'Unit Price', key: 'price' }
+            { label: 'Product Name', key: 'productName' },
+            { label: 'Cost From Vendor', key: 'costFromVendor' }
         ];
 
         return (
@@ -60,7 +99,7 @@ function VendorPage() {
                 <h4>Catalog for {row.vendorName}</h4>
                 <button onClick={() => handleAddCatalogItem(row.vendorID)}>+ Add Product to Catalog</button>
                 <SimpleTable
-                    data={specificCatalog}
+                    data={catalogItems.filter(item => item.vendorID === row.vendorID)}
                     columns={catalogColumns}
                     onEdit={(itemRow) => handleEditCatalogItem(row.vendorID, itemRow)}
                     onDelete={(itemRow) => handleDeleteCatalogItem(row.vendorID, itemRow)}
@@ -141,15 +180,13 @@ function VendorPage() {
                     <Dropdown
                         label="Product"
                         name="productID"
-                        options={mockProducts}
+                        options={products}
                         valueKey="productID"
                         labelKey="productName"
                         selectedValue={currentCatalogItem?.productID}
                     />
-                    <label>Min Qty:</label>
-                    <input name="qty" type="number" defaultValue={currentCatalogItem?.qty || 0} />
-                    <label>Unit Price:</label>
-                    <input name="price" type="number" step="0.01" defaultValue={currentCatalogItem?.price || 0} />
+                    <label>Cost From Vendor:</label>
+                    <input name="costFromVendor" type="number" step="0.01" defaultValue={currentCatalogItem?.costFromVendor || 0} />
                     <button type="submit">Save Product</button>
                 </form>
             </PopupForm>
