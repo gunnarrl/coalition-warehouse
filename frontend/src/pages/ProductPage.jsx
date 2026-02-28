@@ -1,24 +1,39 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import SimpleTable from '../components/SimpleTable';
 import { HiUserAdd } from "react-icons/hi";
 import PopupForm from '../components/PopupForm';
 
 // Much of the code is reused from CustomerPage, but adapted for products. 
 // The main differences are the fields we display and edit, and the API endpoints we would call (not implemented yet).
-const products = [
-    { productId: 1, productName: 'Premium Keyboard 591', listCost: 299.89 },
-    { productId: 2, productName: 'Plastic Drawer 653', listCost: 297.88 },
-    { productId: 3, productName: 'Steel Desk 473', listCost: 441.74 },
-    { productId: 4, productName: 'Ergonomic Mouse 654', listCost: 220.62 },
-];
+
+
 
 const ProductPage = () => {
-    const [isPopupOpen, setIsPopupOpen] = React.useState(false);
-    const [currentRow, setCurrentRow] = React.useState(null);
+    const [products, setProducts] = useState([]);
+    const [isPopupOpen, setIsPopupOpen] = useState(false);
+    const [currentRow, setCurrentRow] = useState(null);
+
+    useEffect(() => {
+        const fetchProducts = async () => {
+            try {
+                const res = await fetch('/products');
+                const data = await res.json();
+                const formattedData = data.map(({ productID, productName, listCost }) => ({
+                    productID: productID,
+                    productName: productName,
+                    listCost: listCost
+                }));
+                setProducts(formattedData);
+            } catch (error) {
+                console.error('Error fetching products:', error);
+            }
+        };
+        fetchProducts();
+    }, []);
 
     // Columns for the SimpleTable, maps the DB fields to user-friendly names
     const columns = [
-        { key: 'productId', label: 'ID' },
+        { key: 'productID', label: 'ID' },
         { key: 'productName', label: 'Name' },
         { key: 'listCost', label: 'Price' },
     ];
@@ -36,7 +51,7 @@ const ProductPage = () => {
 
     const handleDelete = (row) => {
         if (window.confirm(`Are you sure you want to delete ${row.productName}?`)) {
-            console.log("Deleting ID:", row.productId);
+            console.log("Deleting ID:", row.productID);
         }
     };
 
