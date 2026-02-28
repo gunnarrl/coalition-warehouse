@@ -104,7 +104,7 @@ app.get("/salesOrders", async function (req, res) {
     try {
         const query = `
 SELECT SalesOrders.saleOrderID, SalesOrders.saleDate,  Warehouses.warehouseID, Warehouses.warehouseName, Customers.customerID, Customers.customerLN, Customers.customerFN, Customers.customerAddr, Customers.customerEmail,
-SUM(SalesOrderItems.quantity * SalesOrderItems.salePrice) AS costOfOrder
+SUM(SalesOrderItems.quantity * SalesOrderItems.salePrice) AS costOfSale
 FROM SalesOrders
 JOIN Customers ON SalesOrders.customerID = Customers.customerID
 JOIN Warehouses ON SalesOrders.warehouseID = Warehouses.warehouseID
@@ -126,6 +126,40 @@ SalesOrderItems.salePrice, Products.productName, SalesOrders.warehouseID
 FROM SalesOrderItems
 JOIN Products ON SalesOrderItems.productID = Products.productID
 JOIN SalesOrders ON SalesOrderItems.saleOrderID = SalesOrders.saleOrderID;`;
+        const [rows] = await db.query(query);
+        res.send(JSON.stringify(rows));
+    } catch (error) {
+        console.error("Error executing query:", error);
+        res.status(500).send("An error occurred while executing the database query.");
+    }
+});
+
+app.get("/purchaseOrders", async function (req, res) {
+    try {
+        const query = `
+SELECT PurchaseOrders.purchaseOrderID, PurchaseOrders.purchaseDate,  Warehouses.warehouseID, Warehouses.warehouseName, Vendors.vendorID, Vendors.vendorName,
+SUM(PurchaseOrderItems.quantity * PurchaseOrderItems.purchasePrice) AS costOfPurchase
+FROM PurchaseOrders
+JOIN Warehouses ON PurchaseOrders.warehouseID = Warehouses.warehouseID
+JOIN Vendors ON PurchaseOrders.vendorID = Vendors.vendorID
+LEFT JOIN PurchaseOrderItems ON PurchaseOrders.purchaseOrderID = PurchaseOrderItems.purchaseOrderID
+GROUP BY PurchaseOrders.purchaseOrderID;`;
+        const [rows] = await db.query(query);
+        res.send(JSON.stringify(rows));
+    } catch (error) {
+        console.error("Error executing query:", error);
+        res.status(500).send("An error occurred while executing the database query.");
+    }
+});
+
+app.get("/purchaseOrderItems", async function (req, res) {
+    try {
+        const query = `
+SELECT PurchaseOrderItems.purchaseOrderID, PurchaseOrderItems.productID, PurchaseOrderItems.quantity, 
+PurchaseOrderItems.purchasePrice, Products.productName, PurchaseOrders.warehouseID
+FROM PurchaseOrderItems
+JOIN Products ON PurchaseOrderItems.productID = Products.productID
+JOIN PurchaseOrders ON PurchaseOrderItems.purchaseOrderID = PurchaseOrders.purchaseOrderID;`;
         const [rows] = await db.query(query);
         res.send(JSON.stringify(rows));
     } catch (error) {

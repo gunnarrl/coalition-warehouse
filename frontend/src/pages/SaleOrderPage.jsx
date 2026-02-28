@@ -33,14 +33,14 @@ const SalesOrdersPage = () => {
             try {
                 const res = await fetch('/salesOrders');
                 const data = await res.json();
-                const formattedData = data.map(({ saleOrderID, saleDate, customerID, customerFN, customerLN, warehouseID, warehouseName, costOfOrder }) => ({
+                const formattedData = data.map(({ saleOrderID, saleDate, customerID, customerFN, customerLN, warehouseID, warehouseName, costOfSale }) => ({
                     saleOrderID: saleOrderID,
                     saleDate: saleDate ? saleDate.substring(0, 10) : '', // format date to YYYY-MM-DD
                     customerID: customerID,
                     customerName: customerFN + ' ' + customerLN,
                     warehouseID: warehouseID,
                     warehouseName: warehouseName,
-                    costOfOrder: costOfOrder ? '$' + Number(costOfOrder).toFixed(2) : '$0.00' // it is possible that costOfOrder is null, default to 0
+                    costOfSale: costOfSale ? '$' + Number(costOfSale).toFixed(2) : '$0.00' // it is possible that costOfSale is null, default to 0
                 }));
                 setSalesOrders(formattedData);
             } catch (error) {
