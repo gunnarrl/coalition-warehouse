@@ -100,6 +100,40 @@ JOIN Products on VendorProducts.productID = Products.productID;`;
     }
 });
 
+app.get("/salesOrders", async function (req, res) {
+    try {
+        const query = `
+SELECT SalesOrders.saleOrderID, SalesOrders.saleDate,  Warehouses.warehouseID, Warehouses.warehouseName, Customers.customerID, Customers.customerLN, Customers.customerFN, Customers.customerAddr, Customers.customerEmail,
+SUM(SalesOrderItems.quantity * SalesOrderItems.salePrice) AS costOfOrder
+FROM SalesOrders
+JOIN Customers ON SalesOrders.customerID = Customers.customerID
+JOIN Warehouses ON SalesOrders.warehouseID = Warehouses.warehouseID
+LEFT JOIN SalesOrderItems ON SalesOrders.saleOrderID = SalesOrderItems.saleOrderID
+GROUP BY SalesOrders.saleOrderID;`;
+        const [rows] = await db.query(query);
+        res.send(JSON.stringify(rows));
+    } catch (error) {
+        console.error("Error executing query:", error);
+        res.status(500).send("An error occurred while executing the database query.");
+    }
+});
+
+app.get("/salesOrderItems", async function (req, res) {
+    try {
+        const query = `
+SELECT SalesOrderItems.saleOrderID, SalesOrderItems.productID, SalesOrderItems.quantity, 
+SalesOrderItems.salePrice, Products.productName, SalesOrders.warehouseID
+FROM SalesOrderItems
+JOIN Products ON SalesOrderItems.productID = Products.productID
+JOIN SalesOrders ON SalesOrderItems.saleOrderID = SalesOrders.saleOrderID;`;
+        const [rows] = await db.query(query);
+        res.send(JSON.stringify(rows));
+    } catch (error) {
+        console.error("Error executing query:", error);
+        res.status(500).send("An error occurred while executing the database query.");
+    }
+});
+
 // Catch-all route to serve the React app
 app.get('/{*path}', function (req, res) {
     res.sendFile(path.join(__dirname, 'dist', 'index.html'));

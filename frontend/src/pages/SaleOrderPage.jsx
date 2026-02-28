@@ -1,41 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import DetailTable from '../components/DetailTable';
-import SimpleTable from '../components/SimpleTable'; // Added SimpleTable
+import SimpleTable from '../components/SimpleTable';
 import PopupForm from '../components/PopupForm';
 import Dropdown from '../components/Dropdown';
-
-const mockSalesOrders = [
-    { saleOrderID: 1, saleDate: '2024-12-05', customerID: 1, customerName: 'Anna Hernandez', warehouseID: 4, warehouseName: 'West Coast Depot' },
-    { saleOrderID: 2, saleDate: '2024-05-20', customerID: 3, customerName: 'Amanda Campbell', warehouseID: 3, warehouseName: 'East Coast Hub' },
-    { saleOrderID: 3, saleDate: '2024-12-12', customerID: 2, customerName: 'Brenda White', warehouseID: 1, warehouseName: 'North Distribution' },
-    { saleOrderID: 4, saleDate: '2024-02-08', customerID: 4, customerName: 'Betty Martin', warehouseID: 2, warehouseName: 'South Fulfillment' }
-];
-
-const mockCustomers = [
-    { customerID: 1, customerName: 'Anna Hernandez' },
-    { customerID: 2, customerName: 'Brenda White' },
-    { customerID: 3, customerName: 'Amanda Campbell' },
-    { customerID: 4, customerName: 'Betty Martin' },
-];
-
-const mockWarehouses = [
-    { warehouseID: 1, warehouseName: 'North Distribution' },
-    { warehouseID: 2, warehouseName: 'South Fulfillment' },
-    { warehouseID: 3, warehouseName: 'East Coast Hub' },
-    { warehouseID: 4, warehouseName: 'West Coast Depot' },
-];
-
-const mockProducts = [
-    { productID: 1, productName: 'Premium Keyboard 591' },
-    { productID: 2, productName: 'Plastic Drawer 653' },
-    { productID: 3, productName: 'Steel Desk 473' },
-    { productID: 4, productName: 'Ergonomic Mouse 654' },
-];
-
-const initialSalesOrderItems = [
-    { name: 'Ergonomic Mouse 654', qty: 4, price: 250.00 },
-    { name: 'Steel Desk 473', qty: 5, price: 450.00 },
-];
 
 const SalesOrdersPage = () => {
 
@@ -43,17 +10,116 @@ const SalesOrdersPage = () => {
         { label: 'ID', key: 'saleOrderID' },
         { label: 'Date', key: 'saleDate' },
         { label: 'Customer', key: 'customerName' },
-        { label: 'Warehouse', key: 'warehouseName' }
+        { label: 'Warehouse', key: 'warehouseName' },
+        { label: 'Total Cost', key: 'costOfOrder' }
     ];
 
-    const [salesOrders, setSalesOrders] = useState(mockSalesOrders);
+    const [salesOrders, setSalesOrders] = useState([]);
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [currentRow, setCurrentRow] = useState(null);
 
-    const [saleItems, setSaleItems] = useState(initialSalesOrderItems);
+    const [saleItems, setSaleItems] = useState([]);
     const [isItemsPopupOpen, setIsItemsPopupOpen] = useState(false);
     const [currentItem, setCurrentItem] = useState(null);
     const [targetSaleID, setTargetSaleID] = useState(null);
+
+    // states to populate dropdown menus
+    const [customers, setCustomers] = useState([]);
+    const [warehouses, setWarehouses] = useState([]);
+    const [products, setProducts] = useState([]);
+
+    useEffect(() => {
+        const fetchSalesOrders = async () => {
+            try {
+                const res = await fetch('/salesOrders');
+                const data = await res.json();
+                const formattedData = data.map(({ saleOrderID, saleDate, customerID, customerFN, customerLN, warehouseID, warehouseName, costOfOrder }) => ({
+                    saleOrderID: saleOrderID,
+                    saleDate: saleDate ? saleDate.substring(0, 10) : '', // format date to YYYY-MM-DD
+                    customerID: customerID,
+                    customerName: customerFN + ' ' + customerLN,
+                    warehouseID: warehouseID,
+                    warehouseName: warehouseName,
+                    costOfOrder: costOfOrder ? '$' + Number(costOfOrder).toFixed(2) : '$0.00' // it is possible that costOfOrder is null, default to 0
+                }));
+                setSalesOrders(formattedData);
+            } catch (error) {
+                console.error('Error fetching sales orders:', error);
+            }
+        };
+        fetchSalesOrders();
+    }, []);
+
+    useEffect(() => {
+        const fetchSaleItems = async () => {
+            try {
+                const res = await fetch('/salesOrderItems');
+                const data = await res.json();
+                const formattedData = data.map(({ saleOrderID, productID, quantity, salePrice, productName }) => ({
+                    saleOrderID: saleOrderID,
+                    productID: productID,
+                    quantity: quantity,
+                    salePrice: '$' + Number(salePrice).toFixed(2),
+                    productName: productName
+                }));
+                setSaleItems(formattedData);
+            } catch (error) {
+                console.error('Error fetching sale items:', error);
+            }
+        };
+        fetchSaleItems();
+    }, []);
+
+    useEffect(() => {
+        const fetchCustomers = async () => {
+            try {
+                const res = await fetch('/customers');
+                const data = await res.json();
+                const formattedData = data.map(({ customerID, customerName }) => ({
+                    customerID: customerID,
+                    customerName: customerName
+                }));
+                setCustomers(formattedData);
+            } catch (error) {
+                console.error('Error fetching customers:', error);
+            }
+        };
+        fetchCustomers();
+    }, []);
+
+    useEffect(() => {
+        const fetchWarehouses = async () => {
+            try {
+                const res = await fetch('/warehouses');
+                const data = await res.json();
+                const formattedData = data.map(({ warehouseID, warehouseName }) => ({
+                    warehouseID: warehouseID,
+                    warehouseName: warehouseName
+                }));
+                setWarehouses(formattedData);
+            } catch (error) {
+                console.error('Error fetching warehouses:', error);
+            }
+        };
+        fetchWarehouses();
+    }, []);
+
+    useEffect(() => {
+        const fetchProducts = async () => {
+            try {
+                const res = await fetch('/products');
+                const data = await res.json();
+                const formattedData = data.map(({ productID, productName }) => ({
+                    productID: productID,
+                    productName: productName
+                }));
+                setProducts(formattedData);
+            } catch (error) {
+                console.error('Error fetching products:', error);
+            }
+        };
+        fetchProducts();
+    }, []);
 
     // Handlers for Add/Edit/Delete
     const handleSave = (e) => {
@@ -98,12 +164,12 @@ const SalesOrdersPage = () => {
     }
 
     const renderSaleItems = (row) => {
-        const specificItems = saleItems;
+        ;
 
         const itemColumns = [
-            { label: 'Product Name', key: 'name' },
-            { label: 'Quantity', key: 'qty' },
-            { label: 'Unit Price', key: 'price' }
+            { label: 'Product Name', key: 'productName' },
+            { label: 'Quantity', key: 'quantity' },
+            { label: 'Sale Price', key: 'salePrice' }
         ];
         return (
             <div>
@@ -111,7 +177,7 @@ const SalesOrdersPage = () => {
                 <button onClick={() => handleAddItem(row.saleOrderID)}>+ Add Item</button>
                 <SimpleTable
                     columns={itemColumns}
-                    data={specificItems}
+                    data={saleItems.filter(item => item.saleOrderID === row.saleOrderID)}
                     onEdit={(itemRow) => handleEditItem(row.saleOrderID, itemRow)}
                     onDelete={(itemRow) => handleDeleteItem(row.saleOrderID, itemRow)}
                 />
@@ -134,7 +200,7 @@ const SalesOrdersPage = () => {
                     <Dropdown
                         label="Customer"
                         name="customerID"
-                        options={mockCustomers}
+                        options={customers}
                         valueKey="customerID"
                         labelKey="customerName"
                         selectedValue={currentRow?.customerID}
@@ -142,7 +208,7 @@ const SalesOrdersPage = () => {
                     <Dropdown
                         label="Warehouse"
                         name="warehouseID"
-                        options={mockWarehouses}
+                        options={warehouses}
                         valueKey="warehouseID"
                         labelKey="warehouseName"
                         selectedValue={currentRow?.warehouseID}
@@ -159,16 +225,16 @@ const SalesOrdersPage = () => {
                     <Dropdown
                         label="Product"
                         name="productID"
-                        options={mockProducts}
+                        options={products}
                         valueKey="productID"
                         labelKey="productName"
                         selectedValue={currentItem?.productID}
                     />
                     <label>Quantity:</label>
-                    <input name="qty" type="number" defaultValue={currentItem?.qty || 0} />
+                    <input name="quantity" type="number" defaultValue={currentItem?.quantity || 0} />
 
-                    <label>Unit Price:</label>
-                    <input name="price" type="number" step="0.01" defaultValue={currentItem?.price || 0} />
+                    <label>Sale Price:</label>
+                    <input name="salePrice" type="number" step="0.01" defaultValue={currentItem?.salePrice || 0} />
 
                     <button type="submit">Save Item</button>
                 </form>
