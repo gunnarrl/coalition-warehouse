@@ -70,6 +70,21 @@ app.get("/vendors", async function (req, res) {
     }
 });
 
+app.get("/inventory", async function (req, res) {
+    try {
+        const query = `
+SELECT Warehouses.warehouseID, Products.productID, Inventory.inventoryID, Products.productName, Inventory.quantity, Products.listCost
+FROM Inventory
+JOIN Products ON Inventory.productID = Products.productID
+JOIN Warehouses ON Inventory.warehouseID = Warehouses.warehouseID;`;
+        const [rows] = await db.query(query);
+        res.send(JSON.stringify(rows));
+    } catch (error) {
+        console.error("Error executing query:", error);
+        res.status(500).send("An error occurred while executing the database query.");
+    }
+});
+
 // Catch-all route to serve the React app
 app.get('/{*path}', function (req, res) {
     res.sendFile(path.join(__dirname, 'dist', 'index.html'));

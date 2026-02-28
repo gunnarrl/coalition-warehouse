@@ -5,27 +5,12 @@
 // Please help me set up the state and handlers for the Add/Edit/Delete buttons for the inventory items, similar to how the warehouses CUD operations are handled."
 // AI Source URL: https://marketplace.visualstudio.com/items?itemName=Google.geminicodeassist
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import DetailTable from '../components/DetailTable';
 import SimpleTable from '../components/SimpleTable';
 import PopupForm from '../components/PopupForm';
 import Dropdown from '../components/Dropdown';
 
-// Sample data before we connect to the backend API
-const initialWarehouses = [
-    { warehouseID: 1, warehouseName: 'North Distribution', warehouseAddr: '123 Frozen Lane, Anchorage, AK' },
-    { warehouseID: 2, warehouseName: 'South Fulfillment', warehouseAddr: '456 Sunny Blvd, Miami, FL' },
-    { warehouseID: 3, warehouseName: 'East Coast Hub', warehouseAddr: '789 Metro Way, New York, NY' },
-    { warehouseID: 4, warehouseName: 'West Coast Depot', warehouseAddr: '101 Tech Drive, San Francisco, CA' },
-];
-
-// Not yet connected to the DB, so using the same inventory for all warehouses for now. Will be linked to warehouseID in the DB later.
-const inventory = [
-    { name: 'Steel Desk 473', qty: 189, price: 84.09 },
-    { name: 'Premium Keyboard 591', qty: 414, price: 96.75 },
-    { name: 'Plastic Drawer 653', qty: 334, price: 60.62 },
-    { name: 'Ergonomic Mouse 654', qty: 445, price: 9.90 },
-];
 
 const mockProducts = [
     { productID: 1, productName: 'Premium Keyboard 591' },
@@ -36,14 +21,75 @@ const mockProducts = [
 
 function WarehousePage() {
 
-    const [warehouses, setWarehouses] = useState(initialWarehouses);
+    const [warehouses, setWarehouses] = useState([]);
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [currentWarehouse, setCurrentWarehouse] = useState(null);
     // inner table states
-    const [inventoryItems, setInventoryItems] = useState(inventory);
+    const [inventoryItems, setInventoryItems] = useState([]);
     const [isItemPopupOpen, setIsItemPopupOpen] = useState(false);
     const [currentItem, setCurrentItem] = useState(null);
     const [targetWarehouseID, setTargetWarehouseID] = useState(null);
+
+    // products state for the dropdown menu
+    const [products, setProducts] = useState([]);
+
+    // get the warehouses from the DB
+    useEffect(() => {
+        const fetchWarehouses = async () => {
+            try {
+                const res = await fetch('/warehouses');
+                const data = await res.json();
+                const formattedData = data.map(({ warehouseID, warehouseName, warehouseAddr }) => ({
+                    warehouseID: warehouseID,
+                    warehouseName: warehouseName,
+                    warehouseAddr: warehouseAddr
+                }));
+                setWarehouses(formattedData);
+            } catch (error) {
+                console.error('Error fetching warehouses:', error);
+            }
+        };
+        fetchWarehouses();
+    }, []);
+
+    // get the inventory from the DB
+    useEffect(() => {
+        const fetchInventory = async () => {
+            try {
+                const res = await fetch('/inventory');
+                const data = await res.json();
+                const formattedData = data.map(({ inventoryID, productName, warehouseID, quantity, listCost }) => ({
+                    inventoryID: inventoryID,
+                    productName: productName,
+                    warehouseID: warehouseID,
+                    quantity: quantity,
+                    price: listCost
+                }));
+                setInventoryItems(formattedData);
+            } catch (error) {
+                console.error('Error fetching inventory:', error);
+            }
+        };
+        fetchInventory();
+    }, []);
+
+    // get the products from the DB
+    useEffect(() => {
+        const fetchProducts = async () => {
+            try {
+                const res = await fetch('/products');
+                const data = await res.json();
+                const formattedData = data.map(({ productID, productName }) => ({
+                    productID: productID,
+                    productName: productName
+                }));
+                setProducts(formattedData);
+            } catch (error) {
+                console.error('Error fetching products:', error);
+            }
+        };
+        fetchProducts();
+    }, []);
 
     // Columns for the DetailTable, maps the DB fields to user-friendly names
     const columns = [
@@ -54,11 +100,9 @@ function WarehousePage() {
 
     const renderInventory = (row) => {
         // Passed to DetailTable to render the inventory details for each warehouse
-        const specificItems = inventoryItems;
-
         const itemColumns = [
-            { label: 'Item Name', key: 'name' },
-            { label: 'Qty', key: 'qty' },
+            { label: 'Item Name', key: 'productName' },
+            { label: 'Quantity', key: 'quantity' },
             { label: 'Price', key: 'price' }
         ];
 
@@ -67,7 +111,7 @@ function WarehousePage() {
                 <h4>Warehouse Inventory</h4>
                 <button onClick={() => handleAddItem(row.warehouseID)}>+ Add Inventory</button>
                 <SimpleTable
-                    data={specificItems}
+                    data={inventoryItems.filter(item => item.warehouseID === row.warehouseID)}
                     columns={itemColumns}
                     onEdit={(itemRow) => handleEditItem(row.warehouseID, itemRow)}
                     onDelete={(itemRow) => handleDeleteItem(row.warehouseID, itemRow)}
@@ -147,15 +191,15 @@ function WarehousePage() {
                     <Dropdown
                         label="Product"
                         name="productID"
-                        options={mockProducts}
+                        options={products}
                         valueKey="productID"
                         labelKey="productName"
                         selectedValue={currentItem?.productID}
                     />
                     <label>Quantity:</label>
-                    <input name='qty' type="number" defaultValue={currentItem?.qty || 0} />
+                    <input name='quantity' type="number" defaultValue={currentItem?.quantity || 0} />
                     <label>Price:</label>
-                    <input name='price' type="number" step="0.01" defaultValue={currentItem?.price || 0} />
+                    <input name='listCost' type="number" step="0.01" defaultValue={currentItem?.price || 0} />
                     <button type="submit">Save</button>
                 </form>
             </PopupForm>
