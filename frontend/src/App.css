@@ -17,7 +17,9 @@ AI Source URL: https://marketplace.visualstudio.com/items?itemName=Google.gemini
   --text-main: #1e293b;    
   --text-muted: #64748b;  
   --border: #e2e8f0;       
-  --danger: #ef4444;      
+  --danger: #ef4444;
+  --caution: #e67e22;
+  
 }
 
 body {
@@ -140,6 +142,10 @@ button {
 
 button:hover {
   opacity: 0.9;
+}
+
+button.caution {
+  background-color: var(--caution);
 }
 
 button.danger {
