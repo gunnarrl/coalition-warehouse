@@ -4,7 +4,7 @@
 */
 -- RESET DATABASE BUTTON --
 DROP PROCEDURE IF EXISTS sp_load_coalitiondb()
-DELEMITER //
+DELIMITER //
 CREATE PROCEDURE sp_load_coalitiondb()
 BEGIN
    -- -----------------------------------------------------------------------------
