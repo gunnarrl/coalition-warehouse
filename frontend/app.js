@@ -23,7 +23,7 @@ const PORT = 30905;
 // Serve the built React app from the dist/ directory
 app.use(express.static(path.join(__dirname, 'dist')));
 
-app.post('/resetdb', aync function(req, res) {
+app.post('/resetdb', async function (req, res) {
     try {
         const reset = "CALL sp_load_coalitiondb();";
         await db.query(reset);
@@ -47,6 +47,16 @@ app.get('/customers', async function (req, res) {
         res.status(500).send("An error occurred while executing the database query.");
     }
 });
+
+app.get('/products/delete-premium-keyboard', async function (req, res) {
+    try {
+        const delete = "CALL DeletePremiumKeyboard();";
+        await db.query(delete);
+        res.status(200).send("Premium Keyboard 591 deleted.");
+    } catch (error) {
+        console.error("Error executing Delete:", error);
+        res.status(500).send("An error occured while executing the delete PL/SQL.");
+        
 
 app.get("/products", async function (req, res) {
     try {
