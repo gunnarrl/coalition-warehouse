@@ -23,7 +23,7 @@ const PORT = 30905;
 // Serve the built React app from the dist/ directory
 app.use(express.static(path.join(__dirname, 'dist')));
 
-app.post('/resetdb', function(req, res) {
+app.post('/resetdb', aync function(req, res) {
     try {
         const reset = "CALL sp_load_coalitiondb();";
         await db.query(reset);
