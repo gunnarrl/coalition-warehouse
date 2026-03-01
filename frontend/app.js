@@ -56,6 +56,8 @@ app.get('/products/delete-premium-keyboard', async function (req, res) {
     } catch (error) {
         console.error("Error executing Delete:", error);
         res.status(500).send("An error occured while executing the delete PL/SQL.");
+    }
+});
         
 
 app.get("/products", async function (req, res) {
