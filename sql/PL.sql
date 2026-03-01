@@ -5,11 +5,11 @@
 
 -- Delete Premium Keyboard from Products
 -- Verify the Reset button works as intended
-DROP PROCEDURE IF EXISTS DeletePremiumKeyboard;
+DROP PROCEDURE IF EXISTS DeleteProduct;
 
 DELIMITER //
-CREATE PROCEDURE DeletePremiumKeyboard()
+CREATE PROCEDURE DeleteProduct(IN p_productID INT)
 BEGIN
-    DELETE FROM Products WHERE productName = 'Premium Keyboard 591';
+    DELETE FROM Products WHERE productID = p_productID;
 END //
 DELIMITER ;

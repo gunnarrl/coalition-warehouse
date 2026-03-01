@@ -13,21 +13,22 @@ const ProductPage = () => {
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [currentRow, setCurrentRow] = useState(null);
 
+    const fetchProducts = async () => {
+        try {
+            const res = await fetch('/products');
+            const data = await res.json();
+            const formattedData = data.map(({ productID, productName, listCost }) => ({
+                productID: productID,
+                productName: productName,
+                listCost: listCost
+            }));
+            setProducts(formattedData);
+        } catch (error) {
+            console.error('Error fetching products:', error);
+        }
+    };
+
     useEffect(() => {
-        const fetchProducts = async () => {
-            try {
-                const res = await fetch('/products');
-                const data = await res.json();
-                const formattedData = data.map(({ productID, productName, listCost }) => ({
-                    productID: productID,
-                    productName: productName,
-                    listCost: listCost
-                }));
-                setProducts(formattedData);
-            } catch (error) {
-                console.error('Error fetching products:', error);
-            }
-        };
         fetchProducts();
     }, []);
 
@@ -49,9 +50,19 @@ const ProductPage = () => {
         setIsPopupOpen(true);
     };
 
-    const handleDelete = (row) => {
-        if (window.confirm(`Are you sure you want to delete ${row.productName}?`)) {
-            console.log("Deleting ID:", row.productID);
+    const handleDelete = async (row) => {
+        try {
+            const response = await fetch(`/products/delete/${row.productID}`, { method: 'GET' });
+            const message = await response.text();
+            if (response.ok) {
+                alert(message);
+                fetchProducts();
+            } else {
+                alert(message);
+            }
+        } catch (error) {
+            console.error('Error deleting product:', error);
+            alert('An error occurred while deleting the product.');
         }
     };
 

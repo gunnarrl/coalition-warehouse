@@ -48,17 +48,18 @@ app.get('/customers', async function (req, res) {
     }
 });
 
-app.get('/products/delete-premium-keyboard', async function (req, res) {
+app.get('/products/delete/:productID', async function (req, res) {
     try {
-        const delete = "CALL DeletePremiumKeyboard();";
-        await db.query(delete);
-        res.status(200).send("Premium Keyboard 591 deleted.");
+        const productID = req.params.productID;
+        const deleteProc = `CALL DeleteProduct(${productID});`;
+        await db.query(deleteProc);
+        res.status(200).send(`Product ${productID} deleted.`);
     } catch (error) {
         console.error("Error executing Delete:", error);
         res.status(500).send("An error occured while executing the delete PL/SQL.");
     }
 });
-        
+
 
 app.get("/products", async function (req, res) {
     try {
