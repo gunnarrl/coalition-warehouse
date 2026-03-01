@@ -3,7 +3,7 @@
    Description: Coalition Warehouse Database Project
 */
 -- RESET DATABASE BUTTON --
-DROP PROCEDURE IF EXISTS sp_load_coalitiondb()
+DROP PROCEDURE IF EXISTS sp_load_coalitiondb;
 DELIMITER //
 CREATE PROCEDURE sp_load_coalitiondb()
 BEGIN
