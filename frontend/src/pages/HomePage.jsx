@@ -2,9 +2,21 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 
 const HomePage = () => {
-    const handleReset = () => {
+    const handleReset = async () => {
         if (window.confirm("Are you sure you want to reset the sample data?")) {
             console.log("Resetting database...");
+            try {
+                const response = await fetch('/resetdb, { method: 'POST' });
+                const message = await response.text();
+                if (response.ok) {
+                    alert(message);
+                } else {
+                    alert("Reset failed: " + message);
+                }
+            } catch (error) {
+                console.error("Error resetting database:", error);
+                alert("An error occurred while resetting the database.");
+            }
         }
     };
 
