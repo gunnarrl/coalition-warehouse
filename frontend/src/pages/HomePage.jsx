@@ -2,6 +2,22 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 
 const HomePage = () => {
+    const handleDelete = async () => {
+        if (window.confirm("Are you sure you want to delete the Premium Keyboard 591?")) {
+            console.log("Deleting keyboard...");
+            try {
+                const response = await fetch('/products/delete-premium-keyboard');
+                if (response.ok) {
+                    alert("Premium Kyeboard 591 is deleted. Visit the Products page to confirm, then press Reset Sample Data.");
+                } else {
+                    alert("Deletion failed.");
+                }
+            } catch (error) {
+                console.error("Error deleting product:", error);
+            }
+        }
+    }; 
+    
     const handleReset = async () => {
         if (window.confirm("Are you sure you want to reset the sample data?")) {
             console.log("Resetting database...");
@@ -31,6 +47,7 @@ const HomePage = () => {
                 <li><Link to="/customers">Manage Customers</Link> - Add and update customer records.</li>
                 <li><Link to="/purchase-orders">Purchase Orders</Link> - Create and review orders placed with vendors.</li>
                 <li><Link to="/sale-orders">Sales Orders</Link> - Create and review orders fulfilled to customers.</li>
+                <li><button className='danger' onclick={handleDelete}>Delete Premium Keyboard 591</button> - Demo Reset Button</li>
             </ul>
             <button className='danger' onClick={handleReset}>Reset Sample Data</button>
         </div>
