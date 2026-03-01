@@ -47,7 +47,7 @@ const HomePage = () => {
                 <li><Link to="/customers">Manage Customers</Link> - Add and update customer records.</li>
                 <li><Link to="/purchase-orders">Purchase Orders</Link> - Create and review orders placed with vendors.</li>
                 <li><Link to="/sale-orders">Sales Orders</Link> - Create and review orders fulfilled to customers.</li>
-                <li><button className='danger' onclick={handleDelete}>Delete Premium Keyboard 591</button> - Demo Reset Button</li>
+                <li><button className='caution' onclick={handleDelete}>Delete Premium Keyboard 591</button> - Demo Reset Button</li>
             </ul>
             <button className='danger' onClick={handleReset}>Reset Sample Data</button>
         </div>
