@@ -23,6 +23,17 @@ const PORT = 30905;
 // Serve the built React app from the dist/ directory
 app.use(express.static(path.join(__dirname, 'dist')));
 
+app.post('/resetdb', function(req, res) {
+    try {
+        const reset = "CALL sp_load_coalitiondb();";
+        await db.query(reset);
+        res.status(200).send("Database successfully reset.");
+    } catch (error) {
+        console.error("Error executing reset procedure:", error);
+        res.status(500).send("An error occured while resetting database.");
+    }
+});
+
 app.get('/customers', async function (req, res) {
     try {
         const query = "SELECT * FROM Customers;"
