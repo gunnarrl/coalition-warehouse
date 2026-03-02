@@ -83,20 +83,21 @@ WHERE VendorProducts.productID = :productID_Input;
 UPDATE Inventory SET quantity = quantity + :quantity_Input
 WHERE warehouseID = :warehouseID_Input AND productID = :productID_Input;
 
--- Read All Purchase Orders--
-SELECT PurchaseOrders.purchaseOrderID, Vendors.vendorName, Warehouses.warehouseName, PurchaseOrders.purchaseDate
+-- Read All Purchase Orders and Calculate Cost of Purchase--
+SELECT PurchaseOrders.purchaseOrderID, PurchaseOrders.purchaseDate,  Warehouses.warehouseID, Warehouses.warehouseName, Vendors.vendorID, Vendors.vendorName,
+SUM(PurchaseOrderItems.quantity * PurchaseOrderItems.purchasePrice) AS costOfPurchase
 FROM PurchaseOrders
-JOIN Vendors ON PurchaseOrders.vendorID = Vendors.vendorID
-JOIN Warehouses ON PurchaseOrders.warehouseID = Warehouses.warehouseID;
-
--- Read Purchase Order Specific Details--
-SELECT PurchaseOrders.purchaseOrderID, Vendors.vendorName, Warehouses.warehouseName, PurchaseOrders.purchaseDate, Products.productName, PurchaseOrderItems.quantity, PurchaseOrderItems.purchasePrice
-FROM PurchaseOrders
-JOIN Vendors ON PurchaseOrders.vendorID = Vendors.vendorID
 JOIN Warehouses ON PurchaseOrders.warehouseID = Warehouses.warehouseID
-LEFT JOIN PurchaseOrderItems ON PurchaseOrders.purchaseOrderID = PurchaseOrderItems.purchaseOrderID 
-LEFT JOIN Products ON PurchaseOrderItems.productID = Products.productID
-WHERE PurchaseOrders.purchaseOrderID= :purchaseOrderID_selected_from_browse_purchaseOrder_page;
+JOIN Vendors ON PurchaseOrders.vendorID = Vendors.vendorID
+LEFT JOIN PurchaseOrderItems ON PurchaseOrders.purchaseOrderID = PurchaseOrderItems.purchaseOrderID
+GROUP BY PurchaseOrders.purchaseOrderID;
+
+-- Read all items purchased--
+SELECT PurchaseOrderItems.purchaseOrderID, PurchaseOrderItems.productID, PurchaseOrderItems.quantity, 
+PurchaseOrderItems.purchasePrice, Products.productName, PurchaseOrders.warehouseID
+FROM PurchaseOrderItems
+JOIN Products ON PurchaseOrderItems.productID = Products.productID
+JOIN PurchaseOrders ON PurchaseOrderItems.purchaseOrderID = PurchaseOrders.purchaseOrderID;
 
 -- Update Purchase Order --
 UPDATE PurchaseOrders SET vendorID = :vendorID_Input, warehouseID = :warehouseID_Input, purchaseDate = :purchaseDate_Input
@@ -134,24 +135,21 @@ UPDATE Inventory SET quantity = quantity - :quantity_Input
 WHERE warehouseID = :warehouseID_Input AND productID = :productID_Input;
 
 
--- Read All Sales Orders --
-SELECT SalesOrders.saleOrderID, SalesOrders.saleDate,  Warehouses.warehouseName, Customers.customerLN, Customers.customerFN, Customers.customerAddr, Customers.customerEmail,
-Products.productName, SalesOrderItems.quantity, SalesOrderItems.salePrice
-FROM SalesOrders
-JOIN Customers ON SalesOrders.customerID = Customers.customerID
-JOIN Warehouses ON SalesOrders.warehouseID = Warehouses.warehouseID
-JOIN SalesOrderItems ON SalesOrders.saleOrderID = SalesOrderItems.saleOrderID
-JOIN Products ON SalesOrderItems.productID = Products.productID;
-
--- Read Specific Sales Order Details --
-SELECT SalesOrders.saleOrderID, SalesOrders.saleDate, Warehouses.warehouseName, Customers.customerLN, Customers.customerFN, Customers.customerAddr, Customers.customerEmail,
-Products.productName, SalesOrderItems.quantity, SalesOrderItems.salePrice
+-- Read All Sales Orders and Calculate Cost of Sale --
+SELECT SalesOrders.saleOrderID, SalesOrders.saleDate,  Warehouses.warehouseID, Warehouses.warehouseName, Customers.customerID, Customers.customerLN, Customers.customerFN, Customers.customerAddr, Customers.customerEmail,
+SUM(SalesOrderItems.quantity * SalesOrderItems.salePrice) AS costOfSale
 FROM SalesOrders
 JOIN Customers ON SalesOrders.customerID = Customers.customerID
 JOIN Warehouses ON SalesOrders.warehouseID = Warehouses.warehouseID
 LEFT JOIN SalesOrderItems ON SalesOrders.saleOrderID = SalesOrderItems.saleOrderID
-LEFT JOIN Products ON SalesOrderItems.productID = Products.productID
-WHERE SalesOrders.saleOrderID = :saleOrderID_selected_from_browse_salesorders_page;
+GROUP BY SalesOrders.saleOrderID;
+
+-- Read all sold items --
+SELECT SalesOrderItems.saleOrderID, SalesOrderItems.productID, SalesOrderItems.quantity, 
+SalesOrderItems.salePrice, Products.productName, SalesOrders.warehouseID
+FROM SalesOrderItems
+JOIN Products ON SalesOrderItems.productID = Products.productID
+JOIN SalesOrders ON SalesOrderItems.saleOrderID = SalesOrders.saleOrderID;
 
 -- Update Sales Order --
 UPDATE SalesOrders SET customerID = :customerID_Input, warehouseID = :warehouseID_Input, saleDate = :saleDate_Input
@@ -174,12 +172,11 @@ WHERE saleOrderItemID = :saleOrderItemID_from_update_form;
 DELETE FROM SalesOrderItems WHERE saleOrderItemID = :saleOrderItemID_selected;
 
 -- Vendor Catalog --
--- Read all products sold by specific vendor --
-SELECT Vendors.vendorName, Products.productID, Products.productName, VendorProducts.costFromVendor
+-- Read all products sold by all vendors --
+SELECT Vendors.vendorID, Vendors.vendorName, Products.productID, Products.productName, VendorProducts.costFromVendor
 FROM VendorProducts
 JOIN Vendors ON VendorProducts.vendorID = Vendors.vendorID
-JOIN Products on VendorProducts.productID = Products.productID 
-WHERE Vendors.vendorID= :vendorID_selected_from_browse_vendor_page;
+JOIN Products on VendorProducts.productID = Products.productID;
 
 -- Create Product to Vendor Catalog --
 INSERT INTO VendorProducts (vendorID, productID, costFromVendor) VALUES
@@ -193,12 +190,11 @@ WHERE vendorProductID = :vendorProductID_from_update_form;
 DELETE FROM VendorProducts WHERE VendorProducts.vendorID= :vendorID_Selected AND VendorProducts.productID = :productID_Selected;
 
 -- WarehouseInventory --
--- Read all products in specific warehouse --
-SELECT Warehouses.warehouseName, Products.productName, Inventory.quantity
+-- Read all products in inventory --
+SELECT Warehouses.warehouseID, Products.productID, Inventory.inventoryID, Products.productName, Inventory.quantity, Products.listCost
 FROM Inventory
 JOIN Products ON Inventory.productID = Products.productID
-JOIN Warehouses ON Inventory.warehouseID = Warehouses.warehouseID
-WHERE Inventory.warehouseID = :warehouseID_selected_from_browse_warehouse_inventory_page;
+JOIN Warehouses ON Inventory.warehouseID = Warehouses.warehouseID;
 
 -- Add product and quantity to warehouse --
 INSERT INTO Inventory (productID, warehouseID, quantity) VALUES
