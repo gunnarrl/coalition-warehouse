@@ -52,7 +52,7 @@ const ProductPage = () => {
 
     const handleDelete = async (row) => {
         try {
-            const response = await fetch(`/products/delete/${row.productID}`, { method: 'GET' });
+            const response = await fetch(`/products/${row.productID}`, { method: 'DELETE' });
             const message = await response.text();
             if (response.ok) {
                 alert(message);

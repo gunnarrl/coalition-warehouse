@@ -48,17 +48,19 @@ app.get('/customers', async function (req, res) {
     }
 });
 
-app.get('/products/delete/:productID', async function (req, res) {
+app.delete('/products/:productID', async function (req, res) {
     try {
         const productID = req.params.productID;
-        const deleteProc = `CALL DeleteProduct(${productID});`;
-        await db.query(deleteProc);
+        const deleteProc = 'CALL DeleteProduct(?);';
+        // Pass productID as a parameter to the SP
+        await db.query(deleteProc, productID);
         res.status(200).send(`Product ${productID} deleted.`);
     } catch (error) {
         console.error("Error executing Delete:", error);
-        res.status(500).send("An error occured while executing the delete PL/SQL.");
+        res.status(500).send("An error occurred while executing the delete PL/SQL.");
     }
 });
+
 
 
 app.get("/products", async function (req, res) {
