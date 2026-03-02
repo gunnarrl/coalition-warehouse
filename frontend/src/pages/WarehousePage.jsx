@@ -33,61 +33,64 @@ function WarehousePage() {
     // products state for the dropdown menu
     const [products, setProducts] = useState([]);
 
+    const fetchWarehouses = async () => {
+        try {
+            const res = await fetch('/warehouses');
+            const data = await res.json();
+            const formattedData = data.map(({ warehouseID, warehouseName, warehouseAddr }) => ({
+                warehouseID: warehouseID,
+                warehouseName: warehouseName,
+                warehouseAddr: warehouseAddr
+            }));
+            setWarehouses(formattedData);
+        } catch (error) {
+            console.error('Error fetching warehouses:', error);
+        }
+    };
+
     // get the warehouses from the DB
     useEffect(() => {
-        const fetchWarehouses = async () => {
-            try {
-                const res = await fetch('/warehouses');
-                const data = await res.json();
-                const formattedData = data.map(({ warehouseID, warehouseName, warehouseAddr }) => ({
-                    warehouseID: warehouseID,
-                    warehouseName: warehouseName,
-                    warehouseAddr: warehouseAddr
-                }));
-                setWarehouses(formattedData);
-            } catch (error) {
-                console.error('Error fetching warehouses:', error);
-            }
-        };
         fetchWarehouses();
     }, []);
 
+    const fetchInventory = async () => {
+        try {
+            const res = await fetch('/inventory');
+            const data = await res.json();
+            const formattedData = data.map(({ inventoryID, productName, warehouseID, quantity, listCost }) => ({
+                inventoryID: inventoryID,
+                productName: productName,
+                warehouseID: warehouseID,
+                quantity: quantity,
+                price: listCost
+            }));
+            setInventoryItems(formattedData);
+        } catch (error) {
+            console.error('Error fetching inventory:', error);
+        }
+    };
+
     // get the inventory from the DB
     useEffect(() => {
-        const fetchInventory = async () => {
-            try {
-                const res = await fetch('/inventory');
-                const data = await res.json();
-                const formattedData = data.map(({ inventoryID, productName, warehouseID, quantity, listCost }) => ({
-                    inventoryID: inventoryID,
-                    productName: productName,
-                    warehouseID: warehouseID,
-                    quantity: quantity,
-                    price: listCost
-                }));
-                setInventoryItems(formattedData);
-            } catch (error) {
-                console.error('Error fetching inventory:', error);
-            }
-        };
         fetchInventory();
     }, []);
 
+    const fetchProducts = async () => {
+        try {
+            const res = await fetch('/products');
+            const data = await res.json();
+            const formattedData = data.map(({ productID, productName }) => ({
+                productID: productID,
+                productName: productName
+            }));
+            setProducts(formattedData);
+        } catch (error) {
+            console.error('Error fetching products:', error);
+        }
+    };
+
     // get the products from the DB
     useEffect(() => {
-        const fetchProducts = async () => {
-            try {
-                const res = await fetch('/products');
-                const data = await res.json();
-                const formattedData = data.map(({ productID, productName }) => ({
-                    productID: productID,
-                    productName: productName
-                }));
-                setProducts(formattedData);
-            } catch (error) {
-                console.error('Error fetching products:', error);
-            }
-        };
         fetchProducts();
     }, []);
 

@@ -8,24 +8,25 @@ const CustomerPage = () => {
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [currentRow, setCurrentRow] = useState(null);
 
+    const fetchCustomers = async () => {
+        try {
+            const res = await fetch('/customers');
+            const data = await res.json();
+
+            const formattedData = data.map(({ customerID, customerFN, customerLN, customerEmail, customerAddr }) => ({
+                customerId: customerID,
+                customerName: `${customerFN} ${customerLN}`,
+                customerEmail: customerEmail,
+                customerAddr: customerAddr
+            }));
+
+            setCustomers(formattedData);
+        } catch (error) {
+            console.error('Error fetching customers:', error);
+        }
+    };
+
     useEffect(() => { // citation: https://maxrozen.com/fetching-data-react-with-useeffect
-        const fetchCustomers = async () => {
-            try {
-                const res = await fetch('/customers');
-                const data = await res.json();
-
-                const formattedData = data.map(({ customerID, customerFN, customerLN, customerEmail, customerAddr }) => ({
-                    customerId: customerID,
-                    customerName: `${customerFN} ${customerLN}`,
-                    customerEmail: customerEmail,
-                    customerAddr: customerAddr
-                }));
-
-                setCustomers(formattedData);
-            } catch (error) {
-                console.error('Error fetching customers:', error);
-            }
-        };
         fetchCustomers();
     }, []);
 

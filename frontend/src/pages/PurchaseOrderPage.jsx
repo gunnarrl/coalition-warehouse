@@ -28,96 +28,101 @@ const PurchaseOrdersPage = () => {
     const [warehouses, setWarehouses] = useState([]);
     const [products, setProducts] = useState([]);
 
+    const fetchPurchasesOrders = async () => {
+        try {
+            const res = await fetch('/purchaseOrders');
+            const data = await res.json();
+            const formattedData = data.map(({ purchaseOrderID, purchaseDate, vendorID, vendorName, warehouseID, warehouseName, costOfPurchase }) => ({
+                purchaseOrderID: purchaseOrderID,
+                purchaseDate: purchaseDate ? purchaseDate.substring(0, 10) : '', // format date to YYYY-MM-DD
+                vendorID: vendorID,
+                vendorName: vendorName,
+                warehouseID: warehouseID,
+                warehouseName: warehouseName,
+                costOfPurchase: costOfPurchase ? '$' + Number(costOfPurchase).toFixed(2) : '$0.00' // it is possible that costOfPurchase is null, default to 0
+            }));
+            setPurchaseOrders(formattedData);
+        } catch (error) {
+            console.error('Error fetching sales orders:', error);
+        }
+    };
+
     useEffect(() => {
-        const fetchPurchasesOrders = async () => {
-            try {
-                const res = await fetch('/purchaseOrders');
-                const data = await res.json();
-                const formattedData = data.map(({ purchaseOrderID, purchaseDate, vendorID, vendorName, warehouseID, warehouseName, costOfPurchase }) => ({
-                    purchaseOrderID: purchaseOrderID,
-                    purchaseDate: purchaseDate ? purchaseDate.substring(0, 10) : '', // format date to YYYY-MM-DD
-                    vendorID: vendorID,
-                    vendorName: vendorName,
-                    warehouseID: warehouseID,
-                    warehouseName: warehouseName,
-                    costOfPurchase: costOfPurchase ? '$' + Number(costOfPurchase).toFixed(2) : '$0.00' // it is possible that costOfPurchase is null, default to 0
-                }));
-                setPurchaseOrders(formattedData);
-            } catch (error) {
-                console.error('Error fetching sales orders:', error);
-            }
-        };
         fetchPurchasesOrders();
     }, []);
 
+    const fetchPurchaseItems = async () => {
+        try {
+            const res = await fetch('/purchaseOrderItems');
+            const data = await res.json();
+            const formattedData = data.map(({ purchaseOrderID, productID, quantity, purchasePrice, productName }) => ({
+                purchaseOrderID: purchaseOrderID,
+                productID: productID,
+                quantity: quantity,
+                purchasePrice: '$' + Number(purchasePrice).toFixed(2),
+                productName: productName
+            }));
+            setOrderItems(formattedData);
+        } catch (error) {
+            console.error('Error fetching purchase items:', error);
+        }
+    };
+
     useEffect(() => {
-        const fetchPurchaseItems = async () => {
-            try {
-                const res = await fetch('/purchaseOrderItems');
-                const data = await res.json();
-                const formattedData = data.map(({ purchaseOrderID, productID, quantity, purchasePrice, productName }) => ({
-                    purchaseOrderID: purchaseOrderID,
-                    productID: productID,
-                    quantity: quantity,
-                    purchasePrice: '$' + Number(purchasePrice).toFixed(2),
-                    productName: productName
-                }));
-                setOrderItems(formattedData);
-            } catch (error) {
-                console.error('Error fetching purchase items:', error);
-            }
-        };
         fetchPurchaseItems();
     }, []);
 
+    const fetchVendors = async () => {
+        try {
+            const res = await fetch('/vendors');
+            const data = await res.json();
+            const formattedData = data.map(({ vendorID, vendorName }) => ({
+                vendorID: vendorID,
+                vendorName: vendorName
+            }));
+            setVendors(formattedData);
+        } catch (error) {
+            console.error('Error fetching vendors:', error);
+        }
+    };
+
     useEffect(() => {
-        const fetchVendors = async () => {
-            try {
-                const res = await fetch('/vendors');
-                const data = await res.json();
-                const formattedData = data.map(({ vendorID, vendorName }) => ({
-                    vendorID: vendorID,
-                    vendorName: vendorName
-                }));
-                setVendors(formattedData);
-            } catch (error) {
-                console.error('Error fetching vendors:', error);
-            }
-        };
         fetchVendors();
     }, []);
 
+    const fetchWarehouses = async () => {
+        try {
+            const res = await fetch('/warehouses');
+            const data = await res.json();
+            const formattedData = data.map(({ warehouseID, warehouseName }) => ({
+                warehouseID: warehouseID,
+                warehouseName: warehouseName
+            }));
+            setWarehouses(formattedData);
+        } catch (error) {
+            console.error('Error fetching warehouses:', error);
+        }
+    };
+
     useEffect(() => {
-        const fetchWarehouses = async () => {
-            try {
-                const res = await fetch('/warehouses');
-                const data = await res.json();
-                const formattedData = data.map(({ warehouseID, warehouseName }) => ({
-                    warehouseID: warehouseID,
-                    warehouseName: warehouseName
-                }));
-                setWarehouses(formattedData);
-            } catch (error) {
-                console.error('Error fetching warehouses:', error);
-            }
-        };
         fetchWarehouses();
     }, []);
 
+    const fetchProducts = async () => {
+        try {
+            const res = await fetch('/products');
+            const data = await res.json();
+            const formattedData = data.map(({ productID, productName }) => ({
+                productID: productID,
+                productName: productName
+            }));
+            setProducts(formattedData);
+        } catch (error) {
+            console.error('Error fetching products:', error);
+        }
+    };
+
     useEffect(() => {
-        const fetchProducts = async () => {
-            try {
-                const res = await fetch('/products');
-                const data = await res.json();
-                const formattedData = data.map(({ productID, productName }) => ({
-                    productID: productID,
-                    productName: productName
-                }));
-                setProducts(formattedData);
-            } catch (error) {
-                console.error('Error fetching products:', error);
-            }
-        };
         fetchProducts();
     }, []);
 

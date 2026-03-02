@@ -23,59 +23,62 @@ function VendorPage() {
     // products for dropdown
     const [products, setProducts] = useState([]);
 
+    const fetchVendors = async () => {
+        try {
+            const res = await fetch('/vendors');
+            const data = await res.json();
+            const formattedData = data.map(({ vendorID, vendorName, vendorAddr, vendorEmail }) => ({
+                vendorID: vendorID,
+                vendorName: vendorName,
+                vendorAddr: vendorAddr,
+                vendorEmail: vendorEmail
+            }));
+            setVendors(formattedData);
+        } catch (error) {
+            console.error('Error fetching vendors:', error);
+        }
+    };
+
     useEffect(() => {
-        const fetchVendors = async () => {
-            try {
-                const res = await fetch('/vendors');
-                const data = await res.json();
-                const formattedData = data.map(({ vendorID, vendorName, vendorAddr, vendorEmail }) => ({
-                    vendorID: vendorID,
-                    vendorName: vendorName,
-                    vendorAddr: vendorAddr,
-                    vendorEmail: vendorEmail
-                }));
-                setVendors(formattedData);
-            } catch (error) {
-                console.error('Error fetching vendors:', error);
-            }
-        };
         fetchVendors();
     }, []);
 
+    const fetchCatalog = async () => {
+        try {
+            const res = await fetch('/catalog');
+            const data = await res.json();
+            const formattedData = data.map(({ vendorID, vendorName, productID, productName, costFromVendor }) => ({
+                vendorID: vendorID,
+                vendorName: vendorName,
+                productID: productID,
+                productName: productName,
+                costFromVendor: costFromVendor
+            }));
+            setCatalogItems(formattedData);
+        } catch (error) {
+            console.error('Error fetching catalog:', error);
+        }
+    };
+
     useEffect(() => {
-        const fetchCatalog = async () => {
-            try {
-                const res = await fetch('/catalog');
-                const data = await res.json();
-                const formattedData = data.map(({ vendorID, vendorName, productID, productName, costFromVendor }) => ({
-                    vendorID: vendorID,
-                    vendorName: vendorName,
-                    productID: productID,
-                    productName: productName,
-                    costFromVendor: costFromVendor
-                }));
-                setCatalogItems(formattedData);
-            } catch (error) {
-                console.error('Error fetching catalog:', error);
-            }
-        };
         fetchCatalog();
     }, []);
 
+    const fetchProducts = async () => {
+        try {
+            const res = await fetch('/products');
+            const data = await res.json();
+            const formattedData = data.map(({ productID, productName }) => ({
+                productID: productID,
+                productName: productName
+            }));
+            setProducts(formattedData);
+        } catch (error) {
+            console.error('Error fetching products:', error);
+        }
+    };
+
     useEffect(() => {
-        const fetchProducts = async () => {
-            try {
-                const res = await fetch('/products');
-                const data = await res.json();
-                const formattedData = data.map(({ productID, productName }) => ({
-                    productID: productID,
-                    productName: productName
-                }));
-                setProducts(formattedData);
-            } catch (error) {
-                console.error('Error fetching products:', error);
-            }
-        };
         fetchProducts();
     }, []);
 
