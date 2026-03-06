@@ -50,6 +50,29 @@ const ProductPage = () => {
         setIsPopupOpen(true);
     };
 
+    const handleSubmit = async (event) => {
+        event.preventDefault();
+        // Get the data from the form
+        const formData = new FormData(event.target);
+        const productName = formData.get('productName');
+        const listCost = formData.get('listCost');
+
+        try {
+            const response = await fetch(`/products`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ productName, listCost }) });
+            const message = await response.text();
+            if (response.ok) {
+                alert(message);
+                setIsPopupOpen(false); // Close popup on success
+                fetchProducts();
+            } else {
+                alert(message);
+            }
+        } catch (error) {
+            console.error('Error adding product:', error);
+            alert('An error occurred while adding the product.');
+        }
+    };
+
     const handleDelete = async (row) => {
         try {
             const response = await fetch(`/products/${row.productID}`, { method: 'DELETE' });
@@ -77,18 +100,21 @@ const ProductPage = () => {
                 onClose={() => setIsPopupOpen(false)}
                 title={currentRow ? 'Edit Product' : 'Add Product'}
             >
-                <form>
+                <form onSubmit={handleSubmit}>
                     <label>Name:</label>
                     <input
                         type="text"
                         defaultValue={currentRow?.productName || ''}
-                        name="ProductName"
+                        name="productName"
+                        required
                     />
                     <label>Price:</label>
                     <input
-                        type="text"
+                        type="number"
+                        step="0.01"
                         defaultValue={currentRow?.listCost || ''}
                         name="listCost"
+                        required
                     />
                     <button type="submit">Submit</button>
                 </form>

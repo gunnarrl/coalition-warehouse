@@ -54,7 +54,7 @@ app.delete('/products/:productID', async function (req, res) {
         const deleteProc = 'CALL DeleteProduct(?);';
         // Pass productID as a parameter to the SP
         await db.query(deleteProc, productID);
-        res.status(204).send(`Product ${productID} deleted.`);
+        res.status(200).send(`Product ${productID} deleted.`);
     } catch (error) {
         console.error("Error executing Delete:", error);
         res.status(500).send("An error occurred while executing the delete PL/SQL.");
@@ -67,9 +67,9 @@ app.put("/products/:productID", async function (req, res) {
         const productName = req.body.productName;
         const listCost = req.body.listCost;
         const updateProc = 'CALL UpdateProduct(?, ?, ?);';
-        // Pass productID as a parameter to the SP
-        await db.query(updateProc, productID, productName, listCost);
-        res.status(204).send(`Product ${productID} updated.`);
+        // Pass parameters as an array
+        await db.query(updateProc, [productID, productName, listCost]);
+        res.status(200).send(`Product ${productID} updated.`);
     } catch (error) {
         console.error("Error executing Update:", error);
         res.status(500).send("An error occurred while executing the update PL/SQL.");
@@ -81,8 +81,8 @@ app.post("/products", async function (req, res) {
         const productName = req.body.productName;
         const listCost = req.body.listCost;
         const addProc = 'CALL AddProduct(?, ?);';
-        // Pass productID as a parameter to the SP
-        await db.query(addProc, productName, listCost);
+        // Pass parameters as an array
+        await db.query(addProc, [productName, listCost]);
         res.status(201).send(`Product ${productName} added.`);
     } catch (error) {
         console.error("Error executing Add:", error);
