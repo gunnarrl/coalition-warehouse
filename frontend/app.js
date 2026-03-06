@@ -37,6 +37,7 @@ app.post('/resetdb', async function (req, res) {
     }
 });
 
+// CUSTOMER CRUD ROUTES
 app.get('/customers', async function (req, res) {
     try {
         const query = "SELECT * FROM Customers;"
@@ -45,19 +46,53 @@ app.get('/customers', async function (req, res) {
 
     } catch (error) {
         console.error("Error executing query:", error);
-
-        // Send a generic error message to the browser
-        res.status(500).send("An error occurred while executing the database query.");
+        res.status(500).send("An error occurred while running the SELECT operation.");
     }
 });
 
+app.delete('/customers/:customerID', async function (req, res) {
+    try {
+        const deleteProc = 'CALL DeleteCustomer(?);';
+        // Pass customerID as a parameter to the SP
+        await db.query(deleteProc, req.params.customerID);
+        res.status(200).send(`Customer ${req.params.customerID} deleted.`);
+    } catch (error) {
+        console.error("Error executing Delete:", error);
+        res.status(500).send("An error occurred while executing the delete PL/SQL.");
+    }
+});
+
+app.put("/customers/:customerID", async function (req, res) {
+    try {
+        const updateProc = 'CALL UpdateCustomer(?, ?, ?, ?, ?);';
+        // Pass parameters as an array
+        await db.query(updateProc, [req.params.customerID, req.body.customerfName, req.body.customerlName, req.body.customerEmail, req.body.customerAddr]);
+        res.status(200).send(`Customer ${req.params.customerID} updated.`);
+    } catch (error) {
+        console.error("Error executing Update:", error);
+        res.status(500).send("An error occurred while executing the update PL/SQL.");
+    }
+});
+
+app.post("/customers", async function (req, res) {
+    try {
+        const addProc = 'CALL AddCustomer(?, ?, ?, ?);';
+        // Pass parameters as an array
+        await db.query(addProc, [req.body.customerfName, req.body.customerlName, req.body.customerEmail, req.body.customerAddr]);
+        res.status(201).send(`Customer ${req.body.customerfName} ${req.body.customerlName} added.`);
+    } catch (error) {
+        console.error("Error executing Add:", error);
+        res.status(500).send("An error occurred while executing the add PL/SQL.");
+    }
+});
+
+// PRODUCT CRUD ROUTES
 app.delete('/products/:productID', async function (req, res) {
     try {
-        const productID = req.params.productID;
         const deleteProc = 'CALL DeleteProduct(?);';
         // Pass productID as a parameter to the SP
-        await db.query(deleteProc, productID);
-        res.status(200).send(`Product ${productID} deleted.`);
+        await db.query(deleteProc, req.params.productID);
+        res.status(200).send(`Product ${req.params.productID} deleted.`);
     } catch (error) {
         console.error("Error executing Delete:", error);
         res.status(500).send("An error occurred while executing the delete PL/SQL.");
@@ -66,13 +101,10 @@ app.delete('/products/:productID', async function (req, res) {
 
 app.put("/products/:productID", async function (req, res) {
     try {
-        const productID = req.params.productID;
-        const productName = req.body.productName;
-        const listCost = req.body.listCost;
         const updateProc = 'CALL UpdateProduct(?, ?, ?);';
         // Pass parameters as an array
-        await db.query(updateProc, [productID, productName, listCost]);
-        res.status(200).send(`Product ${productID} updated.`);
+        await db.query(updateProc, [req.params.productID, req.body.productName, req.body.listCost]);
+        res.status(200).send(`Product ${req.params.productID} updated.`);
     } catch (error) {
         console.error("Error executing Update:", error);
         res.status(500).send("An error occurred while executing the update PL/SQL.");
@@ -81,12 +113,10 @@ app.put("/products/:productID", async function (req, res) {
 
 app.post("/products", async function (req, res) {
     try {
-        const productName = req.body.productName;
-        const listCost = req.body.listCost;
         const addProc = 'CALL AddProduct(?, ?);';
         // Pass parameters as an array
-        await db.query(addProc, [productName, listCost]);
-        res.status(201).send(`Product ${productName} added.`);
+        await db.query(addProc, [req.body.productName, req.body.listCost]);
+        res.status(201).send(`Product ${req.body.productName} added.`);
     } catch (error) {
         console.error("Error executing Add:", error);
         res.status(500).send("An error occurred while executing the add PL/SQL.");
