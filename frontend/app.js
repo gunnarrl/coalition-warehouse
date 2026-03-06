@@ -20,6 +20,9 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = 30905;
 
+// used to parse JSON request bodies
+app.use(express.json());
+
 // Serve the built React app from the dist/ directory
 app.use(express.static(path.join(__dirname, 'dist')));
 
