@@ -55,7 +55,7 @@ BEGIN
     `customerID`		int(11) AUTO_INCREMENT UNIQUE NOT NULL,
     `customerLN`		varchar(255) NOT NULL,
     `customerFN`		varchar(255) NOT NULL,
-    `customerAddr`		varchar(255) NOT NULL,
+    `customerAddr`	varchar(255) NOT NULL,
     `customerEmail`	varchar(255),
    PRIMARY KEY (`customerID`)
    );
