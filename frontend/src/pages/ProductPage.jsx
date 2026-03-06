@@ -58,7 +58,13 @@ const ProductPage = () => {
         const listCost = formData.get('listCost');
 
         try {
-            const response = await fetch(`/products`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ productName, listCost }) });
+            let response;
+            // If currentRow is not null, we are editing an existing product, otherwise we are creating one.
+            if (currentRow) {
+                response = await fetch(`/products/${currentRow.productID}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ productName, listCost }) });
+            } else {
+                response = await fetch(`/products`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ productName, listCost }) });
+            }
             const message = await response.text();
             if (response.ok) {
                 alert(message);
@@ -68,8 +74,8 @@ const ProductPage = () => {
                 alert(message);
             }
         } catch (error) {
-            console.error('Error adding product:', error);
-            alert('An error occurred while adding the product.');
+            console.error('Error adding/updating product:', error);
+            alert('An error occurred while adding/updating the product.');
         }
     };
 
