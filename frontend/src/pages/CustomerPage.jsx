@@ -14,7 +14,9 @@ const CustomerPage = () => {
             const data = await res.json();
 
             const formattedData = data.map(({ customerID, customerFN, customerLN, customerEmail, customerAddr }) => ({
-                customerId: customerID,
+                customerID: customerID,
+                customerfName: customerFN,
+                customerlName: customerLN,
                 customerName: `${customerFN} ${customerLN}`,
                 customerEmail: customerEmail,
                 customerAddr: customerAddr
@@ -32,7 +34,7 @@ const CustomerPage = () => {
 
     // Columns for the SimpleTable, maps the DB fields to user-friendly names
     const columns = [
-        { key: 'customerId', label: 'ID' },
+        { key: 'customerID', label: 'ID' },
         { key: 'customerName', label: 'Name' },
         { key: 'customerEmail', label: 'Email' },
         { key: 'customerAddr', label: 'Address' }
@@ -48,10 +50,52 @@ const CustomerPage = () => {
         setIsPopupOpen(true);
     };
 
-    const handleDelete = (row) => {
-        if (window.confirm(`Are you sure you want to delete ${row.customerName}?`)) {
-            console.log("Deleting ID:", row.customerId);
-            // TODO: Call API to delete customer, then refresh data
+    const handleSubmit = async (event) => {
+        event.preventDefault();
+        // get the form data
+        const formData = new FormData(event.target);
+        // format the data to match the database schema
+        const customerData = {
+            customerfName: formData.get('customerfName'),
+            customerlName: formData.get('customerlName'),
+            customerEmail: formData.get('customerEmail'),
+            customerAddr: formData.get('customerAddr')
+        };
+        try {
+            let response;
+            // If currentRow is not null, we are editing an existing customer, otherwise we are creating a new one.
+            if (currentRow) {
+                response = await fetch(`/customers/${currentRow.customerID}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(customerData) });
+            } else {
+                response = await fetch('/customers', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(customerData) });
+            }
+            const message = await response.text();
+            if (response.ok) {
+                alert(message);
+                fetchCustomers();
+                setIsPopupOpen(false);
+            } else {
+                alert(message);
+            }
+        } catch (error) {
+            console.error('Error adding customer:', error);
+            alert('An error occurred while adding the customer.');
+        }
+    };
+
+    const handleDelete = async (row) => {
+        try {
+            const response = await fetch(`/customers/${row.customerID}`, { method: 'DELETE' });
+            const message = await response.text();
+            if (response.ok) {
+                alert(message);
+                fetchCustomers();
+            } else {
+                alert(message);
+            }
+        } catch (error) {
+            console.error('Error deleting customer:', error);
+            alert('An error occurred while deleting the customer.');
         }
     };
 
@@ -66,12 +110,20 @@ const CustomerPage = () => {
                 onClose={() => setIsPopupOpen(false)}
                 title={currentRow ? 'Edit Customer' : 'Add Customer'}
             >
-                <form>
-                    <label>Name:</label>
+                <form onSubmit={handleSubmit}>
+                    <label>First Name:</label>
                     <input
                         type="text"
-                        defaultValue={currentRow?.customerName || ''}
-                        name="customerName"
+                        defaultValue={currentRow?.customerfName || ''}
+                        name="customerfName"
+                        required
+                    />
+                    <label>Last Name:</label>
+                    <input
+                        type="text"
+                        defaultValue={currentRow?.customerlName || ''}
+                        name="customerlName"
+                        required
                     />
                     <label>Email:</label>
                     <input

@@ -54,16 +54,19 @@ const ProductPage = () => {
         event.preventDefault();
         // Get the data from the form
         const formData = new FormData(event.target);
-        const productName = formData.get('productName');
-        const listCost = formData.get('listCost');
+        // Format the data to match the database schema
+        const productData = {
+            productName: formData.get('productName'),
+            listCost: formData.get('listCost')
+        };
 
         try {
             let response;
             // If currentRow is not null, we are editing an existing product, otherwise we are creating one.
             if (currentRow) {
-                response = await fetch(`/products/${currentRow.productID}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ productName, listCost }) });
+                response = await fetch(`/products/${currentRow.productID}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(productData) });
             } else {
-                response = await fetch(`/products`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ productName, listCost }) });
+                response = await fetch(`/products`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(productData) });
             }
             const message = await response.text();
             if (response.ok) {

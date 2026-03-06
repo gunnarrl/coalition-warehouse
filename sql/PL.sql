@@ -10,27 +10,27 @@
 DROP PROCEDURE IF EXISTS DeleteProduct;
 
 DELIMITER //
-CREATE PROCEDURE DeleteProduct(IN p_productID INT)
+CREATE PROCEDURE DeleteProduct(IN in_productID INT)
 BEGIN
-    DELETE FROM Products WHERE productID = p_productID;
+    DELETE FROM Products WHERE productID = in_productID;
 END //
 DELIMITER ;
 
 DROP PROCEDURE IF EXISTS AddProduct;
 
 DELIMITER //
-CREATE PROCEDURE AddProduct(IN p_productName VARCHAR(255), IN p_listCost DECIMAL(10,2))
+CREATE PROCEDURE AddProduct(IN in_productName VARCHAR(255), IN in_listCost DECIMAL(10,2))
 BEGIN
-    INSERT INTO Products (productName, listCost) VALUES (p_productName, p_listCost);
+    INSERT INTO Products (productName, listCost) VALUES (in_productName, in_listCost);
 END //
 DELIMITER ;
 
 DROP PROCEDURE IF EXISTS UpdateProduct;
 
 DELIMITER //
-CREATE PROCEDURE UpdateProduct(IN p_productID INT, IN p_productName VARCHAR(255), IN p_listCost DECIMAL(10,2))
+CREATE PROCEDURE UpdateProduct(IN in_productID INT, IN in_productName VARCHAR(255), IN in_listCost DECIMAL(10,2))
 BEGIN
-    UPDATE Products SET productName = p_productName, listCost = p_listCost WHERE productID = p_productID;
+    UPDATE Products SET productName = in_productName, listCost = in_listCost WHERE productID = in_productID;
 END //
 DELIMITER ;
 
@@ -38,26 +38,26 @@ DELIMITER ;
 DROP PROCEDURE IF EXISTS DeleteCustomer;
 
 DELIMITER //
-CREATE PROCEDURE DeleteCustomer(IN p_customerID INT)
+CREATE PROCEDURE DeleteCustomer(IN in_customerID INT)
 BEGIN
-    DELETE FROM Customers WHERE customerID = p_customerID;
+    DELETE FROM Customers WHERE customerID = in_customerID;
 END //
 DELIMITER ;
 
 DROP PROCEDURE IF EXISTS AddCustomer;
 
 DELIMITER //
-CREATE PROCEDURE AddCustomer(IN p_customerfName VARCHAR(255), IN p_customerlName VARCHAR(255), IN p_customerEmail VARCHAR(255), IN p_customerAddr VARCHAR(255))
+CREATE PROCEDURE AddCustomer(IN in_customerfName VARCHAR(255), IN in_customerlName VARCHAR(255), IN in_customerEmail VARCHAR(255), IN in_customerAddr VARCHAR(255))
 BEGIN
-    INSERT INTO Customers (customerfName, customerlName, customerEmail, customerAddr) VALUES (p_customerfName, p_customerlName, p_customerEmail, p_customerAddr);
+    INSERT INTO Customers (customerFN, customerLN, customerEmail, customerAddr) VALUES (in_customerfName, in_customerlName, in_customerEmail, in_customerAddr);
 END //
 DELIMITER ;
 
 DROP PROCEDURE IF EXISTS UpdateCustomer;
 
 DELIMITER //
-CREATE PROCEDURE UpdateCustomer(IN p_customerID INT, IN p_customerfName VARCHAR(255), IN p_customerlName VARCHAR(255), IN p_customerEmail VARCHAR(255), IN p_customerAddr VARCHAR(255))
+CREATE PROCEDURE UpdateCustomer(IN in_customerID INT, IN in_customerfName VARCHAR(255), IN in_customerlName VARCHAR(255), IN in_customerEmail VARCHAR(255), IN in_customerAddr VARCHAR(255))
 BEGIN
-    UPDATE Customers SET customerfName = p_customerfName, customerlName = p_customerlName, customerEmail = p_customerEmail, customerAddr = p_customerAddr WHERE customerID = p_customerID;
+    UPDATE Customers SET customerFN = in_customerfName, customerLN = in_customerlName, customerEmail = in_customerEmail, customerAddr = in_customerAddr WHERE customerID = in_customerID;
 END //
 DELIMITER ;
