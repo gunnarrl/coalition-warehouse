@@ -61,3 +61,32 @@ BEGIN
     UPDATE Customers SET customerFN = in_customerfName, customerLN = in_customerlName, customerEmail = in_customerEmail, customerAddr = in_customerAddr WHERE customerID = in_customerID;
 END //
 DELIMITER ;
+
+-- SALES ORDER SPs --
+DROP PROCEDURE IF EXISTS DeleteSalesOrder;
+
+DELIMITER //
+CREATE PROCEDURE DeleteSalesOrder(IN in_saleOrderID INT)
+BEGIN
+    DELETE FROM SalesOrders WHERE saleOrderID = in_saleOrderID;
+END //
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS AddSalesOrder;
+
+DELIMITER //
+CREATE PROCEDURE AddSalesOrder(IN in_customerID INT, IN in_warehouseID INT, IN in_saleDate DATE)
+BEGIN
+    INSERT INTO SalesOrders (customerID, warehouseID, saleDate) VALUES (in_customerID, in_warehouseID, in_saleDate);
+END //
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS UpdateSalesOrder;
+
+DELIMITER //
+CREATE PROCEDURE UpdateSalesOrder(IN in_saleOrderID INT, IN in_customerID INT, IN in_warehouseID INT, IN in_saleDate DATE)
+BEGIN
+    UPDATE SalesOrders SET customerID = in_customerID, warehouseID = in_warehouseID, saleDate = in_saleDate WHERE saleOrderID = in_saleOrderID;
+END //
+DELIMITER ;
+
