@@ -20,7 +20,7 @@ const SalesOrdersPage = () => {
         { label: 'Date', key: 'saleDate' },
         { label: 'Customer', key: 'customerName' },
         { label: 'Warehouse', key: 'warehouseName' },
-        { label: 'Total Cost', key: 'costOfOrder' }
+        { label: 'Total Cost', key: 'costOfSale' }
     ];
 
     const [salesOrders, setSalesOrders] = useState([]);
@@ -277,7 +277,7 @@ const SalesOrdersPage = () => {
                     columns={itemColumns}
                     data={saleItems.filter(item => item.saleOrderID === row.saleOrderID)}
                     onEdit={(itemRow) => handleEditItem(row.saleOrderID, itemRow)}
-                    onDelete={(itemRow) => handleDeleteItem(row.saleOrderID, itemRow)}
+                    onDelete={handleDeleteItem}
                 />
             </div>
         );
