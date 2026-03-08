@@ -201,13 +201,54 @@ const SalesOrdersPage = () => {
         setIsItemsPopupOpen(true);
     };
 
-    const handleDeleteItem = (saleID, itemRow) => {
-        window.alert(`Delete Item ${itemRow.name} from Sale ID: ${saleID}`);
+    const handleDeleteItem = async (itemRow) => {
+        try {
+            const response = await fetch(`/salesOrderItems/${itemRow.saleOrderItemID}`, { method: 'DELETE' });
+            const message = await response.text();
+            if (response.ok) {
+                alert(message);
+                fetchSaleItems();
+            } else {
+                alert(message);
+            }
+        } catch (error) {
+            console.error('Error deleting sale order item:', error);
+            alert('An error occurred while deleting the sale order item.');
+        }
     };
 
-    const handleSaveItem = (e) => {
-        e.preventDefault();
-        setIsItemsPopupOpen(false);
+    const handleSaveItem = async (event) => {
+        event.preventDefault();
+        // Get the data from the form
+        const formData = new FormData(event.target);
+        // Format the data to match the database schema
+        const saleOrderItemData = {
+            saleOrderID: formData.get('saleOrderID'),
+            productID: formData.get('productID'),
+            quantity: formData.get('quantity'),
+            salePrice: formData.get('salePrice')
+        };
+
+        try {
+            let response;
+            // If currentRow is not null, we are editing an existing sale order, otherwise we are creating one.
+            if (currentItem) {
+                response = await fetch(`/salesOrderItems/${currentItem.saleOrderItemID}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(saleOrderItemData) });
+            } else {
+                response = await fetch(`/salesOrderItems`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(saleOrderItemData) });
+            }
+            const message = await response.text();
+            if (response.ok) {
+                alert(message);
+                setIsItemsPopupOpen(false); // Close popup on success
+                fetchSaleItems();
+            } else {
+                alert(message);
+            }
+        } catch (error) {
+            console.error('Error adding/updating sale order item:', error);
+            alert('An error occurred while adding/updating the sale order item.');
+        }
     }
 
     const renderSaleItems = (row) => {
