@@ -219,6 +219,7 @@ const SalesOrdersPage = () => {
             if (response.ok) {
                 alert(message);
                 fetchSaleItems();
+                fetchSalesOrders();
             } else {
                 alert(message);
             }
@@ -253,6 +254,7 @@ const SalesOrdersPage = () => {
                 alert(message);
                 setIsItemsPopupOpen(false); // Close popup on success
                 fetchSaleItems();
+                fetchSalesOrders();
             } else {
                 alert(message);
             }

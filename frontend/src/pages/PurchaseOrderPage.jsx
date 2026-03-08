@@ -212,6 +212,7 @@ const PurchaseOrdersPage = () => {
             if (response.ok) {
                 alert(message);
                 fetchPurchaseItems();
+                fetchPurchaseOrders(); // fetch orders so total cost is updated
             } else {
                 alert(message);
             }
@@ -246,6 +247,7 @@ const PurchaseOrdersPage = () => {
                 alert(message);
                 setIsItemsPopupOpen(false); // Close popup on success
                 fetchPurchaseItems();
+                fetchPurchaseOrders(); // fetch orders so total cost is updated
             } else {
                 alert(message);
             }
