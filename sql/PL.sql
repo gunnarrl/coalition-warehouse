@@ -112,9 +112,9 @@ DELIMITER ;
 DROP PROCEDURE IF EXISTS UpdateSalesOrderItem;
 
 DELIMITER //
-CREATE PROCEDURE UpdateSalesOrderItem(IN in_saleOrderItemID INT, IN in_quantity INT, IN in_salePrice DECIMAL(10,2))
+CREATE PROCEDURE UpdateSalesOrderItem(IN in_saleOrderItemID INT, IN in_productID INT, IN in_quantity INT, IN in_salePrice DECIMAL(10,2))
 BEGIN
-    UPDATE SalesOrderItems SET quantity = in_quantity, salePrice = in_salePrice WHERE saleOrderItemID = in_saleOrderItemID;
+    UPDATE SalesOrderItems SET productID = in_productID, quantity = in_quantity, salePrice = in_salePrice WHERE saleOrderItemID = in_saleOrderItemID;
 END //
 DELIMITER ;
 

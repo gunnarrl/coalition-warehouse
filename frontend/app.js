@@ -9,7 +9,6 @@
 // 1. ESM syntax wasn't being used in app.js. 
 // 2. The react app wasn't being served, only the /customers endpoint existed. Added express.static and a catch-all route to serve the react app. 
 // AI Source URL: https://marketplace.visualstudio.com/items?itemName=Google.geminicodeassist
-
 import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -247,7 +246,7 @@ app.post("/salesOrders", async function (req, res) {
 app.get("/salesOrderItems", async function (req, res) {
     try {
         const query = `
-SELECT SalesOrderItems.saleOrderID, SalesOrderItems.productID, SalesOrderItems.quantity, 
+SELECT SalesOrderItems.saleOrderItemID, SalesOrderItems.saleOrderID, SalesOrderItems.productID, SalesOrderItems.quantity, 
 SalesOrderItems.salePrice, Products.productName, SalesOrders.warehouseID
 FROM SalesOrderItems
 JOIN Products ON SalesOrderItems.productID = Products.productID
@@ -262,10 +261,10 @@ JOIN SalesOrders ON SalesOrderItems.saleOrderID = SalesOrders.saleOrderID;`;
 
 app.put("/salesOrderItems/:saleOrderItemID", async function (req, res) {
     try {
-        const updateProc = 'CALL UpdateSalesOrderItem(?, ?, ?);';
+        const updateProc = 'CALL UpdateSalesOrderItem(?, ?, ?, ?);';
         // Pass parameters as an array
-        await db.query(updateProc, [req.body.saleOrderItemID, req.body.quantity, req.body.salePrice]);
-        res.status(200).send(`Sales Order Item ${req.body.saleOrderItemID} updated.`);
+        await db.query(updateProc, [req.params.saleOrderItemID, req.body.productID, req.body.quantity, req.body.salePrice]);
+        res.status(200).send(`Sales Order Item ${req.params.saleOrderItemID} updated.`);
     } catch (error) {
         console.error("Error executing Update:", error);
         res.status(500).send("An error occurred while executing the update PL/SQL.");

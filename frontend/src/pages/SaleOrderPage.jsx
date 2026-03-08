@@ -1,3 +1,12 @@
+// Citation for use of AI Tools: VS Code's Gemini Code Assist to help debug issues with the add/edit/delete functionality of the sales order items
+// Date: 03/08/2026
+// Prompt: [Attached the app.js, SaleOrderPage.jsx]
+// "I have created endpoints that should allow you to add, edit and delete items in a sale order. When I try to run any of the operations the console prints:
+// [error]. Can you help me diagnose and fix this issue
+// Result: Turns out I forgot to select saleOrderItemID from the DB so all operations were relying on it but it was set to null
+// fixing this fixed all the issues.
+// AI Source URL: https://marketplace.visualstudio.com/items?itemName=Google.geminicodeassist
+
 import React, { useState, useEffect } from 'react';
 import DetailTable from '../components/DetailTable';
 import SimpleTable from '../components/SimpleTable';
@@ -55,11 +64,13 @@ const SalesOrdersPage = () => {
         try {
             const res = await fetch('/salesOrderItems');
             const data = await res.json();
-            const formattedData = data.map(({ saleOrderID, productID, quantity, salePrice, productName }) => ({
+            const formattedData = data.map(({ saleOrderItemID, saleOrderID, productID, quantity, salePrice, productName }) => ({
+                saleOrderItemID: saleOrderItemID,
                 saleOrderID: saleOrderID,
                 productID: productID,
                 quantity: quantity,
-                salePrice: '$' + Number(salePrice).toFixed(2),
+                salePrice: salePrice,
+                formattedSalePrice: '$' + Number(salePrice).toFixed(2),
                 productName: productName
             }));
             setSaleItems(formattedData);
@@ -223,7 +234,7 @@ const SalesOrdersPage = () => {
         const formData = new FormData(event.target);
         // Format the data to match the database schema
         const saleOrderItemData = {
-            saleOrderID: formData.get('saleOrderID'),
+            saleOrderID: targetSaleID, // This is the sale order ID that the item is being added to, not allowed to be changed in form.
             productID: formData.get('productID'),
             quantity: formData.get('quantity'),
             salePrice: formData.get('salePrice')
@@ -256,7 +267,7 @@ const SalesOrdersPage = () => {
         const itemColumns = [
             { label: 'Product Name', key: 'productName' },
             { label: 'Quantity', key: 'quantity' },
-            { label: 'Sale Price', key: 'salePrice' }
+            { label: 'Sale Price', key: 'formattedSalePrice' }
         ];
         return (
             <div>
