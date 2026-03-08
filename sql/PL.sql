@@ -90,3 +90,52 @@ BEGIN
 END //
 DELIMITER ;
 
+-- SALES ORDER ITEMS SPs --
+DROP PROCEDURE IF EXISTS DeleteSalesOrderItem;
+
+DELIMITER //
+CREATE PROCEDURE DeleteSalesOrderItem(IN in_saleOrderID INT, IN in_productID INT)
+BEGIN
+    DELETE FROM SalesOrderItems WHERE saleOrderID = in_saleOrderID AND productID = in_productID;
+END //
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS AddSalesOrderItem;
+
+DELIMITER //
+CREATE PROCEDURE AddSalesOrderItem(IN in_saleOrderID INT, IN in_productID INT, IN in_quantity INT, IN in_salePrice DECIMAL(10,2))
+BEGIN
+    INSERT INTO SalesOrderItems (saleOrderID, productID, quantity, salePrice) VALUES (in_saleOrderID, in_productID, in_quantity, in_salePrice);
+END //
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS UpdateSalesOrderItem;
+
+DELIMITER //
+CREATE PROCEDURE UpdateSalesOrderItem(IN in_saleOrderID INT, IN in_productID INT, IN in_quantity INT, IN in_salePrice DECIMAL(10,2))
+BEGIN
+    UPDATE SalesOrderItems SET quantity = in_quantity, salePrice = in_salePrice WHERE saleOrderID = in_saleOrderID AND productID = in_productID;
+END //
+DELIMITER ;
+
+DROP TRIGGER IF EXISTS UpdateInventoryAfterSale;
+
+DELIMITER //
+CREATE TRIGGER UpdateInventoryAfterSale
+AFTER INSERT ON SalesOrderItems
+FOR EACH ROW
+BEGIN
+    DECLARE v_warehouseID INT;
+    
+    -- Look up the warehouse associated with this sale order
+    SELECT warehouseID INTO v_warehouseID 
+    FROM SalesOrders 
+    WHERE saleOrderID = NEW.saleOrderID;
+    -- Update the inventory for that specific warehouse + product
+    UPDATE Inventory 
+    SET quantity = quantity - NEW.quantity 
+    WHERE productID = NEW.productID 
+      AND warehouseID = v_warehouseID;
+END //
+DELIMITER ;
+
