@@ -295,6 +295,7 @@ app.post("/salesOrderItems", async function (req, res) {
     }
 });
 
+// PURCHASES ROUTES (basically the same as sales orders, but with purchases variables)
 app.get("/purchaseOrders", async function (req, res) {
     try {
         const query = `
@@ -313,10 +314,47 @@ GROUP BY PurchaseOrders.purchaseOrderID;`;
     }
 });
 
+app.put("/purchaseOrders/:purchaseOrderID", async function (req, res) {
+    try {
+        const updateProc = 'CALL UpdatePurchaseOrder(?, ?, ?, ?);';
+        // Pass parameters as an array
+        await db.query(updateProc, [req.params.purchaseOrderID, req.body.supplierID, req.body.warehouseID, req.body.purchaseDate]);
+        res.status(200).send(`Purchase Order ${req.params.purchaseOrderID} updated.`);
+    } catch (error) {
+        console.error("Error executing Update:", error);
+        res.status(500).send("An error occurred while executing the update PL/SQL.");
+    }
+});
+
+app.delete("/purchaseOrders/:purchaseOrderID", async function (req, res) {
+    try {
+        const deleteProc = 'CALL DeletePurchaseOrder(?);';
+        // Pass parameters as an array
+        await db.query(deleteProc, req.params.purchaseOrderID);
+        res.status(200).send(`Purchase Order ${req.params.purchaseOrderID} deleted.`);
+    } catch (error) {
+        console.error("Error executing Delete:", error);
+        res.status(500).send("An error occurred while executing the delete PL/SQL.");
+    }
+});
+
+app.post("/purchaseOrders", async function (req, res) {
+    try {
+        const addProc = 'CALL AddPurchaseOrder(?, ?, ?);';
+        // Pass parameters as an array
+        await db.query(addProc, [req.body.supplierID, req.body.warehouseID, req.body.purchaseDate]);
+        res.status(201).send(`Purchase Order ${req.body.supplierID} ${req.body.warehouseID} ${req.body.purchaseDate} added.`);
+    } catch (error) {
+        console.error("Error executing Add:", error);
+        res.status(500).send("An error occurred while executing the add PL/SQL.");
+    }
+});
+
+// PURCHASES ORDER ITEMS ROUTES (basically the same as sales order items, but with purchases variables)
 app.get("/purchaseOrderItems", async function (req, res) {
     try {
         const query = `
-SELECT PurchaseOrderItems.purchaseOrderID, PurchaseOrderItems.productID, PurchaseOrderItems.quantity, 
+SELECT PurchaseOrderItems.purchaseOrderItemID, PurchaseOrderItems.purchaseOrderID, PurchaseOrderItems.productID, PurchaseOrderItems.quantity, 
 PurchaseOrderItems.purchasePrice, Products.productName, PurchaseOrders.warehouseID
 FROM PurchaseOrderItems
 JOIN Products ON PurchaseOrderItems.productID = Products.productID
@@ -326,6 +364,42 @@ JOIN PurchaseOrders ON PurchaseOrderItems.purchaseOrderID = PurchaseOrders.purch
     } catch (error) {
         console.error("Error executing query:", error);
         res.status(500).send("An error occurred while executing the database query.");
+    }
+});
+
+app.put("/purchaseOrderItems/:purchaseOrderItemID", async function (req, res) {
+    try {
+        const updateProc = 'CALL UpdatePurchaseOrderItem(?, ?, ?, ?);';
+        // Pass parameters as an array
+        await db.query(updateProc, [req.params.purchaseOrderItemID, req.body.productID, req.body.quantity, req.body.purchasePrice]);
+        res.status(200).send(`Purchase Order Item ${req.params.purchaseOrderItemID} updated.`);
+    } catch (error) {
+        console.error("Error executing Update:", error);
+        res.status(500).send("An error occurred while executing the update PL/SQL.");
+    }
+});
+
+app.delete("/purchaseOrderItems/:purchaseOrderItemID", async function (req, res) {
+    try {
+        const deleteProc = 'CALL DeletePurchaseOrderItem(?);';
+        // Pass parameters as an array
+        await db.query(deleteProc, req.params.purchaseOrderItemID);
+        res.status(200).send(`Purchase Order Item ${req.params.purchaseOrderItemID} deleted.`);
+    } catch (error) {
+        console.error("Error executing Delete:", error);
+        res.status(500).send("An error occurred while executing the delete PL/SQL.");
+    }
+});
+
+app.post("/purchaseOrderItems", async function (req, res) {
+    try {
+        const addProc = 'CALL AddPurchaseOrderItem(?, ?, ?, ?);';
+        // Pass parameters as an array
+        await db.query(addProc, [req.body.purchaseOrderID, req.body.productID, req.body.quantity, req.body.purchasePrice]);
+        res.status(201).send(`Purchase Order Item ${req.body.purchaseOrderID} ${req.body.productID} ${req.body.quantity} ${req.body.purchasePrice} added.`);
+    } catch (error) {
+        console.error("Error executing Add:", error);
+        res.status(500).send("An error occurred while executing the add PL/SQL.");
     }
 });
 
