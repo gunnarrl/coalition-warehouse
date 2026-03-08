@@ -318,7 +318,7 @@ app.put("/purchaseOrders/:purchaseOrderID", async function (req, res) {
     try {
         const updateProc = 'CALL UpdatePurchaseOrder(?, ?, ?, ?);';
         // Pass parameters as an array
-        await db.query(updateProc, [req.params.purchaseOrderID, req.body.supplierID, req.body.warehouseID, req.body.purchaseDate]);
+        await db.query(updateProc, [req.params.purchaseOrderID, req.body.vendorID, req.body.warehouseID, req.body.purchaseDate]);
         res.status(200).send(`Purchase Order ${req.params.purchaseOrderID} updated.`);
     } catch (error) {
         console.error("Error executing Update:", error);
@@ -342,8 +342,8 @@ app.post("/purchaseOrders", async function (req, res) {
     try {
         const addProc = 'CALL AddPurchaseOrder(?, ?, ?);';
         // Pass parameters as an array
-        await db.query(addProc, [req.body.supplierID, req.body.warehouseID, req.body.purchaseDate]);
-        res.status(201).send(`Purchase Order ${req.body.supplierID} ${req.body.warehouseID} ${req.body.purchaseDate} added.`);
+        await db.query(addProc, [req.body.vendorID, req.body.warehouseID, req.body.purchaseDate]);
+        res.status(201).send(`Purchase Order added.`);
     } catch (error) {
         console.error("Error executing Add:", error);
         res.status(500).send("An error occurred while executing the add PL/SQL.");
@@ -396,7 +396,7 @@ app.post("/purchaseOrderItems", async function (req, res) {
         const addProc = 'CALL AddPurchaseOrderItem(?, ?, ?, ?);';
         // Pass parameters as an array
         await db.query(addProc, [req.body.purchaseOrderID, req.body.productID, req.body.quantity, req.body.purchasePrice]);
-        res.status(201).send(`Purchase Order Item ${req.body.purchaseOrderID} ${req.body.productID} ${req.body.quantity} ${req.body.purchasePrice} added.`);
+        res.status(201).send(`Purchase Order Item added to order ${req.body.purchaseOrderID}.`);
     } catch (error) {
         console.error("Error executing Add:", error);
         res.status(500).send("An error occurred while executing the add PL/SQL.");

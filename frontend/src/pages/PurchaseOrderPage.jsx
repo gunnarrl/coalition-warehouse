@@ -21,14 +21,14 @@ const PurchaseOrdersPage = () => {
     const [orderItems, setOrderItems] = useState([]);
     const [isItemsPopupOpen, setIsItemsPopupOpen] = useState(false);
     const [currentItem, setCurrentItem] = useState(null);
-    const [targetSaleID, setTargetSaleID] = useState(null);
+    const [targetPurchaseID, setTargetPurchaseID] = useState(null);
 
     // states for dropdowns
     const [vendors, setVendors] = useState([]);
     const [warehouses, setWarehouses] = useState([]);
     const [products, setProducts] = useState([]);
 
-    const fetchPurchasesOrders = async () => {
+    const fetchPurchaseOrders = async () => {
         try {
             const res = await fetch('/purchaseOrders');
             const data = await res.json();
@@ -48,18 +48,20 @@ const PurchaseOrdersPage = () => {
     };
 
     useEffect(() => {
-        fetchPurchasesOrders();
+        fetchPurchaseOrders();
     }, []);
 
     const fetchPurchaseItems = async () => {
         try {
             const res = await fetch('/purchaseOrderItems');
             const data = await res.json();
-            const formattedData = data.map(({ purchaseOrderID, productID, quantity, purchasePrice, productName }) => ({
+            const formattedData = data.map(({ purchaseOrderItemID, purchaseOrderID, productID, quantity, purchasePrice, productName }) => ({
+                purchaseOrderItemID: purchaseOrderItemID,
                 purchaseOrderID: purchaseOrderID,
                 productID: productID,
                 quantity: quantity,
-                purchasePrice: '$' + Number(purchasePrice).toFixed(2),
+                purchasePrice: purchasePrice,
+                purchasePriceFormatted: '$' + Number(purchasePrice).toFixed(2),
                 productName: productName
             }));
             setOrderItems(formattedData);
@@ -128,10 +130,38 @@ const PurchaseOrdersPage = () => {
 
 
     // Handlers for Add/Edit/Delete
-    // TODO: Connect these to the backend API and refresh the data after changes
-    const handleSave = (e) => {
-        e.preventDefault();
-        setIsPopupOpen(false);
+    // adapted from SaleOrderPage.jsx
+    const handleSave = async (event) => {
+        event.preventDefault();
+        // Get the data from the form
+        const formData = new FormData(event.target);
+        // Format the data to match the database schema
+        const purchaseOrderData = {
+            purchaseDate: formData.get('purchaseDate'),
+            vendorID: formData.get('vendorID'),
+            warehouseID: formData.get('warehouseID')
+        };
+
+        try {
+            let response;
+            // If currentRow is not null, we are editing an existing sale order, otherwise we are creating one.
+            if (currentRow) {
+                response = await fetch(`/purchaseOrders/${currentRow.purchaseOrderID}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(purchaseOrderData) });
+            } else {
+                response = await fetch(`/purchaseOrders`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(purchaseOrderData) });
+            }
+            const message = await response.text();
+            if (response.ok) {
+                alert(message);
+                setIsPopupOpen(false); // Close popup on success
+                fetchPurchaseOrders();
+            } else {
+                alert(message);
+            }
+        } catch (error) {
+            console.error('Error adding/updating purchase order:', error);
+            alert('An error occurred while adding/updating the purchase order.');
+        }
     }
 
     const handleEdit = (rowData) => {
@@ -144,38 +174,92 @@ const PurchaseOrdersPage = () => {
         setIsPopupOpen(true);
     }
 
-    const handleDelete = (rowData) => {
-        window.alert(`Delete Purchase Order ID: ${rowData.saleID}`);
+    // adapted from SaleOrderPage.jsx
+    const handleDelete = async (row) => {
+        try {
+            const response = await fetch(`/purchaseOrders/${row.purchaseOrderID}`, { method: 'DELETE' });
+            const message = await response.text();
+            if (response.ok) {
+                alert(message);
+                fetchPurchaseOrders();
+            } else {
+                alert(message);
+            }
+        } catch (error) {
+            console.error('Error deleting purchase order:', error);
+            alert('An error occurred while deleting the purchase order.');
+        }
     }
 
     // Inner table handlers
 
-    const handleAddItem = (saleID) => {
-        setTargetSaleID(saleID);
+    const handleAddItem = (purchaseID) => {
+        setTargetPurchaseID(purchaseID);
         setCurrentItem(null);
         setIsItemsPopupOpen(true);
     };
 
-    const handleEditItem = (saleID, itemRow) => {
-        setTargetSaleID(saleID);
+    const handleEditItem = (purchaseID, itemRow) => {
+        setTargetPurchaseID(purchaseID);
         setCurrentItem(itemRow);
         setIsItemsPopupOpen(true);
     };
 
-    const handleDeleteItem = (saleID, itemRow) => {
-        window.alert(`Delete Item ${itemRow.name} from Sale ID: ${saleID}`);
+    const handleDeleteItem = async (itemRow) => {
+        try {
+            const response = await fetch(`/purchaseOrderItems/${itemRow.purchaseOrderItemID}`, { method: 'DELETE' });
+            const message = await response.text();
+            if (response.ok) {
+                alert(message);
+                fetchPurchaseItems();
+            } else {
+                alert(message);
+            }
+        } catch (error) {
+            console.error('Error deleting purchase order item:', error);
+            alert('An error occurred while deleting the purchase order item.');
+        }
     };
 
-    const handleSaveItem = (e) => {
-        e.preventDefault();
-        setIsItemsPopupOpen(false);
+    const handleSaveItem = async (event) => {
+        event.preventDefault();
+        // Get the data from the form
+        const formData = new FormData(event.target);
+        // Format the data to match the database schema
+        const purchaseOrderItemData = {
+            purchaseOrderID: targetPurchaseID, // This is the sale order ID that the item is being added to, not allowed to be changed in form.
+            productID: formData.get('productID'),
+            quantity: formData.get('quantity'),
+            purchasePrice: formData.get('purchasePrice')
+        };
+
+        try {
+            let response;
+            // If currentRow is not null, we are editing an existing sale order, otherwise we are creating one.
+            if (currentItem) {
+                response = await fetch(`/purchaseOrderItems/${currentItem.purchaseOrderItemID}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(purchaseOrderItemData) });
+            } else {
+                response = await fetch(`/purchaseOrderItems`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(purchaseOrderItemData) });
+            }
+            const message = await response.text();
+            if (response.ok) {
+                alert(message);
+                setIsItemsPopupOpen(false); // Close popup on success
+                fetchPurchaseItems();
+            } else {
+                alert(message);
+            }
+        } catch (error) {
+            console.error('Error adding/updating purchase order item:', error);
+            alert('An error occurred while adding/updating the purchase order item.');
+        }
     }
 
     const renderPurchaseItems = (row) => {
         const itemColumns = [
             { label: 'Product Name', key: 'productName' },
             { label: 'Quantity', key: 'quantity' },
-            { label: 'Purchase Price', key: 'purchasePrice' }
+            { label: 'Purchase Price', key: 'purchasePriceFormatted' }
         ];
 
         return (
@@ -186,7 +270,7 @@ const PurchaseOrdersPage = () => {
                     columns={itemColumns}
                     data={orderItems.filter(item => item.purchaseOrderID === row.purchaseOrderID)}
                     onEdit={(itemRow) => handleEditItem(row.purchaseOrderID, itemRow)}
-                    onDelete={(itemRow) => handleDeleteItem(row.purchaseOrderID, itemRow)}
+                    onDelete={handleDeleteItem}
                 />
             </div>
         );
@@ -228,19 +312,19 @@ const PurchaseOrdersPage = () => {
                 onClose={() => setIsItemsPopupOpen(false)}
                 title={currentItem ? "Edit Order Item" : "Add Item to Order"}
             >
-                <form key={currentItem?.name || 'new-item'} onSubmit={handleSaveItem}>
+                <form key={currentItem?.purchaseOrderItemID || 'new-item'} onSubmit={handleSaveItem}>
                     <Dropdown
                         label="Product"
                         name="productID"
                         options={products}
                         valueKey="productID"
                         labelKey="productName"
-                        selectedValue={currentRow?.productID}
+                        selectedValue={currentItem?.productID}
                     />
                     <label>Quantity:</label>
-                    <input name="qty" type="number" defaultValue={currentItem?.qty || 0} />
+                    <input name="quantity" type="number" defaultValue={currentItem?.quantity || 0} />
                     <label>Unit Price:</label>
-                    <input name="price" type="number" step="0.01" defaultValue={currentItem?.price || 0} />
+                    <input name="purchasePrice" type="number" step="0.01" defaultValue={currentItem?.purchasePrice || 0} />
                     <button type="submit">Save Item</button>
                 </form>
             </PopupForm>

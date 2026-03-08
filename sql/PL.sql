@@ -152,18 +152,18 @@ DELIMITER ;
 DROP PROCEDURE IF EXISTS AddPurchaseOrder;
 
 DELIMITER //
-CREATE PROCEDURE AddPurchaseOrder(IN in_supplierID INT, IN in_warehouseID INT, IN in_purchaseDate DATE)
+CREATE PROCEDURE AddPurchaseOrder(IN in_vendorID INT, IN in_warehouseID INT, IN in_purchaseDate DATE)
 BEGIN
-    INSERT INTO PurchaseOrders (supplierID, warehouseID, purchaseDate) VALUES (in_supplierID, in_warehouseID, in_purchaseDate);
+    INSERT INTO PurchaseOrders (vendorID, warehouseID, purchaseDate) VALUES (in_vendorID, in_warehouseID, in_purchaseDate);
 END //
 DELIMITER ;
 
 DROP PROCEDURE IF EXISTS UpdatePurchaseOrder;
 
 DELIMITER //
-CREATE PROCEDURE UpdatePurchaseOrder(IN in_purchaseOrderID INT, IN in_supplierID INT, IN in_warehouseID INT, IN in_purchaseDate DATE)
+CREATE PROCEDURE UpdatePurchaseOrder(IN in_purchaseOrderID INT, IN in_vendorID INT, IN in_warehouseID INT, IN in_purchaseDate DATE)
 BEGIN
-    UPDATE PurchaseOrders SET supplierID = in_supplierID, warehouseID = in_warehouseID, purchaseDate = in_purchaseDate WHERE purchaseOrderID = in_purchaseOrderID;
+    UPDATE PurchaseOrders SET vendorID = in_vendorID, warehouseID = in_warehouseID, purchaseDate = in_purchaseDate WHERE purchaseOrderID = in_purchaseOrderID;
 END //
 DELIMITER ;
 
