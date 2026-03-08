@@ -243,6 +243,7 @@ app.post("/salesOrders", async function (req, res) {
     }
 });
 
+// SALES ORDER ITEMS ROUTES
 app.get("/salesOrderItems", async function (req, res) {
     try {
         const query = `
@@ -256,6 +257,42 @@ JOIN SalesOrders ON SalesOrderItems.saleOrderID = SalesOrders.saleOrderID;`;
     } catch (error) {
         console.error("Error executing query:", error);
         res.status(500).send("An error occurred while executing the database query.");
+    }
+});
+
+app.put("/salesOrderItems/:saleOrderItemID", async function (req, res) {
+    try {
+        const updateProc = 'CALL UpdateSalesOrderItem(?, ?, ?);';
+        // Pass parameters as an array
+        await db.query(updateProc, [req.body.saleOrderItemID, req.body.quantity, req.body.salePrice]);
+        res.status(200).send(`Sales Order Item ${req.body.saleOrderItemID} updated.`);
+    } catch (error) {
+        console.error("Error executing Update:", error);
+        res.status(500).send("An error occurred while executing the update PL/SQL.");
+    }
+});
+
+app.delete("/salesOrderItems/:saleOrderItemID", async function (req, res) {
+    try {
+        const deleteProc = 'CALL DeleteSalesOrderItem(?);';
+        // Pass saleOrderItemID as a parameter to the SP
+        await db.query(deleteProc, req.params.saleOrderItemID);
+        res.status(200).send(`Sales Order Item ${req.params.saleOrderItemID} deleted.`); // send 200 status so the message shows up (204 didn't show message for some reason)
+    } catch (error) {
+        console.error("Error executing Delete:", error);
+        res.status(500).send("An error occurred while executing the delete PL/SQL.");
+    }
+});
+
+app.post("/salesOrderItems", async function (req, res) {
+    try {
+        const addProc = 'CALL AddSalesOrderItem(?, ?, ?, ?);';
+        // Pass parameters as an array
+        await db.query(addProc, [req.body.saleOrderID, req.body.productID, req.body.quantity, req.body.salePrice]);
+        res.status(201).send(`Sales Order Item ${req.body.saleOrderID} ${req.body.productID} added.`);
+    } catch (error) {
+        console.error("Error executing Add:", error);
+        res.status(500).send("An error occurred while executing the add PL/SQL.");
     }
 });
 
