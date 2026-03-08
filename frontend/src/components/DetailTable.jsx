@@ -40,16 +40,16 @@ function DetailTable({ columns, data, onEdit, onDelete, renderDetails }) {
                             <td>
                                 {openRowId === i ? <MdKeyboardArrowDown /> : <MdKeyboardArrowRight />}
                             </td>
-                            
+
                             {columns.map((col, j) => (
                                 <td key={j}>{row[col.key]}</td>
                             ))}
-                            
+
                             <td>
-                                <button onClick={(e) => {e.stopPropagation(); onEdit(row)}}><MdEdit /></button>
+                                <button onClick={(e) => { e.stopPropagation(); onEdit(row) }}><MdEdit /></button>
                             </td>
                             <td>
-                                <button className="danger" onClick={(e) => {e.stopPropagation(); onDelete(row.id)}}><MdDelete /></button>
+                                <button className="danger" onClick={(e) => { e.stopPropagation(); onDelete(row) }}><MdDelete /></button>
                             </td>
                         </tr>
                         {/* EXPANDED ROW */}

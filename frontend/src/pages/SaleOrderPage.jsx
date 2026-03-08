@@ -76,9 +76,9 @@ const SalesOrdersPage = () => {
         try {
             const res = await fetch('/customers');
             const data = await res.json();
-            const formattedData = data.map(({ customerID, customerName }) => ({
+            const formattedData = data.map(({ customerID, customerFN, customerLN }) => ({
                 customerID: customerID,
-                customerName: customerName
+                customerName: customerFN + ' ' + customerLN
             }));
             setCustomers(formattedData);
         } catch (error) {
@@ -127,9 +127,38 @@ const SalesOrdersPage = () => {
     }, []);
 
     // Handlers for Add/Edit/Delete
-    const handleSave = (e) => {
-        e.preventDefault();
-        setIsPopupOpen(false);
+    // adapted from ProductPage.jsx
+    const handleSave = async (event) => {
+        event.preventDefault();
+        // Get the data from the form
+        const formData = new FormData(event.target);
+        // Format the data to match the database schema
+        const saleOrderData = {
+            saleDate: formData.get('saleDate'),
+            customerID: formData.get('customerID'),
+            warehouseID: formData.get('warehouseID')
+        };
+
+        try {
+            let response;
+            // If currentRow is not null, we are editing an existing sale order, otherwise we are creating one.
+            if (currentRow) {
+                response = await fetch(`/salesOrders/${currentRow.saleOrderID}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(saleOrderData) });
+            } else {
+                response = await fetch(`/salesOrders`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(saleOrderData) });
+            }
+            const message = await response.text();
+            if (response.ok) {
+                alert(message);
+                setIsPopupOpen(false); // Close popup on success
+                fetchSalesOrders();
+            } else {
+                alert(message);
+            }
+        } catch (error) {
+            console.error('Error adding/updating sale order:', error);
+            alert('An error occurred while adding/updating the sale order.');
+        }
     }
 
     const handleEdit = (rowData) => {
@@ -142,8 +171,21 @@ const SalesOrdersPage = () => {
         setIsPopupOpen(true);
     }
 
-    const handleDelete = (rowData) => {
-        window.alert(`Delete Sale Order ID: ${rowData.saleOrderID}`);
+    // adapted from ProductPage.jsx
+    const handleDelete = async (row) => {
+        try {
+            const response = await fetch(`/salesOrders/${row.saleOrderID}`, { method: 'DELETE' });
+            const message = await response.text();
+            if (response.ok) {
+                alert(message);
+                fetchSalesOrders();
+            } else {
+                alert(message);
+            }
+        } catch (error) {
+            console.error('Error deleting sale order:', error);
+            alert('An error occurred while deleting the sale order.');
+        }
     }
 
     // item handlers
@@ -169,7 +211,6 @@ const SalesOrdersPage = () => {
     }
 
     const renderSaleItems = (row) => {
-        ;
 
         const itemColumns = [
             { label: 'Product Name', key: 'productName' },
