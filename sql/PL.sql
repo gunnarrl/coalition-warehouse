@@ -125,17 +125,94 @@ CREATE TRIGGER UpdateInventoryAfterSale
 AFTER INSERT ON SalesOrderItems
 FOR EACH ROW
 BEGIN
-    DECLARE v_warehouseID INT;
+    DECLARE _warehouseID INT;
     
     -- Look up the warehouse associated with this sale order
-    SELECT warehouseID INTO v_warehouseID 
+    SELECT warehouseID INTO _warehouseID 
     FROM SalesOrders 
     WHERE saleOrderID = NEW.saleOrderID;
     -- Update the inventory for that specific warehouse + product
     UPDATE Inventory 
     SET quantity = quantity - NEW.quantity 
     WHERE productID = NEW.productID 
-      AND warehouseID = v_warehouseID;
+      AND warehouseID = _warehouseID;
+END //
+DELIMITER ;
+
+-- PURCHASES SPs -- (basically the same as sales orders, but with purchases)
+DROP PROCEDURE IF EXISTS DeletePurchaseOrder;
+
+DELIMITER //
+CREATE PROCEDURE DeletePurchaseOrder(IN in_purchaseOrderID INT)
+BEGIN
+    DELETE FROM PurchaseOrders WHERE purchaseOrderID = in_purchaseOrderID;
+END //
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS AddPurchaseOrder;
+
+DELIMITER //
+CREATE PROCEDURE AddPurchaseOrder(IN in_supplierID INT, IN in_warehouseID INT, IN in_purchaseDate DATE)
+BEGIN
+    INSERT INTO PurchaseOrders (supplierID, warehouseID, purchaseDate) VALUES (in_supplierID, in_warehouseID, in_purchaseDate);
+END //
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS UpdatePurchaseOrder;
+
+DELIMITER //
+CREATE PROCEDURE UpdatePurchaseOrder(IN in_purchaseOrderID INT, IN in_supplierID INT, IN in_warehouseID INT, IN in_purchaseDate DATE)
+BEGIN
+    UPDATE PurchaseOrders SET supplierID = in_supplierID, warehouseID = in_warehouseID, purchaseDate = in_purchaseDate WHERE purchaseOrderID = in_purchaseOrderID;
+END //
+DELIMITER ;
+
+-- PURCHASE ORDER ITEMS SPs -- (basically the same as sales order items, but with purchases)
+DROP PROCEDURE IF EXISTS DeletePurchaseOrderItem;
+
+DELIMITER //
+CREATE PROCEDURE DeletePurchaseOrderItem(IN in_purchaseOrderItemID INT)
+BEGIN
+    DELETE FROM PurchaseOrderItems WHERE purchaseOrderItemID = in_purchaseOrderItemID;
+END //
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS AddPurchaseOrderItem;
+
+DELIMITER //
+CREATE PROCEDURE AddPurchaseOrderItem(IN in_purchaseOrderID INT, IN in_productID INT, IN in_quantity INT, IN in_purchasePrice DECIMAL(10,2))
+BEGIN
+    INSERT INTO PurchaseOrderItems (purchaseOrderID, productID, quantity, purchasePrice) VALUES (in_purchaseOrderID, in_productID, in_quantity, in_purchasePrice);
+END //
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS UpdatePurchaseOrderItem;
+
+DELIMITER //
+CREATE PROCEDURE UpdatePurchaseOrderItem(IN in_purchaseOrderItemID INT, IN in_productID INT, IN in_quantity INT, IN in_purchasePrice DECIMAL(10,2))
+BEGIN
+    UPDATE PurchaseOrderItems SET productID = in_productID, quantity = in_quantity, purchasePrice = in_purchasePrice WHERE purchaseOrderItemID = in_purchaseOrderItemID;
+END //
+DELIMITER ;
+
+DROP TRIGGER IF EXISTS UpdateInventoryAfterPurchase;
+
+DELIMITER //
+CREATE TRIGGER UpdateInventoryAfterPurchase
+AFTER INSERT ON PurchaseOrderItems
+FOR EACH ROW
+BEGIN
+    DECLARE _warehouseID INT;
+    
+    -- Look up the warehouse associated with this purchase order
+    SELECT warehouseID INTO _warehouseID 
+    FROM PurchaseOrders 
+    WHERE purchaseOrderID = NEW.purchaseOrderID;
+    -- Update the inventory for that specific warehouse + product
+    UPDATE Inventory 
+    SET quantity = quantity + NEW.quantity 
+    WHERE productID = NEW.productID 
+      AND warehouseID = _warehouseID;
 END //
 DELIMITER ;
 
