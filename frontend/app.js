@@ -36,6 +36,96 @@ app.post('/resetdb', async function (req, res) {
     }
 });
 
+// WAREHOUSE CRUD ROUTES
+app.get('/warehouses', async function (req,res) {
+    try {
+        const query = "SELECT * FROM Warehouses;";
+        const [rows] = await db.query(query);
+        res.send(JSON.stringify(rows));
+    } catch (error) {
+        console.error("Error executing query:", error);
+        res.status(500).send("An error occurred while running the SELECT operation.");
+    }
+});
+
+app.post("/warehouses", async function (req, res) {
+    try {
+        const addProc = 'CALL AddWarehouse(?,?);';
+        await db.query(addProc, [req.body.warehouseName, req.body.warehouseAddr]);
+        res.status(201).send(`Warehouse ${req.body.warehouseName} added.`);
+    } catch (error) {
+        console.error("Error executing Add:", error);
+        res.status(500).send("An error occurred while executing the add PL/SQL.");
+    }
+});
+
+app.put('/warehouses/:warehouseID', async function (req, res) {
+    try {
+        const updateProc = 'CALL UpdateWarehouse(?,?,?);';
+        await db.query(updateProc, [req.params.warehouseID, req.body.warehouseName, req.body.warehouseAddr]);
+        res.status(200).send(`Warehouse ${req.params.warehouseID} updated.`);
+    } catch (error) {
+        console.error("Error executing Update:", error);
+        res.status(500).send("An error occurred while executing the update PL/SQL");
+    }
+});
+
+app.delete('/warehouses/:warehouseID', async function (req, res) {
+    try {
+        const deleteProc = 'CALL DeleteWarehouse(?);';
+        await db.query(deleteProc, [req.params.warehouseID]);
+        res.status(200).send(`Warehouse ${req.params.warehouseID} deleted.`);
+    } catch (error) {
+        console.error("Error executing Delete:", error);
+        res.status(500).send("An error occurred while executing the delete PL/SQL.");
+    }
+});
+
+// INVENTORY CRUD ROUTES
+app.get('/inventory', async function (req,res) {
+    try {
+        const query = "SELECT * FROM Inventory;";
+        const [rows] = await db.query(query);
+        res.send(JSON.stringify(rows));
+    } catch (error) {
+        console.error("Error executing query:", error);
+        res.status(500).send("An error occurred while running the SELECT operation.");
+    }
+});
+
+app.post("/inventory", async function (req, res) {
+    try {
+        const addProc = 'CALL AddInventory(?,?,?);';
+        await db.query(addProc, [req.body.productID, req.body.warehouseID, req.body.quantity]);
+        res.status(201).send(`Inventory ${req.body.productID} added.`);
+    } catch (error) {
+        console.error("Error executing Add:", error);
+        res.status(500).send("An error occurred while executing the add PL/SQL");
+    }
+});
+
+app.put('/inventory/', async function (req, res) {
+    try {
+        const updateProc = 'CALL UpdateInventory(?,?,?);';
+        await db.query(updateProc, [req.body.productID, req.body.warehouseID, req.body.quantity]);
+        res.status(200).send(`Inventory ${req.body.productID} updated.`);
+    } catch (error) {
+        console.error("Error executing Update:", error);
+        res.status(500).send("An error occurred while executing the update PL/SQL");
+    }
+});
+
+app.delete('/inventory', async function (req, res) {
+    try {
+        const deleteProc = 'CALL DeleteInventory(?,?);';
+        await db.query(deleteProc, [req.body.productID, req.body.warehouseID]);
+        res.status(200).send(`Inventory ${req.body.productID} deleted from ${req.body.warehouseID}.`);
+    } catch (error) {
+        console.error("Error executing Delete:", error);
+        res.status(500).send("An error occurred while executing the delete PL/SQL.");
+    }
+});
+
 // CUSTOMER CRUD ROUTES
 app.get('/customers', async function (req, res) {
     try {

@@ -6,6 +6,56 @@
 -- Delete Premium Keyboard from Products
 -- Verify the Reset button works as intended
 
+-- WAREHOUSE SPs --
+DROP PROCEDURE IF EXISTS AddWarehouse;
+DELIMITER //
+CREATE PROCEDURE AddWarehouse(IN in_warehouseName VARCHAR(255), IN in_warehouseAddr VARCHAR(255))
+BEGIN
+    INSERT INTO Warehouses(warehouseName, warehouseAddr) VALUES (in_warehouseName, in_warehouseAddr);
+END //
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS UpdateWarehouse;
+DELIMITER //
+CREATE PROCEDURE UpdateWarehouse(IN in_warehouseID INT, IN in_warehouseName VARCHAR(255), IN in_warehouseAddr VARCHAR(255))
+BEGIN
+    UPDATE Warehouses SET warehouseName = in_warehouseName, warehouseAddr = in_warehouseAddr WHERE warehouseID = in_warehouseID;
+END // 
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS DeleteWarehouse;
+DELIMITER //
+CREATE PROCEDURE DeleteWarehouse(IN in_warehouseID INT)
+BEGIN
+    DELETE FROM Warehouses WHERE warehouseID = in_warehouseID;
+END //
+DELIMITER ;
+
+-- WAREHOUSE-INVENTORY SPs --
+DROP PROCEDURE IF EXISTS AddInventory;
+DELIMITER //
+CREATE PROCEDURE AddInventory(IN in_productID INT, IN in_warehouseID INT, IN in_quantity INT)
+BEGIN
+    INSERT INTO Inventory(productID, warehouseID, quantity) VALUES (in_productID, in_warehouseID, in_quantity);
+END //
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS UpdateInventory;
+DELIMITER //
+CREATE PROCEDURE UpdateInventory(IN in_productID INT, IN in_warehouseID INT, IN in_quantity INT)
+BEGIN 
+    UPDATE Inventory SET quantity = in_quantity WHERE warehouseID = in_warehouseID AND productID = in_productID;
+END //
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS DeleteInventory;
+DELIMITER //
+CREATE PROCEDURE DeleteInventory(IN in_productID INT, IN in_warehouseID INT)
+BEGIN
+    DELETE FROM Inventory WHERE warehouseID = in_warehouseID AND productID = in_productID;
+END //
+DELIMITER ;
+
 -- PRODUCTS SPs --
 DROP PROCEDURE IF EXISTS DeleteProduct;
 

@@ -134,8 +134,48 @@ function WarehousePage() {
         setIsPopupOpen(true);
     };
 
-    const handleDelete = (id) => {
-        alert("Delete Warehouse ID: " + id);
+    const handleSubmit = async (event) => {
+        event.preventDefault();
+        const formData = new FormData(event.target);
+        const warehouseData = {
+            warehouseName: formData.get('warehouseName'),
+            warehouseAddr: formData.get('warehouseAddr'),
+        };
+        try {
+            let response;
+            if (currentRow) {
+                response = await fetch(`/warehouses/${ currentRow.warehouseID }`, { method: 'PUT', headers:{ 'Content-Type': 'application/json' }, body: JSON.stringify(warehouseData)});
+            } else {
+                response = await fetch('/warehouses', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(warehouseData) });
+            }
+            const message = await response.text();
+            if (response.ok) {
+                alert(message);
+                fetchWarehouses();
+                setIsPopupOpen(false);
+            } else {
+                alert(message);
+            }
+        } catch (error) {
+            console.error('Error adding/updating warehouse:', error);
+            alert('An error occurred while adding/updating the warehouse.');
+        }
+    };
+
+    const handleDelete = async (row) => {
+        try {
+            const response = await fetch(`/warehouses/${row.warehouseID}`, { method: 'DELETE' });
+            const message = await response.text();
+            if (response.ok) {
+                alert(message);
+                fetchWarehouses();
+            } else {
+                alert(message);
+            }
+        } catch (error) {
+            console.error('Error deleting warehouse:', error);
+            alert('An error occurred while deleting the warehouse.');
+        }
     };
 
     const handleSave = (e) => {
@@ -157,15 +197,50 @@ function WarehousePage() {
         setIsItemPopupOpen(true);
     };
 
-    const handleDeleteItem = (warehouseID, itemRow) => {
-        alert(`Delete Item ${itemRow.name} from Warehouse ID: ${warehouseID}`);
+    const handleSubmitItem = async (event) => {
+        event.preventDefault();
+        const formData = new FormData(event.target);
+        const inventoryData = {
+            productID: formData.get('productID'),
+            warehouseID: targetWarehouseID,
+            quantity: formData.get('quantity'),
+        };
+        try {
+            let response;
+            if (currentItem) {
+                response = await fetch('/inventory/', { method: 'PUT', headers:{ 'Content-Type': 'application/json' }, body: JSON.stringify(inventoryData)});
+            } else {
+                response = await fetch('/inventory', { method: 'POST', headers:{ 'Content-Type': 'application/json' }, body: JSON.stringify(inventoryData)});
+            }
+            const message = await response.text();
+            if (response.ok) {
+                alert(message);
+                fetchInventory();
+                setIsItemPopupOpen(false);
+            } else {
+                alert(message);
+            }
+        } catch (error) {
+            console.error('Error adding/updating inventory:', error);
+            alert('An error occurred while adding/updating the inventory.');
+        }
     };
 
-    const handleSaveItem = (e) => {
-        e.preventDefault();
-        alert("Saved Item!");
-        setIsItemPopupOpen(false);
-    }
+    const handleDeleteItem = async (warehouseID, itemRow) => {
+        try {
+            const response = await fetch('/inventory', {method: 'DELETE', headers: { 'Content-Type': 'application/json'}, body: JSON.stringify({productID: itemRow.productID, warehouseID: warehouseID})});
+            const message = await response.text();
+            if (response.ok) {
+                alert(message);
+                fetchInventory();
+            } else {
+                alert(message);
+            }
+        } catch (error) {
+            console.error('Error deleting inventory:', error);
+            alert('An error occurred while deleting the inventory.');
+        }
+    };
 
     return (
         <div>
