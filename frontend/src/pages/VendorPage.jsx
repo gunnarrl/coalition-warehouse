@@ -47,7 +47,8 @@ function VendorPage() {
         try {
             const res = await fetch('/catalog');
             const data = await res.json();
-            const formattedData = data.map(({ vendorID, vendorName, productID, productName, costFromVendor }) => ({
+            const formattedData = data.map(({ vendorProductID, vendorID, vendorName, productID, productName, costFromVendor }) => ({
+                vendorProductID: vendorProductID,
                 vendorID: vendorID,
                 vendorName: vendorName,
                 productID: productID,
@@ -105,7 +106,7 @@ function VendorPage() {
                     data={catalogItems.filter(item => item.vendorID === row.vendorID)}
                     columns={catalogColumns}
                     onEdit={(itemRow) => handleEditCatalogItem(row.vendorID, itemRow)}
-                    onDelete={(itemRow) => handleDeleteCatalogItem(row.vendorID, itemRow)}
+                    onDelete={handleDeleteItem}
                 />
             </div>
         );
@@ -122,14 +123,49 @@ function VendorPage() {
         setIsPopupOpen(true);
     };
 
-    const handleSave = (e) => {
-        e.preventDefault();
-        alert("Vendor Saved!");
-        setIsPopupOpen(false);
+    const handleSubmit = async (event) => {
+        event.preventDefault();
+        const formData = new FormData(event.target);
+        const vendorData = {
+            vendorName: formData.get('vendorName'),
+            vendorAddr: formData.get('vendorAddr'),
+            vendorEmail: formData.get('vendorEmail'),
+        };
+        try {
+            let response;
+            if (currentVendor) {
+                response = await fetch(`/vendors/${currentVendor.vendorID}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(vendorData) });
+            } else {
+                response = await fetch('/vendors', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(vendorData) });
+            }
+            const message = await response.text();
+            if (response.ok) {
+                alert(message);
+                fetchVendors();
+                setIsPopupOpen(false);
+            } else {
+                alert(message);
+            }
+        } catch (error) {
+            console.error('Error adding/updating vendor:', error);
+            alert('An error occurred while adding/updating the vendor.');
+        }
     };
 
-    const handleDelete = (id) => {
-        alert("Delete Vendor ID: " + id);
+    const handleDelete = async (row) => {
+        try {
+            const response = await fetch(`/vendors/${row.vendorID}`, { method: 'DELETE' });
+            const message = await response.text();
+            if (response.ok) {
+                alert(message);
+                fetchVendors();
+            } else {
+                alert(message);
+            }
+        } catch (error) {
+            console.error('Error deleting vendor:', error);
+            alert('An error occurred while deleting the vendor.');
+        }
     };
 
     // Inner Table handlers
@@ -145,14 +181,49 @@ function VendorPage() {
         setIsCatalogPopupOpen(true);
     };
 
-    const handleSaveCatalogItem = (e) => {
-        e.preventDefault();
-        alert(`Saved ${currentCatalogItem ? "changes to" : "new"} product for Vendor ID ${targetVendorID}`);
-        setIsCatalogPopupOpen(false);
+    const handleSubmitItem = async (event) => {
+        event.preventDefault();
+        const formData = new FormData(event.target);
+        const catalogData = {
+            vendorID: targetVendorID,
+            productID: formData.get('productID'),
+            costFromVendor: formData.get('costFromVendor'),
+        };
+        try {
+            let response;
+            if (currentCatalogItem) {
+                response = await fetch(`/catalog/${currentCatalogItem.vendorProductID}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(catalogData) });
+            } else {
+                response = await fetch('/catalog', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(catalogData) });
+            }
+            const message = await response.text();
+            if (response.ok) {
+                alert(message);
+                fetchCatalog();
+                setIsCatalogPopupOpen(false);
+            } else {
+                alert(message);
+            }
+        } catch (error) {
+            console.error('Error adding/updating catalog:', error);
+            alert('An error occurred while adding/updating the catalog.');
+        }
     };
 
-    const handleDeleteCatalogItem = (vendorID, itemRow) => {
-        alert(`Removed ${itemRow.name} from Vendor ID ${vendorID}`);
+    const handleDeleteItem = async (itemRow) => {
+        try {
+            const response = await fetch(`/catalog/${itemRow.vendorProductID}`, { method: 'DELETE' });
+            const message = await response.text();
+            if (response.ok) {
+                alert(message);
+                fetchCatalog();
+            } else {
+                alert(message);
+            }
+        } catch (error) {
+            console.error('Error deleting catalog:', error);
+            alert('An error occurred while deleting the catalog.');
+        }
     };
 
     return (
@@ -164,7 +235,7 @@ function VendorPage() {
                 onClose={() => setIsPopupOpen(false)}
                 title={currentVendor ? "Edit Vendor" : "Add Vendor"}
             >
-                <form key={currentVendor?.vendorID || 'new-vendor'} onSubmit={handleSave}>
+                <form key={currentVendor?.vendorID || 'new-vendor'} onSubmit={handleSubmit}>
                     <label>Name:</label>
                     <input name="vendorName" defaultValue={currentVendor?.vendorName || ''} />
                     <label>Address:</label>
@@ -179,7 +250,7 @@ function VendorPage() {
                 onClose={() => setIsCatalogPopupOpen(false)}
                 title={currentCatalogItem ? "Edit Catalog Product" : "Add Product to Catalog"}
             >
-                <form key={currentCatalogItem?.name || 'new-cat-item'} onSubmit={handleSaveCatalogItem}>
+                <form key={currentCatalogItem?.vendorProductID || 'new-cat-item'} onSubmit={handleSubmitItem}>
                     <Dropdown
                         label="Product"
                         name="productID"

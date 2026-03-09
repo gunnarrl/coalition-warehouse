@@ -228,8 +228,6 @@ app.post("/products", async function (req, res) {
     }
 });
 
-
-
 app.get("/products", async function (req, res) {
     try {
         const query = "SELECT * FROM Products;"
@@ -241,6 +239,7 @@ app.get("/products", async function (req, res) {
     }
 });
 
+// VENDOR CRUD ROUTES
 app.get("/vendors", async function (req, res) {
     try {
         const query = "SELECT * FROM Vendors;"
@@ -252,10 +251,43 @@ app.get("/vendors", async function (req, res) {
     }
 });
 
+app.delete("/vendors/:vendorID", async function (req, res) {
+    try {
+        const deleteProc = 'CALL DeleteVendor(?);';
+        await db.query(deleteProc, [req.params.vendorID]);
+        res.status(200).send(`Vendor ${req.params.vendorID} deleted.`);
+    } catch (error) {
+        console.error("Error executing Delete:", error);
+        res.status(500).send("An error occurred while executing the delete PL/SQL.");
+    }
+});
+
+app.put("/vendors/:vendorID", async function (req, res) {
+    try {
+        const updateProc = 'CALL UpdateVendor(?, ?, ?);';
+        await db.query(updateProc, [req.params.vendorID, req.body.vendorName, req.body.vendorAddr]);
+        res.status(200).send(`Vendor ${req.params.vendorID} updated.`);
+    } catch (error) {
+        console.error("Error executing Update:", error);
+        res.status(500).send("An error occurred while executing the update PL/SQL.");
+    }
+});
+
+app.post("/vendors", async function (req, res) {
+    try {
+        const addProc = 'CALL AddVendor(?, ?);';
+        await db.query(addProc, [req.body.vendorName, req.body.vendorAddr]);
+        res.status(201).send(`Vendor ${req.body.vendorName} added.`);
+    } catch (error) {
+        console.error("Error executing Add:", error);
+        res.status(500).send("An error occurred while executing the add PL/SQL.");
+    }
+});
+
 app.get("/catalog", async function (req, res) {
     try {
         const query = `
-SELECT Vendors.vendorID, Vendors.vendorName, Products.productID, Products.productName, VendorProducts.costFromVendor
+SELECT VendorProducts.vendorProductID, Vendors.vendorID, Vendors.vendorName, Products.productID, Products.productName, VendorProducts.costFromVendor
 FROM VendorProducts
 JOIN Vendors ON VendorProducts.vendorID = Vendors.vendorID
 JOIN Products on VendorProducts.productID = Products.productID;`;
@@ -264,6 +296,39 @@ JOIN Products on VendorProducts.productID = Products.productID;`;
     } catch (error) {
         console.error("Error executing query:", error);
         res.status(500).send("An error occurred while executing the database query.");
+    }
+});
+
+app.delete("/catalog/:vendorProductID", async function (req, res) {
+    try {
+        const deleteProc = 'CALL DeleteVendorProduct(?);';
+        await db.query(deleteProc, [req.params.vendorProductID]);
+        res.status(200).send(`Vendor Product ${req.params.vendorProductID} deleted.`);
+    } catch (error) {
+        console.error("Error executing Delete:", error);
+        res.status(500).send("An error occurred while executing the delete PL/SQL.");
+    }
+});
+
+app.put("/catalog/:vendorProductID", async function (req, res) {
+    try {
+        const updateProc = 'CALL UpdateVendorProduct(?, ?, ?, ?);';
+        await db.query(updateProc, [req.params.vendorProductID, req.body.vendorID, req.body.productID, req.body.costFromVendor]);
+        res.status(200).send(`Vendor Product ${req.params.vendorProductID} updated.`);
+    } catch (error) {
+        console.error("Error executing Update:", error);
+        res.status(500).send("An error occurred while executing the update PL/SQL.");
+    }
+});
+
+app.post("/catalog", async function (req, res) {
+    try {
+        const addProc = 'CALL AddVendorProduct(?, ?, ?);';
+        await db.query(addProc, [req.body.vendorID, req.body.productID, req.body.costFromVendor]);
+        res.status(201).send(`Vendor Product ${req.body.productID} added.`);
+    } catch (error) {
+        console.error("Error executing Add:", error);
+        res.status(500).send("An error occurred while executing the add PL/SQL.");
     }
 });
 
