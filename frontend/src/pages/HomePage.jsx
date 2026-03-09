@@ -7,7 +7,7 @@ const HomePage = () => {
         if (window.confirm("Are you sure you want to reset the sample data?")) {
             console.log("Resetting database...");
             try {
-                const response = await fetch('/resetdb', { method: 'POST' });
+                const response = await fetch('/api/resetdb', { method: 'POST' });
                 const message = await response.text();
                 if (response.ok) {
                     alert(message);

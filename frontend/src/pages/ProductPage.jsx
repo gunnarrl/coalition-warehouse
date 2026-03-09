@@ -15,7 +15,7 @@ const ProductPage = () => {
 
     const fetchProducts = async () => {
         try {
-            const res = await fetch('/products');
+            const res = await fetch('/api/products');
             const data = await res.json();
             const formattedData = data.map(({ productID, productName, listCost }) => ({
                 productID: productID,
@@ -64,9 +64,9 @@ const ProductPage = () => {
             let response;
             // If currentRow is not null, we are editing an existing product, otherwise we are creating one.
             if (currentRow) {
-                response = await fetch(`/products/${currentRow.productID}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(productData) });
+                response = await fetch(`/api/products/${currentRow.productID}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(productData) });
             } else {
-                response = await fetch(`/products`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(productData) });
+                response = await fetch(`/api/products`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(productData) });
             }
             const message = await response.text();
             if (response.ok) {
@@ -84,7 +84,7 @@ const ProductPage = () => {
 
     const handleDelete = async (row) => {
         try {
-            const response = await fetch(`/products/${row.productID}`, { method: 'DELETE' });
+            const response = await fetch(`/api/products/${row.productID}`, { method: 'DELETE' });
             const message = await response.text();
             if (response.ok) {
                 alert(message);

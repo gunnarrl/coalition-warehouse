@@ -10,7 +10,7 @@ const CustomerPage = () => {
 
     const fetchCustomers = async () => {
         try {
-            const res = await fetch('/customers');
+            const res = await fetch('/api/customers');
             const data = await res.json();
 
             const formattedData = data.map(({ customerID, customerFN, customerLN, customerEmail, customerAddr }) => ({
@@ -65,9 +65,9 @@ const CustomerPage = () => {
             let response;
             // If currentRow is not null, we are editing an existing customer, otherwise we are creating a new one.
             if (currentRow) {
-                response = await fetch(`/customers/${currentRow.customerID}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(customerData) });
+                response = await fetch(`/api/customers/${currentRow.customerID}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(customerData) });
             } else {
-                response = await fetch('/customers', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(customerData) });
+                response = await fetch('/api/customers', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(customerData) });
             }
             const message = await response.text();
             if (response.ok) {
@@ -85,7 +85,7 @@ const CustomerPage = () => {
 
     const handleDelete = async (row) => {
         try {
-            const response = await fetch(`/customers/${row.customerID}`, { method: 'DELETE' });
+            const response = await fetch(`/api/customers/${row.customerID}`, { method: 'DELETE' });
             const message = await response.text();
             if (response.ok) {
                 alert(message);

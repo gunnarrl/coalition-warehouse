@@ -59,7 +59,7 @@ GROUP BY Warehouses.warehouseID;`;
     }
 });
 
-app.post("/warehouses", async function (req, res) {
+app.post("/api/warehouses", async function (req, res) {
     try {
         const addProc = 'CALL AddWarehouse(?,?);';
         await db.query(addProc, [req.body.warehouseName, req.body.warehouseAddr]);
@@ -94,7 +94,7 @@ app.delete('/warehouses/:warehouseID', async function (req, res) {
 
 // INVENTORY CRUD ROUTES
 
-app.get("/inventory", async function (req, res) {
+app.get("/api/inventory", async function (req, res) {
     try {
         const query = `
 SELECT Warehouses.warehouseID, Products.productID, Inventory.inventoryID, Products.productName, Inventory.quantity, Products.listCost
@@ -109,7 +109,7 @@ JOIN Warehouses ON Inventory.warehouseID = Warehouses.warehouseID;`;
     }
 });
 
-app.post("/inventory", async function (req, res) {
+app.post("/api/inventory", async function (req, res) {
     try {
         const addProc = 'CALL AddInventory(?,?,?);';
         await db.query(addProc, [req.body.productID, req.body.warehouseID, req.body.quantity]);
@@ -143,7 +143,7 @@ app.delete('/inventory/:inventoryID', async function (req, res) {
 });
 
 // CUSTOMER CRUD ROUTES
-app.get('/customers', async function (req, res) {
+app.get('/api/customers', async function (req, res) {
     try {
         const query = "SELECT * FROM Customers;"
         const [rows] = await db.query(query);
@@ -179,7 +179,7 @@ app.put("/customers/:customerID", async function (req, res) {
     }
 });
 
-app.post("/customers", async function (req, res) {
+app.post("/api/customers", async function (req, res) {
     try {
         const addProc = 'CALL AddCustomer(?, ?, ?, ?);';
         // Pass parameters as an array
@@ -216,7 +216,7 @@ app.put("/products/:productID", async function (req, res) {
     }
 });
 
-app.post("/products", async function (req, res) {
+app.post("/api/products", async function (req, res) {
     try {
         const addProc = 'CALL AddProduct(?, ?);';
         // Pass parameters as an array
@@ -228,7 +228,7 @@ app.post("/products", async function (req, res) {
     }
 });
 
-app.get("/products", async function (req, res) {
+app.get("/api/products", async function (req, res) {
     try {
         const query = "SELECT * FROM Products;"
         const [rows] = await db.query(query);
@@ -240,7 +240,7 @@ app.get("/products", async function (req, res) {
 });
 
 // VENDOR CRUD ROUTES
-app.get("/vendors", async function (req, res) {
+app.get("/api/vendors", async function (req, res) {
     try {
         const query = "SELECT * FROM Vendors;"
         const [rows] = await db.query(query);
@@ -273,7 +273,7 @@ app.put("/vendors/:vendorID", async function (req, res) {
     }
 });
 
-app.post("/vendors", async function (req, res) {
+app.post("/api/vendors", async function (req, res) {
     try {
         const addProc = 'CALL AddVendor(?, ?);';
         await db.query(addProc, [req.body.vendorName, req.body.vendorAddr]);
@@ -284,7 +284,7 @@ app.post("/vendors", async function (req, res) {
     }
 });
 
-app.get("/catalog", async function (req, res) {
+app.get("/api/catalog", async function (req, res) {
     try {
         const query = `
 SELECT VendorProducts.vendorProductID, Vendors.vendorID, Vendors.vendorName, Products.productID, Products.productName, VendorProducts.costFromVendor
@@ -321,7 +321,7 @@ app.put("/catalog/:vendorProductID", async function (req, res) {
     }
 });
 
-app.post("/catalog", async function (req, res) {
+app.post("/api/catalog", async function (req, res) {
     try {
         const addProc = 'CALL AddVendorProduct(?, ?, ?);';
         await db.query(addProc, [req.body.vendorID, req.body.productID, req.body.costFromVendor]);
@@ -333,7 +333,7 @@ app.post("/catalog", async function (req, res) {
 });
 
 // SALES ORDER ROUTES
-app.get("/salesOrders", async function (req, res) {
+app.get("/api/salesOrders", async function (req, res) {
     try {
         const query = `
 SELECT SalesOrders.saleOrderID, SalesOrders.saleDate,  Warehouses.warehouseID, Warehouses.warehouseName, Customers.customerID, Customers.customerLN, Customers.customerFN, Customers.customerAddr, Customers.customerEmail,
@@ -375,7 +375,7 @@ app.delete("/salesOrders/:saleOrderID", async function (req, res) {
     }
 });
 
-app.post("/salesOrders", async function (req, res) {
+app.post("/api/salesOrders", async function (req, res) {
     try {
         const addProc = 'CALL AddSalesOrder(?, ?, ?);';
         // Pass parameters as an array
@@ -388,7 +388,7 @@ app.post("/salesOrders", async function (req, res) {
 });
 
 // SALES ORDER ITEMS ROUTES
-app.get("/salesOrderItems", async function (req, res) {
+app.get("/api/salesOrderItems", async function (req, res) {
     try {
         const query = `
 SELECT SalesOrderItems.saleOrderItemID, SalesOrderItems.saleOrderID, SalesOrderItems.productID, SalesOrderItems.quantity, 
@@ -428,7 +428,7 @@ app.delete("/salesOrderItems/:saleOrderItemID", async function (req, res) {
     }
 });
 
-app.post("/salesOrderItems", async function (req, res) {
+app.post("/api/salesOrderItems", async function (req, res) {
     try {
         const addProc = 'CALL AddSalesOrderItem(?, ?, ?, ?);';
         // Pass parameters as an array
@@ -441,7 +441,7 @@ app.post("/salesOrderItems", async function (req, res) {
 });
 
 // PURCHASES ROUTES (basically the same as sales orders, but with purchases variables)
-app.get("/purchaseOrders", async function (req, res) {
+app.get("/api/purchaseOrders", async function (req, res) {
     try {
         const query = `
 SELECT PurchaseOrders.purchaseOrderID, PurchaseOrders.purchaseDate,  Warehouses.warehouseID, Warehouses.warehouseName, Vendors.vendorID, Vendors.vendorName,
@@ -483,7 +483,7 @@ app.delete("/purchaseOrders/:purchaseOrderID", async function (req, res) {
     }
 });
 
-app.post("/purchaseOrders", async function (req, res) {
+app.post("/api/purchaseOrders", async function (req, res) {
     try {
         const addProc = 'CALL AddPurchaseOrder(?, ?, ?);';
         // Pass parameters as an array
@@ -496,7 +496,7 @@ app.post("/purchaseOrders", async function (req, res) {
 });
 
 // PURCHASES ORDER ITEMS ROUTES (basically the same as sales order items, but with purchases variables)
-app.get("/purchaseOrderItems", async function (req, res) {
+app.get("/api/purchaseOrderItems", async function (req, res) {
     try {
         const query = `
 SELECT PurchaseOrderItems.purchaseOrderItemID, PurchaseOrderItems.purchaseOrderID, PurchaseOrderItems.productID, PurchaseOrderItems.quantity, 
@@ -536,7 +536,7 @@ app.delete("/purchaseOrderItems/:purchaseOrderItemID", async function (req, res)
     }
 });
 
-app.post("/purchaseOrderItems", async function (req, res) {
+app.post("/api/purchaseOrderItems", async function (req, res) {
     try {
         const addProc = 'CALL AddPurchaseOrderItem(?, ?, ?, ?);';
         // Pass parameters as an array

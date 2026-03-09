@@ -25,7 +25,7 @@ function VendorPage() {
 
     const fetchVendors = async () => {
         try {
-            const res = await fetch('/vendors');
+            const res = await fetch('/api/vendors');
             const data = await res.json();
             const formattedData = data.map(({ vendorID, vendorName, vendorAddr, vendorEmail }) => ({
                 vendorID: vendorID,
@@ -45,7 +45,7 @@ function VendorPage() {
 
     const fetchCatalog = async () => {
         try {
-            const res = await fetch('/catalog');
+            const res = await fetch('/api/catalog');
             const data = await res.json();
             const formattedData = data.map(({ vendorProductID, vendorID, vendorName, productID, productName, costFromVendor }) => ({
                 vendorProductID: vendorProductID,
@@ -67,7 +67,7 @@ function VendorPage() {
 
     const fetchProducts = async () => {
         try {
-            const res = await fetch('/products');
+            const res = await fetch('/api/products');
             const data = await res.json();
             const formattedData = data.map(({ productID, productName }) => ({
                 productID: productID,
@@ -134,9 +134,9 @@ function VendorPage() {
         try {
             let response;
             if (currentVendor) {
-                response = await fetch(`/vendors/${currentVendor.vendorID}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(vendorData) });
+                response = await fetch(`/api/vendors/${currentVendor.vendorID}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(vendorData) });
             } else {
-                response = await fetch('/vendors', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(vendorData) });
+                response = await fetch('/api/vendors', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(vendorData) });
             }
             const message = await response.text();
             if (response.ok) {
@@ -154,7 +154,7 @@ function VendorPage() {
 
     const handleDelete = async (row) => {
         try {
-            const response = await fetch(`/vendors/${row.vendorID}`, { method: 'DELETE' });
+            const response = await fetch(`/api/vendors/${row.vendorID}`, { method: 'DELETE' });
             const message = await response.text();
             if (response.ok) {
                 alert(message);
@@ -192,9 +192,9 @@ function VendorPage() {
         try {
             let response;
             if (currentCatalogItem) {
-                response = await fetch(`/catalog/${currentCatalogItem.vendorProductID}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(catalogData) });
+                response = await fetch(`/api/catalog/${currentCatalogItem.vendorProductID}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(catalogData) });
             } else {
-                response = await fetch('/catalog', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(catalogData) });
+                response = await fetch('/api/catalog', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(catalogData) });
             }
             const message = await response.text();
             if (response.ok) {
@@ -212,7 +212,7 @@ function VendorPage() {
 
     const handleDeleteItem = async (itemRow) => {
         try {
-            const response = await fetch(`/catalog/${itemRow.vendorProductID}`, { method: 'DELETE' });
+            const response = await fetch(`/api/catalog/${itemRow.vendorProductID}`, { method: 'DELETE' });
             const message = await response.text();
             if (response.ok) {
                 alert(message);
