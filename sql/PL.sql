@@ -266,3 +266,59 @@ BEGIN
 END //
 DELIMITER ;
 
+-- VENDOR SPs --
+DROP PROCEDURE IF EXISTS AddVendor;
+
+DELIMITER //
+CREATE PROCEDURE AddVendor(IN in_vendorName VARCHAR(255), IN in_vendorAddr VARCHAR(255), IN in_vendorEmail VARCHAR(255))
+BEGIN
+    INSERT INTO Vendors (vendorName, vendorAddr, vendorEmail) VALUES (in_vendorName, in_vendorAddr, in_vendorEmail);
+END //
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS UpdateVendor;
+
+DELIMITER //
+CREATE PROCEDURE UpdateVendor(IN in_vendorID INT, IN in_vendorName VARCHAR(255), IN in_vendorAddr VARCHAR(255), IN in_vendorEmail VARCHAR(255))
+BEGIN
+    UPDATE Vendors SET vendorName = in_vendorName, vendorAddr = in_vendorAddr, vendorEmail = in_vendorEmail WHERE vendorID = in_vendorID;
+END //
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS DeleteVendor;
+
+DELIMITER //
+CREATE PROCEDURE DeleteVendor(IN in_vendorID INT)
+BEGIN
+    DELETE FROM Vendors WHERE vendorID = in_vendorID;
+END //
+DELIMITER ;
+
+-- CATALOG (VendorProducts) SPs --
+
+DROP PROCEDURE IF EXISTS AddVendorProduct;
+
+DELIMITER //
+CREATE PROCEDURE AddVendorProduct(IN in_vendorID INT, IN in_productID INT, IN in_costFromVendor DECIMAL(10,2))
+BEGIN
+    INSERT INTO VendorProducts (vendorID, productID, costFromVendor) VALUES (in_vendorID, in_productID, in_costFromVendor);
+END //
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS UpdateVendorProduct;
+
+DELIMITER //
+CREATE PROCEDURE UpdateVendorProduct(IN in_vendorProductID INT, IN in_vendorID INT, IN in_productID INT, IN in_costFromVendor DECIMAL(10,2))
+BEGIN
+    UPDATE VendorProducts SET vendorID = in_vendorID, productID = in_productID, costFromVendor = in_costFromVendor WHERE vendorProductID = in_vendorProductID;
+END //
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS DeleteVendorProduct;
+
+DELIMITER //
+CREATE PROCEDURE DeleteVendorProduct(IN in_vendorProductID INT)
+BEGIN
+    DELETE FROM VendorProducts WHERE vendorProductID = in_vendorProductID;
+END //
+DELIMITER ;
