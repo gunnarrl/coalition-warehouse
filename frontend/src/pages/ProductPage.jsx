@@ -83,7 +83,8 @@ const ProductPage = () => {
     };
 
     const handleDelete = async (row) => {
-        try {
+        if (window.confirm("Are you sure you want to delete this?")) {
+            try {
             const response = await fetch(`/api/products/${row.productID}`, { method: 'DELETE' });
             const message = await response.text();
             if (response.ok) {
@@ -96,7 +97,8 @@ const ProductPage = () => {
             console.error('Error deleting product:', error);
             alert('An error occurred while deleting the product.');
         }
-    };
+    }
+        };
 
     return (
         <div>

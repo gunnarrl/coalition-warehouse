@@ -84,18 +84,20 @@ const CustomerPage = () => {
     };
 
     const handleDelete = async (row) => {
-        try {
-            const response = await fetch(`/api/customers/${row.customerID}`, { method: 'DELETE' });
-            const message = await response.text();
-            if (response.ok) {
-                alert(message);
-                fetchCustomers();
-            } else {
-                alert(message);
+        if (window.confirm("Are you sure you want to delete this?")) {
+            try {
+                const response = await fetch(`/api/customers/${row.customerID}`, { method: 'DELETE' });
+                const message = await response.text();
+                if (response.ok) {
+                    alert(message);
+                    fetchCustomers();
+                } else {
+                    alert(message);
+                }
+            } catch (error) {
+                console.error('Error deleting customer:', error);
+                alert('An error occurred while deleting the customer.');
             }
-        } catch (error) {
-            console.error('Error deleting customer:', error);
-            alert('An error occurred while deleting the customer.');
         }
     };
 

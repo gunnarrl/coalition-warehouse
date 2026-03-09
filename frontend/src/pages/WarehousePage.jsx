@@ -166,7 +166,8 @@ function WarehousePage() {
     };
 
     const handleDelete = async (row) => {
-        try {
+        if (window.confirm("Are you sure you want to delete this?")) {
+            try {
             const response = await fetch(`/api/warehouses/${row.warehouseID}`, { method: 'DELETE' });
             const message = await response.text();
             if (response.ok) {
@@ -179,7 +180,8 @@ function WarehousePage() {
             console.error('Error deleting warehouse:', error);
             alert('An error occurred while deleting the warehouse.');
         }
-    };
+    }
+        };
 
     // Handlers for Inner table actions
     const handleAddItem = (warehouseID) => {
@@ -224,7 +226,8 @@ function WarehousePage() {
     };
 
     const handleDeleteItem = async (itemRow) => {
-        try {
+        if (window.confirm("Are you sure you want to delete this?")) {
+            try {
             const response = await fetch(`/api/inventory/${itemRow.inventoryID}`, { method: 'DELETE' });
             const message = await response.text();
             if (response.ok) {
@@ -237,7 +240,8 @@ function WarehousePage() {
             console.error('Error deleting inventory:', error);
             alert('An error occurred while deleting the inventory.');
         }
-    };
+    }
+        };
 
     return (
         <div>

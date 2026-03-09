@@ -153,7 +153,8 @@ function VendorPage() {
     };
 
     const handleDelete = async (row) => {
-        try {
+        if (window.confirm("Are you sure you want to delete this?")) {
+            try {
             const response = await fetch(`/api/vendors/${row.vendorID}`, { method: 'DELETE' });
             const message = await response.text();
             if (response.ok) {
@@ -166,7 +167,8 @@ function VendorPage() {
             console.error('Error deleting vendor:', error);
             alert('An error occurred while deleting the vendor.');
         }
-    };
+    }
+        };
 
     // Inner Table handlers
     const handleAddCatalogItem = (vendorID) => {
@@ -211,7 +213,8 @@ function VendorPage() {
     };
 
     const handleDeleteItem = async (itemRow) => {
-        try {
+        if (window.confirm("Are you sure you want to delete this?")) {
+            try {
             const response = await fetch(`/api/catalog/${itemRow.vendorProductID}`, { method: 'DELETE' });
             const message = await response.text();
             if (response.ok) {
@@ -224,7 +227,8 @@ function VendorPage() {
             console.error('Error deleting catalog:', error);
             alert('An error occurred while deleting the catalog.');
         }
-    };
+    }
+        };
 
     return (
         <div>

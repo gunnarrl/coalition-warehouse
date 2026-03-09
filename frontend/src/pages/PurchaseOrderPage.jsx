@@ -26,8 +26,6 @@ const PurchaseOrdersPage = () => {
     // states for dropdowns
     const [vendors, setVendors] = useState([]);
     const [warehouses, setWarehouses] = useState([]);
-
-    // Instead of all products, we fetch the catalog of vendor products
     const [catalogItems, setCatalogItems] = useState([]);
 
     const fetchPurchaseOrders = async () => {
@@ -182,18 +180,20 @@ const PurchaseOrdersPage = () => {
 
     // adapted from SaleOrderPage.jsx
     const handleDelete = async (row) => {
-        try {
-            const response = await fetch(`/api/purchaseOrders/${row.purchaseOrderID}`, { method: 'DELETE' });
-            const message = await response.text();
-            if (response.ok) {
-                alert(message);
-                fetchPurchaseOrders();
-            } else {
-                alert(message);
+        if (window.confirm("Are you sure you want to delete this?")) {
+            try {
+                const response = await fetch(`/api/purchaseOrders/${row.purchaseOrderID}`, { method: 'DELETE' });
+                const message = await response.text();
+                if (response.ok) {
+                    alert(message);
+                    fetchPurchaseOrders();
+                } else {
+                    alert(message);
+                }
+            } catch (error) {
+                console.error('Error deleting purchase order:', error);
+                alert('An error occurred while deleting the purchase order.');
             }
-        } catch (error) {
-            console.error('Error deleting purchase order:', error);
-            alert('An error occurred while deleting the purchase order.');
         }
     }
 
@@ -212,19 +212,21 @@ const PurchaseOrdersPage = () => {
     };
 
     const handleDeleteItem = async (itemRow) => {
-        try {
-            const response = await fetch(`/api/purchaseOrderItems/${itemRow.purchaseOrderItemID}`, { method: 'DELETE' });
-            const message = await response.text();
-            if (response.ok) {
-                alert(message);
-                fetchPurchaseItems();
-                fetchPurchaseOrders(); // fetch orders so total cost is updated
-            } else {
-                alert(message);
+        if (window.confirm("Are you sure you want to delete this?")) {
+            try {
+                const response = await fetch(`/api/purchaseOrderItems/${itemRow.purchaseOrderItemID}`, { method: 'DELETE' });
+                const message = await response.text();
+                if (response.ok) {
+                    alert(message);
+                    fetchPurchaseItems();
+                    fetchPurchaseOrders(); // fetch orders so total cost is updated
+                } else {
+                    alert(message);
+                }
+            } catch (error) {
+                console.error('Error deleting purchase order item:', error);
+                alert('An error occurred while deleting the purchase order item.');
             }
-        } catch (error) {
-            console.error('Error deleting purchase order item:', error);
-            alert('An error occurred while deleting the purchase order item.');
         }
     };
 

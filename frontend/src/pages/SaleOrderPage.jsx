@@ -185,7 +185,8 @@ const SalesOrdersPage = () => {
 
     // adapted from ProductPage.jsx
     const handleDelete = async (row) => {
-        try {
+        if (window.confirm("Are you sure you want to delete this?")) {
+            try {
             const response = await fetch(`/api/salesOrders/${row.saleOrderID}`, { method: 'DELETE' });
             const message = await response.text();
             if (response.ok) {
@@ -199,6 +200,7 @@ const SalesOrdersPage = () => {
             alert('An error occurred while deleting the sale order.');
         }
     }
+        }
 
     // item handlers
     const handleAddItem = (saleID) => {
@@ -214,7 +216,8 @@ const SalesOrdersPage = () => {
     };
 
     const handleDeleteItem = async (itemRow) => {
-        try {
+        if (window.confirm("Are you sure you want to delete this?")) {
+            try {
             const response = await fetch(`/api/salesOrderItems/${itemRow.saleOrderItemID}`, { method: 'DELETE' });
             const message = await response.text();
             if (response.ok) {
@@ -228,7 +231,8 @@ const SalesOrdersPage = () => {
             console.error('Error deleting sale order item:', error);
             alert('An error occurred while deleting the sale order item.');
         }
-    };
+    }
+        };
 
     const handleSaveItem = async (event) => {
         event.preventDefault();

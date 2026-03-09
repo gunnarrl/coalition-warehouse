@@ -42,7 +42,7 @@ app.post('/resetdb', async function (req, res) {
 // Prompt: Attached the DDL.sql file. I would like to display the total inventory cost for each warehouse in the warehouse page.
 // Can you write a select statement that returns the warehouseID, warehouseName, warehouseAddr, and totalInventoryCost (total cost of all products in warehouse)?
 // AI Source URL: https://marketplace.visualstudio.com/items?itemName=Google.geminicodeassist
-app.get('/warehouses', async function (req, res) {
+app.get('/api/warehouses', async function (req, res) {
     try {
         const query = `
 SELECT Warehouses.warehouseID, Warehouses.warehouseName, Warehouses.warehouseAddr,
@@ -61,7 +61,7 @@ GROUP BY Warehouses.warehouseID;`;
 
 app.post("/api/warehouses", async function (req, res) {
     try {
-        const addProc = 'CALL AddWarehouse(?,?);';
+        const addProc = 'CALL sp_add_warehouse(?,?);';
         await db.query(addProc, [req.body.warehouseName, req.body.warehouseAddr]);
         res.status(201).send(`Warehouse ${req.body.warehouseName} added.`);
     } catch (error) {
@@ -70,9 +70,9 @@ app.post("/api/warehouses", async function (req, res) {
     }
 });
 
-app.put('/warehouses/:warehouseID', async function (req, res) {
+app.put('/api/warehouses/:warehouseID', async function (req, res) {
     try {
-        const updateProc = 'CALL UpdateWarehouse(?,?,?);';
+        const updateProc = 'CALL sp_update_warehouse(?,?,?);';
         await db.query(updateProc, [req.params.warehouseID, req.body.warehouseName, req.body.warehouseAddr]);
         res.status(200).send(`Warehouse ${req.params.warehouseID} updated.`);
     } catch (error) {
@@ -81,9 +81,9 @@ app.put('/warehouses/:warehouseID', async function (req, res) {
     }
 });
 
-app.delete('/warehouses/:warehouseID', async function (req, res) {
+app.delete('/api/warehouses/:warehouseID', async function (req, res) {
     try {
-        const deleteProc = 'CALL DeleteWarehouse(?);';
+        const deleteProc = 'CALL sp_delete_warehouse(?);';
         await db.query(deleteProc, [req.params.warehouseID]);
         res.status(200).send(`Warehouse ${req.params.warehouseID} deleted.`);
     } catch (error) {
@@ -111,7 +111,7 @@ JOIN Warehouses ON Inventory.warehouseID = Warehouses.warehouseID;`;
 
 app.post("/api/inventory", async function (req, res) {
     try {
-        const addProc = 'CALL AddInventory(?,?,?);';
+        const addProc = 'CALL sp_add_inventory(?,?,?);';
         await db.query(addProc, [req.body.productID, req.body.warehouseID, req.body.quantity]);
         res.status(201).send(`Inventory ${req.body.productID} added.`);
     } catch (error) {
@@ -120,9 +120,9 @@ app.post("/api/inventory", async function (req, res) {
     }
 });
 
-app.put('/inventory/:inventoryID', async function (req, res) {
+app.put('/api/inventory/:inventoryID', async function (req, res) {
     try {
-        const updateProc = 'CALL UpdateInventory(?,?);';
+        const updateProc = 'CALL sp_update_inventory(?,?);';
         await db.query(updateProc, [req.params.inventoryID, req.body.quantity]);
         res.status(200).send(`Inventory ${req.params.inventoryID} updated.`);
     } catch (error) {
@@ -131,9 +131,9 @@ app.put('/inventory/:inventoryID', async function (req, res) {
     }
 });
 
-app.delete('/inventory/:inventoryID', async function (req, res) {
+app.delete('/api/inventory/:inventoryID', async function (req, res) {
     try {
-        const deleteProc = 'CALL DeleteInventory(?);';
+        const deleteProc = 'CALL sp_delete_inventory(?);';
         await db.query(deleteProc, [req.params.inventoryID]);
         res.status(200).send(`Inventory ${req.params.inventoryID} deleted.`);
     } catch (error) {
@@ -155,9 +155,9 @@ app.get('/api/customers', async function (req, res) {
     }
 });
 
-app.delete('/customers/:customerID', async function (req, res) {
+app.delete('/api/customers/:customerID', async function (req, res) {
     try {
-        const deleteProc = 'CALL DeleteCustomer(?);';
+        const deleteProc = 'CALL sp_delete_customer(?);';
         // Pass customerID as a parameter to the SP
         await db.query(deleteProc, req.params.customerID);
         res.status(200).send(`Customer ${req.params.customerID} deleted.`);
@@ -167,9 +167,9 @@ app.delete('/customers/:customerID', async function (req, res) {
     }
 });
 
-app.put("/customers/:customerID", async function (req, res) {
+app.put("/api/customers/:customerID", async function (req, res) {
     try {
-        const updateProc = 'CALL UpdateCustomer(?, ?, ?, ?, ?);';
+        const updateProc = 'CALL sp_update_customer(?, ?, ?, ?, ?);';
         // Pass parameters as an array
         await db.query(updateProc, [req.params.customerID, req.body.customerfName, req.body.customerlName, req.body.customerEmail, req.body.customerAddr]);
         res.status(200).send(`Customer ${req.params.customerID} updated.`);
@@ -181,7 +181,7 @@ app.put("/customers/:customerID", async function (req, res) {
 
 app.post("/api/customers", async function (req, res) {
     try {
-        const addProc = 'CALL AddCustomer(?, ?, ?, ?);';
+        const addProc = 'CALL sp_add_customer(?, ?, ?, ?);';
         // Pass parameters as an array
         await db.query(addProc, [req.body.customerfName, req.body.customerlName, req.body.customerEmail, req.body.customerAddr]);
         res.status(201).send(`Customer ${req.body.customerfName} ${req.body.customerlName} added.`);
@@ -192,9 +192,9 @@ app.post("/api/customers", async function (req, res) {
 });
 
 // PRODUCT CRUD ROUTES
-app.delete('/products/:productID', async function (req, res) {
+app.delete('/api/products/:productID', async function (req, res) {
     try {
-        const deleteProc = 'CALL DeleteProduct(?);';
+        const deleteProc = 'CALL sp_delete_product(?);';
         // Pass productID as a parameter to the SP
         await db.query(deleteProc, req.params.productID);
         res.status(200).send(`Product ${req.params.productID} deleted.`);
@@ -204,9 +204,9 @@ app.delete('/products/:productID', async function (req, res) {
     }
 });
 
-app.put("/products/:productID", async function (req, res) {
+app.put("/api/products/:productID", async function (req, res) {
     try {
-        const updateProc = 'CALL UpdateProduct(?, ?, ?);';
+        const updateProc = 'CALL sp_update_product(?, ?, ?);';
         // Pass parameters as an array
         await db.query(updateProc, [req.params.productID, req.body.productName, req.body.listCost]);
         res.status(200).send(`Product ${req.params.productID} updated.`);
@@ -218,7 +218,7 @@ app.put("/products/:productID", async function (req, res) {
 
 app.post("/api/products", async function (req, res) {
     try {
-        const addProc = 'CALL AddProduct(?, ?);';
+        const addProc = 'CALL sp_add_product(?, ?);';
         // Pass parameters as an array
         await db.query(addProc, [req.body.productName, req.body.listCost]);
         res.status(201).send(`Product ${req.body.productName} added.`);
@@ -251,9 +251,9 @@ app.get("/api/vendors", async function (req, res) {
     }
 });
 
-app.delete("/vendors/:vendorID", async function (req, res) {
+app.delete("/api/vendors/:vendorID", async function (req, res) {
     try {
-        const deleteProc = 'CALL DeleteVendor(?);';
+        const deleteProc = 'CALL sp_delete_vendor(?);';
         await db.query(deleteProc, [req.params.vendorID]);
         res.status(200).send(`Vendor ${req.params.vendorID} deleted.`);
     } catch (error) {
@@ -262,9 +262,9 @@ app.delete("/vendors/:vendorID", async function (req, res) {
     }
 });
 
-app.put("/vendors/:vendorID", async function (req, res) {
+app.put("/api/vendors/:vendorID", async function (req, res) {
     try {
-        const updateProc = 'CALL UpdateVendor(?, ?, ?);';
+        const updateProc = 'CALL sp_update_vendor(?, ?, ?);';
         await db.query(updateProc, [req.params.vendorID, req.body.vendorName, req.body.vendorAddr]);
         res.status(200).send(`Vendor ${req.params.vendorID} updated.`);
     } catch (error) {
@@ -275,7 +275,7 @@ app.put("/vendors/:vendorID", async function (req, res) {
 
 app.post("/api/vendors", async function (req, res) {
     try {
-        const addProc = 'CALL AddVendor(?, ?);';
+        const addProc = 'CALL sp_add_vendor(?, ?);';
         await db.query(addProc, [req.body.vendorName, req.body.vendorAddr]);
         res.status(201).send(`Vendor ${req.body.vendorName} added.`);
     } catch (error) {
@@ -299,9 +299,9 @@ JOIN Products on VendorProducts.productID = Products.productID;`;
     }
 });
 
-app.delete("/catalog/:vendorProductID", async function (req, res) {
+app.delete("/api/catalog/:vendorProductID", async function (req, res) {
     try {
-        const deleteProc = 'CALL DeleteVendorProduct(?);';
+        const deleteProc = 'CALL sp_delete_vendorProduct(?);';
         await db.query(deleteProc, [req.params.vendorProductID]);
         res.status(200).send(`Vendor Product ${req.params.vendorProductID} deleted.`);
     } catch (error) {
@@ -310,9 +310,9 @@ app.delete("/catalog/:vendorProductID", async function (req, res) {
     }
 });
 
-app.put("/catalog/:vendorProductID", async function (req, res) {
+app.put("/api/catalog/:vendorProductID", async function (req, res) {
     try {
-        const updateProc = 'CALL UpdateVendorProduct(?, ?, ?, ?);';
+        const updateProc = 'CALL sp_update_vendorProduct(?, ?, ?, ?);';
         await db.query(updateProc, [req.params.vendorProductID, req.body.vendorID, req.body.productID, req.body.costFromVendor]);
         res.status(200).send(`Vendor Product ${req.params.vendorProductID} updated.`);
     } catch (error) {
@@ -323,7 +323,7 @@ app.put("/catalog/:vendorProductID", async function (req, res) {
 
 app.post("/api/catalog", async function (req, res) {
     try {
-        const addProc = 'CALL AddVendorProduct(?, ?, ?);';
+        const addProc = 'CALL sp_add_vendorProduct(?, ?, ?);';
         await db.query(addProc, [req.body.vendorID, req.body.productID, req.body.costFromVendor]);
         res.status(201).send(`Vendor Product ${req.body.productID} added.`);
     } catch (error) {
@@ -351,9 +351,9 @@ GROUP BY SalesOrders.saleOrderID;`;
     }
 });
 
-app.put("/salesOrders/:saleOrderID", async function (req, res) {
+app.put("/api/salesOrders/:saleOrderID", async function (req, res) {
     try {
-        const updateProc = 'CALL UpdateSalesOrder(?, ?, ?, ?);';
+        const updateProc = 'CALL sp_update_sales_order(?, ?, ?, ?);';
         // Pass parameters as an array
         await db.query(updateProc, [req.params.saleOrderID, req.body.customerID, req.body.warehouseID, req.body.saleDate]);
         res.status(200).send(`Sales Order ${req.params.saleOrderID} updated.`);
@@ -363,9 +363,9 @@ app.put("/salesOrders/:saleOrderID", async function (req, res) {
     }
 });
 
-app.delete("/salesOrders/:saleOrderID", async function (req, res) {
+app.delete("/api/salesOrders/:saleOrderID", async function (req, res) {
     try {
-        const deleteProc = 'CALL DeleteSalesOrder(?);';
+        const deleteProc = 'CALL sp_delete_sales_order(?);';
         // Pass saleOrderID as a parameter to the SP
         await db.query(deleteProc, req.params.saleOrderID);
         res.status(200).send(`Sales Order ${req.params.saleOrderID} deleted.`); // send 200 status so the message shows up (204 didn't show message for some reason)
@@ -377,7 +377,7 @@ app.delete("/salesOrders/:saleOrderID", async function (req, res) {
 
 app.post("/api/salesOrders", async function (req, res) {
     try {
-        const addProc = 'CALL AddSalesOrder(?, ?, ?);';
+        const addProc = 'CALL sp_add_sales_order(?, ?, ?);';
         // Pass parameters as an array
         await db.query(addProc, [req.body.customerID, req.body.warehouseID, req.body.saleDate]);
         res.status(201).send(`Sales Order ${req.body.customerID} ${req.body.warehouseID} ${req.body.saleDate} added.`);
@@ -404,9 +404,9 @@ JOIN SalesOrders ON SalesOrderItems.saleOrderID = SalesOrders.saleOrderID;`;
     }
 });
 
-app.put("/salesOrderItems/:saleOrderItemID", async function (req, res) {
+app.put("/api/salesOrderItems/:saleOrderItemID", async function (req, res) {
     try {
-        const updateProc = 'CALL UpdateSalesOrderItem(?, ?, ?, ?);';
+        const updateProc = 'CALL sp_update_sales_orderItem(?, ?, ?, ?);';
         // Pass parameters as an array
         await db.query(updateProc, [req.params.saleOrderItemID, req.body.productID, req.body.quantity, req.body.salePrice]);
         res.status(200).send(`Sales Order Item ${req.params.saleOrderItemID} updated.`);
@@ -416,9 +416,9 @@ app.put("/salesOrderItems/:saleOrderItemID", async function (req, res) {
     }
 });
 
-app.delete("/salesOrderItems/:saleOrderItemID", async function (req, res) {
+app.delete("/api/salesOrderItems/:saleOrderItemID", async function (req, res) {
     try {
-        const deleteProc = 'CALL DeleteSalesOrderItem(?);';
+        const deleteProc = 'CALL sp_delete_sales_orderItem(?);';
         // Pass saleOrderItemID as a parameter to the SP
         await db.query(deleteProc, req.params.saleOrderItemID);
         res.status(200).send(`Sales Order Item ${req.params.saleOrderItemID} deleted.`); // send 200 status so the message shows up (204 didn't show message for some reason)
@@ -430,7 +430,7 @@ app.delete("/salesOrderItems/:saleOrderItemID", async function (req, res) {
 
 app.post("/api/salesOrderItems", async function (req, res) {
     try {
-        const addProc = 'CALL AddSalesOrderItem(?, ?, ?, ?);';
+        const addProc = 'CALL sp_add_sales_orderItem(?, ?, ?, ?);';
         // Pass parameters as an array
         await db.query(addProc, [req.body.saleOrderID, req.body.productID, req.body.quantity, req.body.salePrice]);
         res.status(201).send(`Sales Order Item ${req.body.saleOrderID} ${req.body.productID} added.`);
@@ -459,9 +459,9 @@ GROUP BY PurchaseOrders.purchaseOrderID;`;
     }
 });
 
-app.put("/purchaseOrders/:purchaseOrderID", async function (req, res) {
+app.put("/api/purchaseOrders/:purchaseOrderID", async function (req, res) {
     try {
-        const updateProc = 'CALL UpdatePurchaseOrder(?, ?, ?, ?);';
+        const updateProc = 'CALL sp_update_purchase_order(?, ?, ?, ?);';
         // Pass parameters as an array
         await db.query(updateProc, [req.params.purchaseOrderID, req.body.vendorID, req.body.warehouseID, req.body.purchaseDate]);
         res.status(200).send(`Purchase Order ${req.params.purchaseOrderID} updated.`);
@@ -471,9 +471,9 @@ app.put("/purchaseOrders/:purchaseOrderID", async function (req, res) {
     }
 });
 
-app.delete("/purchaseOrders/:purchaseOrderID", async function (req, res) {
+app.delete("/api/purchaseOrders/:purchaseOrderID", async function (req, res) {
     try {
-        const deleteProc = 'CALL DeletePurchaseOrder(?);';
+        const deleteProc = 'CALL sp_delete_purchase_order(?);';
         // Pass parameters as an array
         await db.query(deleteProc, req.params.purchaseOrderID);
         res.status(200).send(`Purchase Order ${req.params.purchaseOrderID} deleted.`);
@@ -485,7 +485,7 @@ app.delete("/purchaseOrders/:purchaseOrderID", async function (req, res) {
 
 app.post("/api/purchaseOrders", async function (req, res) {
     try {
-        const addProc = 'CALL AddPurchaseOrder(?, ?, ?);';
+        const addProc = 'CALL sp_add_purchase_order(?, ?, ?);';
         // Pass parameters as an array
         await db.query(addProc, [req.body.vendorID, req.body.warehouseID, req.body.purchaseDate]);
         res.status(201).send(`Purchase Order added.`);
@@ -512,9 +512,9 @@ JOIN PurchaseOrders ON PurchaseOrderItems.purchaseOrderID = PurchaseOrders.purch
     }
 });
 
-app.put("/purchaseOrderItems/:purchaseOrderItemID", async function (req, res) {
+app.put("/api/purchaseOrderItems/:purchaseOrderItemID", async function (req, res) {
     try {
-        const updateProc = 'CALL UpdatePurchaseOrderItem(?, ?, ?, ?);';
+        const updateProc = 'CALL sp_update_purchase_orderItem(?, ?, ?, ?);';
         // Pass parameters as an array
         await db.query(updateProc, [req.params.purchaseOrderItemID, req.body.productID, req.body.quantity, req.body.purchasePrice]);
         res.status(200).send(`Purchase Order Item ${req.params.purchaseOrderItemID} updated.`);
@@ -524,9 +524,9 @@ app.put("/purchaseOrderItems/:purchaseOrderItemID", async function (req, res) {
     }
 });
 
-app.delete("/purchaseOrderItems/:purchaseOrderItemID", async function (req, res) {
+app.delete("/api/purchaseOrderItems/:purchaseOrderItemID", async function (req, res) {
     try {
-        const deleteProc = 'CALL DeletePurchaseOrderItem(?);';
+        const deleteProc = 'CALL sp_delete_purchase_orderItem(?);';
         // Pass parameters as an array
         await db.query(deleteProc, req.params.purchaseOrderItemID);
         res.status(200).send(`Purchase Order Item ${req.params.purchaseOrderItemID} deleted.`);
@@ -538,7 +538,7 @@ app.delete("/purchaseOrderItems/:purchaseOrderItemID", async function (req, res)
 
 app.post("/api/purchaseOrderItems", async function (req, res) {
     try {
-        const addProc = 'CALL AddPurchaseOrderItem(?, ?, ?, ?);';
+        const addProc = 'CALL sp_add_purchase_orderItem(?, ?, ?, ?);';
         // Pass parameters as an array
         await db.query(addProc, [req.body.purchaseOrderID, req.body.productID, req.body.quantity, req.body.purchasePrice]);
         res.status(201).send(`Purchase Order Item added to order ${req.body.purchaseOrderID}.`);
