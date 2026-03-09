@@ -39,7 +39,7 @@ const SalesOrdersPage = () => {
 
     const fetchSalesOrders = async () => {
         try {
-            const res = await fetch('/salesOrders');
+            const res = await fetch('/api/salesOrders');
             const data = await res.json();
             const formattedData = data.map(({ saleOrderID, saleDate, customerID, customerFN, customerLN, warehouseID, warehouseName, costOfSale }) => ({
                 saleOrderID: saleOrderID,
@@ -62,7 +62,7 @@ const SalesOrdersPage = () => {
 
     const fetchSaleItems = async () => {
         try {
-            const res = await fetch('/salesOrderItems');
+            const res = await fetch('/api/salesOrderItems');
             const data = await res.json();
             const formattedData = data.map(({ saleOrderItemID, saleOrderID, productID, quantity, salePrice, productName }) => ({
                 saleOrderItemID: saleOrderItemID,
@@ -85,7 +85,7 @@ const SalesOrdersPage = () => {
 
     const fetchCustomers = async () => {
         try {
-            const res = await fetch('/customers');
+            const res = await fetch('/api/customers');
             const data = await res.json();
             const formattedData = data.map(({ customerID, customerFN, customerLN }) => ({
                 customerID: customerID,
@@ -103,7 +103,7 @@ const SalesOrdersPage = () => {
 
     const fetchWarehouses = async () => {
         try {
-            const res = await fetch('/warehouses');
+            const res = await fetch('/api/warehouses');
             const data = await res.json();
             const formattedData = data.map(({ warehouseID, warehouseName }) => ({
                 warehouseID: warehouseID,
@@ -121,11 +121,12 @@ const SalesOrdersPage = () => {
 
     const fetchProducts = async () => {
         try {
-            const res = await fetch('/products');
+            const res = await fetch('/api/products');
             const data = await res.json();
-            const formattedData = data.map(({ productID, productName }) => ({
+            const formattedData = data.map(({ productID, productName, listCost }) => ({
                 productID: productID,
-                productName: productName
+                productName: productName,
+                listCost: listCost
             }));
             setProducts(formattedData);
         } catch (error) {
@@ -154,9 +155,9 @@ const SalesOrdersPage = () => {
             let response;
             // If currentRow is not null, we are editing an existing sale order, otherwise we are creating one.
             if (currentRow) {
-                response = await fetch(`/salesOrders/${currentRow.saleOrderID}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(saleOrderData) });
+                response = await fetch(`/api/salesOrders/${currentRow.saleOrderID}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(saleOrderData) });
             } else {
-                response = await fetch(`/salesOrders`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(saleOrderData) });
+                response = await fetch(`/api/salesOrders`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(saleOrderData) });
             }
             const message = await response.text();
             if (response.ok) {
@@ -185,7 +186,7 @@ const SalesOrdersPage = () => {
     // adapted from ProductPage.jsx
     const handleDelete = async (row) => {
         try {
-            const response = await fetch(`/salesOrders/${row.saleOrderID}`, { method: 'DELETE' });
+            const response = await fetch(`/api/salesOrders/${row.saleOrderID}`, { method: 'DELETE' });
             const message = await response.text();
             if (response.ok) {
                 alert(message);
@@ -214,7 +215,7 @@ const SalesOrdersPage = () => {
 
     const handleDeleteItem = async (itemRow) => {
         try {
-            const response = await fetch(`/salesOrderItems/${itemRow.saleOrderItemID}`, { method: 'DELETE' });
+            const response = await fetch(`/api/salesOrderItems/${itemRow.saleOrderItemID}`, { method: 'DELETE' });
             const message = await response.text();
             if (response.ok) {
                 alert(message);
@@ -233,21 +234,25 @@ const SalesOrdersPage = () => {
         event.preventDefault();
         // Get the data from the form
         const formData = new FormData(event.target);
+        const selectedProductID = Number(formData.get('productID'));
+        const selectedProduct = products.find(p => p.productID === selectedProductID);
+        const autoSalePrice = selectedProduct ? selectedProduct.listCost : 0;
+
         // Format the data to match the database schema
         const saleOrderItemData = {
             saleOrderID: targetSaleID, // This is the sale order ID that the item is being added to, not allowed to be changed in form.
-            productID: formData.get('productID'),
+            productID: selectedProductID,
             quantity: formData.get('quantity'),
-            salePrice: formData.get('salePrice')
+            salePrice: autoSalePrice
         };
 
         try {
             let response;
             // If currentRow is not null, we are editing an existing sale order, otherwise we are creating one.
             if (currentItem) {
-                response = await fetch(`/salesOrderItems/${currentItem.saleOrderItemID}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(saleOrderItemData) });
+                response = await fetch(`/api/salesOrderItems/${currentItem.saleOrderItemID}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(saleOrderItemData) });
             } else {
-                response = await fetch(`/salesOrderItems`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(saleOrderItemData) });
+                response = await fetch(`/api/salesOrderItems`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(saleOrderItemData) });
             }
             const message = await response.text();
             if (response.ok) {
@@ -321,7 +326,7 @@ const SalesOrdersPage = () => {
                 onClose={() => setIsItemsPopupOpen(false)}
                 title={currentItem ? "Edit Item" : "Add Item"}
             >
-                <form key={currentItem?.name || 'new-item'} onSubmit={handleSaveItem}>
+                <form key={currentItem?.saleOrderItemID || 'new-item'} onSubmit={handleSaveItem}>
                     <Dropdown
                         label="Product"
                         name="productID"
@@ -332,9 +337,6 @@ const SalesOrdersPage = () => {
                     />
                     <label>Quantity:</label>
                     <input name="quantity" type="number" defaultValue={currentItem?.quantity || 0} />
-
-                    <label>Sale Price:</label>
-                    <input name="salePrice" type="number" step="0.01" defaultValue={currentItem?.salePrice || 0} />
 
                     <button type="submit">Save Item</button>
                 </form>

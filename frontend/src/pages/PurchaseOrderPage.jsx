@@ -26,11 +26,13 @@ const PurchaseOrdersPage = () => {
     // states for dropdowns
     const [vendors, setVendors] = useState([]);
     const [warehouses, setWarehouses] = useState([]);
-    const [products, setProducts] = useState([]);
+
+    // Instead of all products, we fetch the catalog of vendor products
+    const [catalogItems, setCatalogItems] = useState([]);
 
     const fetchPurchaseOrders = async () => {
         try {
-            const res = await fetch('/purchaseOrders');
+            const res = await fetch('/api/purchaseOrders');
             const data = await res.json();
             const formattedData = data.map(({ purchaseOrderID, purchaseDate, vendorID, vendorName, warehouseID, warehouseName, costOfPurchase }) => ({
                 purchaseOrderID: purchaseOrderID,
@@ -53,7 +55,7 @@ const PurchaseOrdersPage = () => {
 
     const fetchPurchaseItems = async () => {
         try {
-            const res = await fetch('/purchaseOrderItems');
+            const res = await fetch('/api/purchaseOrderItems');
             const data = await res.json();
             const formattedData = data.map(({ purchaseOrderItemID, purchaseOrderID, productID, quantity, purchasePrice, productName }) => ({
                 purchaseOrderItemID: purchaseOrderItemID,
@@ -76,7 +78,7 @@ const PurchaseOrdersPage = () => {
 
     const fetchVendors = async () => {
         try {
-            const res = await fetch('/vendors');
+            const res = await fetch('/api/vendors');
             const data = await res.json();
             const formattedData = data.map(({ vendorID, vendorName }) => ({
                 vendorID: vendorID,
@@ -94,7 +96,7 @@ const PurchaseOrdersPage = () => {
 
     const fetchWarehouses = async () => {
         try {
-            const res = await fetch('/warehouses');
+            const res = await fetch('/api/warehouses');
             const data = await res.json();
             const formattedData = data.map(({ warehouseID, warehouseName }) => ({
                 warehouseID: warehouseID,
@@ -110,22 +112,26 @@ const PurchaseOrdersPage = () => {
         fetchWarehouses();
     }, []);
 
-    const fetchProducts = async () => {
+    const fetchCatalog = async () => {
         try {
-            const res = await fetch('/products');
+            const res = await fetch('/api/catalog');
             const data = await res.json();
-            const formattedData = data.map(({ productID, productName }) => ({
+            const formattedData = data.map(({ vendorProductID, vendorID, vendorName, productID, productName, costFromVendor }) => ({
+                vendorProductID: vendorProductID,
+                vendorID: vendorID,
+                vendorName: vendorName,
                 productID: productID,
-                productName: productName
+                productName: productName,
+                costFromVendor: costFromVendor
             }));
-            setProducts(formattedData);
+            setCatalogItems(formattedData);
         } catch (error) {
-            console.error('Error fetching products:', error);
+            console.error('Error fetching catalog:', error);
         }
     };
 
     useEffect(() => {
-        fetchProducts();
+        fetchCatalog();
     }, []);
 
 
@@ -146,9 +152,9 @@ const PurchaseOrdersPage = () => {
             let response;
             // If currentRow is not null, we are editing an existing sale order, otherwise we are creating one.
             if (currentRow) {
-                response = await fetch(`/purchaseOrders/${currentRow.purchaseOrderID}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(purchaseOrderData) });
+                response = await fetch(`/api/purchaseOrders/${currentRow.purchaseOrderID}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(purchaseOrderData) });
             } else {
-                response = await fetch(`/purchaseOrders`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(purchaseOrderData) });
+                response = await fetch(`/api/purchaseOrders`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(purchaseOrderData) });
             }
             const message = await response.text();
             if (response.ok) {
@@ -177,7 +183,7 @@ const PurchaseOrdersPage = () => {
     // adapted from SaleOrderPage.jsx
     const handleDelete = async (row) => {
         try {
-            const response = await fetch(`/purchaseOrders/${row.purchaseOrderID}`, { method: 'DELETE' });
+            const response = await fetch(`/api/purchaseOrders/${row.purchaseOrderID}`, { method: 'DELETE' });
             const message = await response.text();
             if (response.ok) {
                 alert(message);
@@ -207,7 +213,7 @@ const PurchaseOrdersPage = () => {
 
     const handleDeleteItem = async (itemRow) => {
         try {
-            const response = await fetch(`/purchaseOrderItems/${itemRow.purchaseOrderItemID}`, { method: 'DELETE' });
+            const response = await fetch(`/api/purchaseOrderItems/${itemRow.purchaseOrderItemID}`, { method: 'DELETE' });
             const message = await response.text();
             if (response.ok) {
                 alert(message);
@@ -226,21 +232,31 @@ const PurchaseOrdersPage = () => {
         event.preventDefault();
         // Get the data from the form
         const formData = new FormData(event.target);
+        const selectedProductID = Number(formData.get('productID'));
+
+        // Find the vendorID for the current purchase order
+        const currentOrder = purchaseOrders.find(o => o.purchaseOrderID === targetPurchaseID);
+        const orderVendorID = currentOrder ? currentOrder.vendorID : null;
+
+        // Find the catalog item for this vendor and product
+        const catalogEntry = catalogItems.find(c => c.vendorID === orderVendorID && c.productID === selectedProductID);
+        const autoPurchasePrice = catalogEntry ? catalogEntry.costFromVendor : 0;
+
         // Format the data to match the database schema
         const purchaseOrderItemData = {
             purchaseOrderID: targetPurchaseID, // This is the sale order ID that the item is being added to, not allowed to be changed in form.
-            productID: formData.get('productID'),
+            productID: selectedProductID,
             quantity: formData.get('quantity'),
-            purchasePrice: formData.get('purchasePrice')
+            purchasePrice: autoPurchasePrice
         };
 
         try {
             let response;
             // If currentRow is not null, we are editing an existing sale order, otherwise we are creating one.
             if (currentItem) {
-                response = await fetch(`/purchaseOrderItems/${currentItem.purchaseOrderItemID}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(purchaseOrderItemData) });
+                response = await fetch(`/api/purchaseOrderItems/${currentItem.purchaseOrderItemID}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(purchaseOrderItemData) });
             } else {
-                response = await fetch(`/purchaseOrderItems`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(purchaseOrderItemData) });
+                response = await fetch(`/api/purchaseOrderItems`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(purchaseOrderItemData) });
             }
             const message = await response.text();
             if (response.ok) {
@@ -314,19 +330,18 @@ const PurchaseOrdersPage = () => {
                 onClose={() => setIsItemsPopupOpen(false)}
                 title={currentItem ? "Edit Order Item" : "Add Item to Order"}
             >
+                {/* Find products specifically for the vendor of the target purchase order */}
                 <form key={currentItem?.purchaseOrderItemID || 'new-item'} onSubmit={handleSaveItem}>
                     <Dropdown
                         label="Product"
                         name="productID"
-                        options={products}
+                        options={catalogItems.filter(c => c.vendorID === purchaseOrders.find(o => o.purchaseOrderID === targetPurchaseID)?.vendorID)}
                         valueKey="productID"
                         labelKey="productName"
                         selectedValue={currentItem?.productID}
                     />
                     <label>Quantity:</label>
                     <input name="quantity" type="number" defaultValue={currentItem?.quantity || 0} />
-                    <label>Unit Price:</label>
-                    <input name="purchasePrice" type="number" step="0.01" defaultValue={currentItem?.purchasePrice || 0} />
                     <button type="submit">Save Item</button>
                 </form>
             </PopupForm>

@@ -35,7 +35,7 @@ function WarehousePage() {
 
     const fetchWarehouses = async () => {
         try {
-            const res = await fetch('/warehouses');
+            const res = await fetch('/api/warehouses');
             const data = await res.json();
             const formattedData = data.map(({ warehouseID, warehouseName, warehouseAddr, totalInventoryCost }) => ({
                 warehouseID: warehouseID,
@@ -56,7 +56,7 @@ function WarehousePage() {
 
     const fetchInventory = async () => {
         try {
-            const res = await fetch('/inventory');
+            const res = await fetch('/api/inventory');
             const data = await res.json();
             const formattedData = data.map(({ inventoryID, productID, productName, warehouseID, quantity, listCost }) => ({
                 inventoryID: inventoryID,
@@ -79,7 +79,7 @@ function WarehousePage() {
 
     const fetchProducts = async () => {
         try {
-            const res = await fetch('/products');
+            const res = await fetch('/api/products');
             const data = await res.json();
             const formattedData = data.map(({ productID, productName }) => ({
                 productID: productID,
@@ -147,9 +147,9 @@ function WarehousePage() {
         try {
             let response;
             if (currentWarehouse) {
-                response = await fetch(`/warehouses/${currentWarehouse.warehouseID}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(warehouseData) });
+                response = await fetch(`/api/warehouses/${currentWarehouse.warehouseID}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(warehouseData) });
             } else {
-                response = await fetch('/warehouses', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(warehouseData) });
+                response = await fetch('/api/warehouses', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(warehouseData) });
             }
             const message = await response.text();
             if (response.ok) {
@@ -167,7 +167,7 @@ function WarehousePage() {
 
     const handleDelete = async (row) => {
         try {
-            const response = await fetch(`/warehouses/${row.warehouseID}`, { method: 'DELETE' });
+            const response = await fetch(`/api/warehouses/${row.warehouseID}`, { method: 'DELETE' });
             const message = await response.text();
             if (response.ok) {
                 alert(message);
@@ -205,9 +205,9 @@ function WarehousePage() {
         try {
             let response;
             if (currentItem) {
-                response = await fetch(`/inventory/${currentItem.inventoryID}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(inventoryData) });
+                response = await fetch(`/api/inventory/${currentItem.inventoryID}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(inventoryData) });
             } else {
-                response = await fetch('/inventory', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(inventoryData) });
+                response = await fetch('/api/inventory', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(inventoryData) });
             }
             const message = await response.text();
             if (response.ok) {
@@ -225,7 +225,7 @@ function WarehousePage() {
 
     const handleDeleteItem = async (itemRow) => {
         try {
-            const response = await fetch(`/inventory/${itemRow.inventoryID}`, { method: 'DELETE' });
+            const response = await fetch(`/api/inventory/${itemRow.inventoryID}`, { method: 'DELETE' });
             const message = await response.text();
             if (response.ok) {
                 alert(message);
@@ -273,8 +273,6 @@ function WarehousePage() {
                     />
                     <label>Quantity:</label>
                     <input name='quantity' type="number" defaultValue={currentItem?.quantity || 0} />
-                    <label>Price:</label>
-                    <input name='listCost' type="number" step="0.01" defaultValue={currentItem?.price || 0} />
                     <button type="submit">Save</button>
                 </form>
             </PopupForm>
