@@ -37,9 +37,20 @@ app.post('/resetdb', async function (req, res) {
 });
 
 // WAREHOUSE CRUD ROUTES
-app.get('/warehouses', async function (req,res) {
+// Citation for use of AI Tools: VS Code's Gemini Code Assist to help debug issues with npm run production not persisting and the database data not being displayed
+// Date: 03/09/2026
+// Prompt: Attached the DDL.sql file. I would like to display the total inventory cost for each warehouse in the warehouse page.
+// Can you write a select statement that returns the warehouseID, warehouseName, warehouseAddr, and totalInventoryCost (total cost of all products in warehouse)?
+// AI Source URL: https://marketplace.visualstudio.com/items?itemName=Google.geminicodeassist
+app.get('/warehouses', async function (req, res) {
     try {
-        const query = "SELECT * FROM Warehouses;";
+        const query = `
+SELECT Warehouses.warehouseID, Warehouses.warehouseName, Warehouses.warehouseAddr,
+COALESCE(SUM(Inventory.quantity * Products.listCost), 0) AS totalInventoryCost
+FROM Warehouses
+LEFT JOIN Inventory ON Warehouses.warehouseID = Inventory.warehouseID
+LEFT JOIN Products ON Inventory.productID = Products.productID
+GROUP BY Warehouses.warehouseID;`;
         const [rows] = await db.query(query);
         res.send(JSON.stringify(rows));
     } catch (error) {
@@ -82,14 +93,19 @@ app.delete('/warehouses/:warehouseID', async function (req, res) {
 });
 
 // INVENTORY CRUD ROUTES
-app.get('/inventory', async function (req,res) {
+
+app.get("/inventory", async function (req, res) {
     try {
-        const query = "SELECT * FROM Inventory;";
+        const query = `
+SELECT Warehouses.warehouseID, Products.productID, Inventory.inventoryID, Products.productName, Inventory.quantity, Products.listCost
+FROM Inventory
+JOIN Products ON Inventory.productID = Products.productID
+JOIN Warehouses ON Inventory.warehouseID = Warehouses.warehouseID;`;
         const [rows] = await db.query(query);
         res.send(JSON.stringify(rows));
     } catch (error) {
         console.error("Error executing query:", error);
-        res.status(500).send("An error occurred while running the SELECT operation.");
+        res.status(500).send("An error occurred while executing the database query.");
     }
 });
 
@@ -104,22 +120,22 @@ app.post("/inventory", async function (req, res) {
     }
 });
 
-app.put('/inventory/', async function (req, res) {
+app.put('/inventory/:inventoryID', async function (req, res) {
     try {
-        const updateProc = 'CALL UpdateInventory(?,?,?);';
-        await db.query(updateProc, [req.body.productID, req.body.warehouseID, req.body.quantity]);
-        res.status(200).send(`Inventory ${req.body.productID} updated.`);
+        const updateProc = 'CALL UpdateInventory(?,?);';
+        await db.query(updateProc, [req.params.inventoryID, req.body.quantity]);
+        res.status(200).send(`Inventory ${req.params.inventoryID} updated.`);
     } catch (error) {
         console.error("Error executing Update:", error);
         res.status(500).send("An error occurred while executing the update PL/SQL");
     }
 });
 
-app.delete('/inventory', async function (req, res) {
+app.delete('/inventory/:inventoryID', async function (req, res) {
     try {
-        const deleteProc = 'CALL DeleteInventory(?,?);';
-        await db.query(deleteProc, [req.body.productID, req.body.warehouseID]);
-        res.status(200).send(`Inventory ${req.body.productID} deleted from ${req.body.warehouseID}.`);
+        const deleteProc = 'CALL DeleteInventory(?);';
+        await db.query(deleteProc, [req.params.inventoryID]);
+        res.status(200).send(`Inventory ${req.params.inventoryID} deleted.`);
     } catch (error) {
         console.error("Error executing Delete:", error);
         res.status(500).send("An error occurred while executing the delete PL/SQL.");
@@ -225,35 +241,9 @@ app.get("/products", async function (req, res) {
     }
 });
 
-app.get("/warehouses", async function (req, res) {
-    try {
-        const query = "SELECT * FROM Warehouses;"
-        const [rows] = await db.query(query);
-        res.send(JSON.stringify(rows));
-    } catch (error) {
-        console.error("Error executing query:", error);
-        res.status(500).send("An error occurred while executing the database query.");
-    }
-});
-
 app.get("/vendors", async function (req, res) {
     try {
         const query = "SELECT * FROM Vendors;"
-        const [rows] = await db.query(query);
-        res.send(JSON.stringify(rows));
-    } catch (error) {
-        console.error("Error executing query:", error);
-        res.status(500).send("An error occurred while executing the database query.");
-    }
-});
-
-app.get("/inventory", async function (req, res) {
-    try {
-        const query = `
-SELECT Warehouses.warehouseID, Products.productID, Inventory.inventoryID, Products.productName, Inventory.quantity, Products.listCost
-FROM Inventory
-JOIN Products ON Inventory.productID = Products.productID
-JOIN Warehouses ON Inventory.warehouseID = Warehouses.warehouseID;`;
         const [rows] = await db.query(query);
         res.send(JSON.stringify(rows));
     } catch (error) {

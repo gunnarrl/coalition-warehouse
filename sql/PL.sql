@@ -42,17 +42,17 @@ DELIMITER ;
 
 DROP PROCEDURE IF EXISTS UpdateInventory;
 DELIMITER //
-CREATE PROCEDURE UpdateInventory(IN in_productID INT, IN in_warehouseID INT, IN in_quantity INT)
+CREATE PROCEDURE UpdateInventory(IN in_inventoryID INT, IN in_quantity INT)
 BEGIN 
-    UPDATE Inventory SET quantity = in_quantity WHERE warehouseID = in_warehouseID AND productID = in_productID;
+    UPDATE Inventory SET quantity = in_quantity WHERE inventoryID = in_inventoryID;
 END //
 DELIMITER ;
 
 DROP PROCEDURE IF EXISTS DeleteInventory;
 DELIMITER //
-CREATE PROCEDURE DeleteInventory(IN in_productID INT, IN in_warehouseID INT)
+CREATE PROCEDURE DeleteInventory(IN in_inventoryID INT)
 BEGIN
-    DELETE FROM Inventory WHERE warehouseID = in_warehouseID AND productID = in_productID;
+    DELETE FROM Inventory WHERE inventoryID = in_inventoryID;
 END //
 DELIMITER ;
 

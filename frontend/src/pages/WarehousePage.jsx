@@ -37,10 +37,11 @@ function WarehousePage() {
         try {
             const res = await fetch('/warehouses');
             const data = await res.json();
-            const formattedData = data.map(({ warehouseID, warehouseName, warehouseAddr }) => ({
+            const formattedData = data.map(({ warehouseID, warehouseName, warehouseAddr, totalInventoryCost }) => ({
                 warehouseID: warehouseID,
                 warehouseName: warehouseName,
-                warehouseAddr: warehouseAddr
+                warehouseAddr: warehouseAddr,
+                totalInventoryCost: '$' + Number(totalInventoryCost).toFixed(2)
             }));
             setWarehouses(formattedData);
         } catch (error) {
@@ -57,8 +58,9 @@ function WarehousePage() {
         try {
             const res = await fetch('/inventory');
             const data = await res.json();
-            const formattedData = data.map(({ inventoryID, productName, warehouseID, quantity, listCost }) => ({
+            const formattedData = data.map(({ inventoryID, productID, productName, warehouseID, quantity, listCost }) => ({
                 inventoryID: inventoryID,
+                productID: productID,
                 productName: productName,
                 warehouseID: warehouseID,
                 quantity: quantity,
@@ -98,7 +100,8 @@ function WarehousePage() {
     const columns = [
         { label: 'ID', key: 'warehouseID' },
         { label: 'Name', key: 'warehouseName' },
-        { label: 'Address', key: 'warehouseAddr' }
+        { label: 'Address', key: 'warehouseAddr' },
+        { label: 'Total Value', key: 'totalInventoryCost' }
     ];
 
     const renderInventory = (row) => {
@@ -117,7 +120,7 @@ function WarehousePage() {
                     data={inventoryItems.filter(item => item.warehouseID === row.warehouseID)}
                     columns={itemColumns}
                     onEdit={(itemRow) => handleEditItem(row.warehouseID, itemRow)}
-                    onDelete={(itemRow) => handleDeleteItem(row.warehouseID, itemRow)}
+                    onDelete={handleDeleteItem}
                 />
             </div>
         );
@@ -143,8 +146,8 @@ function WarehousePage() {
         };
         try {
             let response;
-            if (currentRow) {
-                response = await fetch(`/warehouses/${ currentRow.warehouseID }`, { method: 'PUT', headers:{ 'Content-Type': 'application/json' }, body: JSON.stringify(warehouseData)});
+            if (currentWarehouse) {
+                response = await fetch(`/warehouses/${currentWarehouse.warehouseID}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(warehouseData) });
             } else {
                 response = await fetch('/warehouses', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(warehouseData) });
             }
@@ -178,12 +181,6 @@ function WarehousePage() {
         }
     };
 
-    const handleSave = (e) => {
-        e.preventDefault();
-        alert("Saved!");
-        setIsPopupOpen(false);
-    };
-
     // Handlers for Inner table actions
     const handleAddItem = (warehouseID) => {
         setTargetWarehouseID(warehouseID);
@@ -208,9 +205,9 @@ function WarehousePage() {
         try {
             let response;
             if (currentItem) {
-                response = await fetch('/inventory/', { method: 'PUT', headers:{ 'Content-Type': 'application/json' }, body: JSON.stringify(inventoryData)});
+                response = await fetch(`/inventory/${currentItem.inventoryID}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(inventoryData) });
             } else {
-                response = await fetch('/inventory', { method: 'POST', headers:{ 'Content-Type': 'application/json' }, body: JSON.stringify(inventoryData)});
+                response = await fetch('/inventory', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(inventoryData) });
             }
             const message = await response.text();
             if (response.ok) {
@@ -226,9 +223,9 @@ function WarehousePage() {
         }
     };
 
-    const handleDeleteItem = async (warehouseID, itemRow) => {
+    const handleDeleteItem = async (itemRow) => {
         try {
-            const response = await fetch('/inventory', {method: 'DELETE', headers: { 'Content-Type': 'application/json'}, body: JSON.stringify({productID: itemRow.productID, warehouseID: warehouseID})});
+            const response = await fetch(`/inventory/${itemRow.inventoryID}`, { method: 'DELETE' });
             const message = await response.text();
             if (response.ok) {
                 alert(message);
@@ -252,11 +249,11 @@ function WarehousePage() {
                 title={currentWarehouse ? "Edit Warehouse" : "Add Warehouse"}
             >
                 { /* Use key so that form data gets refreshed when you change it. Gemini 3 pro helped bugfix */}
-                <form key={currentWarehouse?.warehouseID || 'new-wh'} onSubmit={handleSave}>
+                <form key={currentWarehouse?.warehouseID || 'new-wh'} onSubmit={handleSubmit}>
                     <label>Name:</label>
-                    <input name='name' defaultValue={currentWarehouse?.warehouseName || ''} />
+                    <input name='warehouseName' defaultValue={currentWarehouse?.warehouseName || ''} />
                     <label>Address:</label>
-                    <input name='address' defaultValue={currentWarehouse?.warehouseAddr || ''} />
+                    <input name='warehouseAddr' defaultValue={currentWarehouse?.warehouseAddr || ''} />
                     <button type="submit">Save</button>
                 </form>
             </PopupForm>
@@ -265,7 +262,7 @@ function WarehousePage() {
                 onClose={() => setIsItemPopupOpen(false)}
                 title={currentItem ? "Edit Inventory Item" : "Add Inventory Item"}
             >
-                <form key={currentItem?.name || 'new-item'} onSubmit={handleSaveItem}>
+                <form key={currentItem?.inventoryID || 'new-item'} onSubmit={handleSubmitItem}>
                     <Dropdown
                         label="Product"
                         name="productID"
