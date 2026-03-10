@@ -235,3 +235,100 @@ BEGIN
 
 END //
 DELIMITER ;
+
+/* Citation for use of AI Tools: VS Code's Gemini Code Assist to help debug issues with npm run production not persisting and the database data not being displayed
+ Date: 03/09/2026
+ Prompt: Attached PL.sql. When I add an item + quantity to a
+purchase order it should show up in the warehouse inventory
+that is selected for that order. For example if I make a order
+to South Fulfillment of 12 plastic drawers (which it didn't
+have before), the inventory should update and add it. If it
+already had it then it should add the new quantity to the
+current amount. I tried to do this with the triggers in
+PL.sql but they are incorrect. The same should apply with
+sales, ideally it will check if we have that quantity in
+stock, if we do it will be removed from the inventory, if
+not the user is alerted and told to select a smaller
+number, if all inventory of a product is sold the row
+should be deleted
+*/
+
+DROP TRIGGER IF EXISTS tr_check_inventoryBeforeSale;
+
+DELIMITER //
+CREATE TRIGGER tr_check_inventoryBeforeSale
+BEFORE INSERT ON SalesOrderItems
+FOR EACH ROW
+BEGIN
+    DECLARE _warehouseID INT;
+    DECLARE _currentStock INT DEFAULT 0;
+    
+    SELECT warehouseID INTO _warehouseID 
+    FROM SalesOrders 
+    WHERE saleOrderID = NEW.saleOrderID;
+    
+    SELECT COALESCE(SUM(quantity), 0) INTO _currentStock
+    FROM Inventory
+    WHERE productID = NEW.productID 
+      AND warehouseID = _warehouseID;
+      
+    IF NEW.quantity > _currentStock THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Not enough inventory in stock. Please select a smaller quantity.';
+    END IF;
+END //
+DELIMITER ;
+
+DROP TRIGGER IF EXISTS tr_update_inventoryAfterSale;
+
+DELIMITER //
+CREATE TRIGGER tr_update_inventoryAfterSale
+AFTER INSERT ON SalesOrderItems
+FOR EACH ROW
+BEGIN
+    DECLARE _warehouseID INT;
+    
+    SELECT warehouseID INTO _warehouseID 
+    FROM SalesOrders 
+    WHERE saleOrderID = NEW.saleOrderID;
+    
+    UPDATE Inventory 
+    SET quantity = quantity - NEW.quantity 
+    WHERE productID = NEW.productID 
+      AND warehouseID = _warehouseID;
+      
+    DELETE FROM Inventory
+    WHERE productID = NEW.productID 
+      AND warehouseID = _warehouseID
+      AND quantity <= 0;
+END //
+DELIMITER ;
+
+DROP TRIGGER IF EXISTS tr_update_inventoryAfterPurchase;
+
+DELIMITER //
+CREATE TRIGGER tr_update_inventoryAfterPurchase
+AFTER INSERT ON PurchaseOrderItems
+FOR EACH ROW
+BEGIN
+    DECLARE _warehouseID INT;
+    DECLARE _count INT;
+    
+    SELECT warehouseID INTO _warehouseID 
+    FROM PurchaseOrders 
+    WHERE purchaseOrderID = NEW.purchaseOrderID;
+    
+    SELECT COUNT(*) INTO _count 
+    FROM Inventory 
+    WHERE productID = NEW.productID AND warehouseID = _warehouseID;
+    
+    IF _count > 0 THEN
+        UPDATE Inventory 
+        SET quantity = quantity + NEW.quantity 
+        WHERE productID = NEW.productID 
+          AND warehouseID = _warehouseID;
+    ELSE
+        INSERT INTO Inventory (productID, warehouseID, quantity)
+        VALUES (NEW.productID, _warehouseID, NEW.quantity);
+    END IF;
+END //
+DELIMITER ;

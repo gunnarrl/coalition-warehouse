@@ -25,10 +25,59 @@ app.use(express.json());
 // Serve the built React app from the dist/ directory
 app.use(express.static(path.join(__dirname, 'dist')));
 
-app.post('/resetdb', async function (req, res) {
+app.post('/api/resetdb', async function (req, res) {
     try {
         const reset = "CALL sp_load_coalitiondb();";
         await db.query(reset);
+
+        // Recreate triggers after reset (MySQL drops triggers when tables are dropped)
+        // Triggers are copied directly from DDL.sql, can't run them inside an sp so must manually define the query
+        await db.query(`
+            CREATE TRIGGER tr_check_inventoryBeforeSale
+            BEFORE INSERT ON SalesOrderItems
+            FOR EACH ROW
+            BEGIN
+                DECLARE _warehouseID INT;
+                DECLARE _currentStock INT DEFAULT 0;
+                SELECT warehouseID INTO _warehouseID FROM SalesOrders WHERE saleOrderID = NEW.saleOrderID;
+                SELECT COALESCE(SUM(quantity), 0) INTO _currentStock FROM Inventory WHERE productID = NEW.productID AND warehouseID = _warehouseID;
+                IF NEW.quantity > _currentStock THEN
+                    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Not enough inventory in stock. Please select a smaller quantity.';
+                END IF;
+            END
+        `);
+
+        // Update inventory after a sale
+        await db.query(`
+            CREATE TRIGGER tr_update_inventoryAfterSale
+            AFTER INSERT ON SalesOrderItems
+            FOR EACH ROW
+            BEGIN
+                DECLARE _warehouseID INT;
+                SELECT warehouseID INTO _warehouseID FROM SalesOrders WHERE saleOrderID = NEW.saleOrderID;
+                UPDATE Inventory SET quantity = quantity - NEW.quantity WHERE productID = NEW.productID AND warehouseID = _warehouseID;
+                DELETE FROM Inventory WHERE productID = NEW.productID AND warehouseID = _warehouseID AND quantity <= 0;
+            END
+        `);
+
+        // Update inventory after a purchase
+        await db.query(`
+            CREATE TRIGGER tr_update_inventoryAfterPurchase
+            AFTER INSERT ON PurchaseOrderItems
+            FOR EACH ROW
+            BEGIN
+                DECLARE _warehouseID INT;
+                DECLARE _count INT;
+                SELECT warehouseID INTO _warehouseID FROM PurchaseOrders WHERE purchaseOrderID = NEW.purchaseOrderID;
+                SELECT COUNT(*) INTO _count FROM Inventory WHERE productID = NEW.productID AND warehouseID = _warehouseID;
+                IF _count > 0 THEN
+                    UPDATE Inventory SET quantity = quantity + NEW.quantity WHERE productID = NEW.productID AND warehouseID = _warehouseID;
+                ELSE
+                    INSERT INTO Inventory (productID, warehouseID, quantity) VALUES (NEW.productID, _warehouseID, NEW.quantity);
+                END IF;
+            END
+        `);
+
         res.status(200).send("Database successfully reset.");
     } catch (error) {
         console.error("Error executing reset procedure:", error);
@@ -435,8 +484,13 @@ app.post("/api/salesOrderItems", async function (req, res) {
         await db.query(addProc, [req.body.saleOrderID, req.body.productID, req.body.quantity, req.body.salePrice]);
         res.status(201).send(`Sales Order Item ${req.body.saleOrderID} ${req.body.productID} added.`);
     } catch (error) {
-        console.error("Error executing Add:", error);
-        res.status(500).send("An error occurred while executing the add PL/SQL.");
+        // handling added by Gemini to catch the error from the SP if there isn't enough inventory
+        if (error.sqlState === '45000') {
+            res.status(400).send(error.sqlMessage || error.message);
+        } else {
+            console.error("Error executing Add:", error);
+            res.status(500).send("An error occurred while executing the add PL/SQL.");
+        }
     }
 });
 

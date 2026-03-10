@@ -168,27 +168,6 @@ BEGIN
 END //
 DELIMITER ;
 
-DROP TRIGGER IF EXISTS sp_update_inventoryAfterSale;
-
-DELIMITER //
-CREATE TRIGGER sp_update_inventoryAfterSale
-AFTER INSERT ON SalesOrderItems
-FOR EACH ROW
-BEGIN
-    DECLARE _warehouseID INT;
-    
-    -- Look up the warehouse associated with this sale order
-    SELECT warehouseID INTO _warehouseID 
-    FROM SalesOrders 
-    WHERE saleOrderID = NEW.saleOrderID;
-    -- Update the inventory for that specific warehouse + product
-    UPDATE Inventory 
-    SET quantity = quantity - NEW.quantity 
-    WHERE productID = NEW.productID 
-      AND warehouseID = _warehouseID;
-END //
-DELIMITER ;
-
 -- PURCHASES SPs -- (basically the same as sales orders, but with purchases)
 DROP PROCEDURE IF EXISTS sp_delete_purchase_order;
 
@@ -242,27 +221,6 @@ DELIMITER //
 CREATE PROCEDURE sp_update_purchase_orderItem(IN in_purchaseOrderItemID INT, IN in_productID INT, IN in_quantity INT, IN in_purchasePrice DECIMAL(10,2))
 BEGIN
     UPDATE PurchaseOrderItems SET productID = in_productID, quantity = in_quantity, purchasePrice = in_purchasePrice WHERE purchaseOrderItemID = in_purchaseOrderItemID;
-END //
-DELIMITER ;
-
-DROP TRIGGER IF EXISTS sp_update_inventoryAfterPurchase;
-
-DELIMITER //
-CREATE TRIGGER sp_update_inventoryAfterPurchase
-AFTER INSERT ON PurchaseOrderItems
-FOR EACH ROW
-BEGIN
-    DECLARE _warehouseID INT;
-    
-    -- Look up the warehouse associated with this purchase order
-    SELECT warehouseID INTO _warehouseID 
-    FROM PurchaseOrders 
-    WHERE purchaseOrderID = NEW.purchaseOrderID;
-    -- Update the inventory for that specific warehouse + product
-    UPDATE Inventory 
-    SET quantity = quantity + NEW.quantity 
-    WHERE productID = NEW.productID 
-      AND warehouseID = _warehouseID;
 END //
 DELIMITER ;
 
