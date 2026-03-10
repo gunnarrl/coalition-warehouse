@@ -7,6 +7,15 @@
 // fixing this fixed all the issues.
 // AI Source URL: https://marketplace.visualstudio.com/items?itemName=Google.geminicodeassist
 
+// Citation for use of AI Tools: VS Code's Gemini Code Assist to set up CUD for inner tables
+// Date: 03/09/2026
+// Prompt: [Attached the SaleOrderPage.jsx]
+// "Currently the user can select any product to add to a sale order, but they should only be able to select products that are in stock at the selected warehouse.
+// Can you modify the code to reflect this? Please explain the changes"
+// Results: It removed the fetchProducts function and added fetchInventory
+// Added a .filter() in the handleAddItem function to only show products that are in stock at the selected warehouse
+// AI Source URL: https://marketplace.visualstudio.com/items?itemName=Google.geminicodeassist
+
 import React, { useState, useEffect } from 'react';
 import DetailTable from '../components/DetailTable';
 import SimpleTable from '../components/SimpleTable';
@@ -35,7 +44,7 @@ const SalesOrdersPage = () => {
     // states to populate dropdown menus
     const [customers, setCustomers] = useState([]);
     const [warehouses, setWarehouses] = useState([]);
-    const [products, setProducts] = useState([]);
+    const [inventoryItems, setInventoryItems] = useState([]);
 
     const fetchSalesOrders = async () => {
         try {
@@ -119,23 +128,18 @@ const SalesOrdersPage = () => {
         fetchWarehouses();
     }, []);
 
-    const fetchProducts = async () => {
+    const fetchInventory = async () => {
         try {
-            const res = await fetch('/api/products');
+            const res = await fetch('/api/inventory');
             const data = await res.json();
-            const formattedData = data.map(({ productID, productName, listCost }) => ({
-                productID: productID,
-                productName: productName,
-                listCost: listCost
-            }));
-            setProducts(formattedData);
+            setInventoryItems(data);
         } catch (error) {
-            console.error('Error fetching products:', error);
+            console.error('Error fetching inventory:', error);
         }
     };
 
     useEffect(() => {
-        fetchProducts();
+        fetchInventory();
     }, []);
 
     // Handlers for Add/Edit/Delete
@@ -187,20 +191,20 @@ const SalesOrdersPage = () => {
     const handleDelete = async (row) => {
         if (window.confirm("Are you sure you want to delete this?")) {
             try {
-            const response = await fetch(`/api/salesOrders/${row.saleOrderID}`, { method: 'DELETE' });
-            const message = await response.text();
-            if (response.ok) {
-                alert(message);
-                fetchSalesOrders();
-            } else {
-                alert(message);
+                const response = await fetch(`/api/salesOrders/${row.saleOrderID}`, { method: 'DELETE' });
+                const message = await response.text();
+                if (response.ok) {
+                    alert(message);
+                    fetchSalesOrders();
+                } else {
+                    alert(message);
+                }
+            } catch (error) {
+                console.error('Error deleting sale order:', error);
+                alert('An error occurred while deleting the sale order.');
             }
-        } catch (error) {
-            console.error('Error deleting sale order:', error);
-            alert('An error occurred while deleting the sale order.');
         }
     }
-        }
 
     // item handlers
     const handleAddItem = (saleID) => {
@@ -218,29 +222,29 @@ const SalesOrdersPage = () => {
     const handleDeleteItem = async (itemRow) => {
         if (window.confirm("Are you sure you want to delete this?")) {
             try {
-            const response = await fetch(`/api/salesOrderItems/${itemRow.saleOrderItemID}`, { method: 'DELETE' });
-            const message = await response.text();
-            if (response.ok) {
-                alert(message);
-                fetchSaleItems();
-                fetchSalesOrders();
-            } else {
-                alert(message);
+                const response = await fetch(`/api/salesOrderItems/${itemRow.saleOrderItemID}`, { method: 'DELETE' });
+                const message = await response.text();
+                if (response.ok) {
+                    alert(message);
+                    fetchSaleItems();
+                    fetchSalesOrders();
+                } else {
+                    alert(message);
+                }
+            } catch (error) {
+                console.error('Error deleting sale order item:', error);
+                alert('An error occurred while deleting the sale order item.');
             }
-        } catch (error) {
-            console.error('Error deleting sale order item:', error);
-            alert('An error occurred while deleting the sale order item.');
         }
-    }
-        };
+    };
 
     const handleSaveItem = async (event) => {
         event.preventDefault();
         // Get the data from the form
         const formData = new FormData(event.target);
         const selectedProductID = Number(formData.get('productID'));
-        const selectedProduct = products.find(p => p.productID === selectedProductID);
-        const autoSalePrice = selectedProduct ? selectedProduct.listCost : 0;
+        const selectedItem = inventoryItems.find(i => i.productID === selectedProductID && i.warehouseID === salesOrders.find(o => o.saleOrderID === targetSaleID)?.warehouseID);
+        const autoSalePrice = selectedItem ? selectedItem.listCost : 0;
 
         // Format the data to match the database schema
         const saleOrderItemData = {
@@ -334,7 +338,7 @@ const SalesOrdersPage = () => {
                     <Dropdown
                         label="Product"
                         name="productID"
-                        options={products}
+                        options={inventoryItems.filter(i => i.warehouseID === salesOrders.find(o => o.saleOrderID === targetSaleID)?.warehouseID)}
                         valueKey="productID"
                         labelKey="productName"
                         selectedValue={currentItem?.productID}
