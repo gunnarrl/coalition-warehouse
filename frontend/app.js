@@ -313,8 +313,8 @@ app.delete("/api/vendors/:vendorID", async function (req, res) {
 
 app.put("/api/vendors/:vendorID", async function (req, res) {
     try {
-        const updateProc = 'CALL sp_update_vendor(?, ?, ?);';
-        await db.query(updateProc, [req.params.vendorID, req.body.vendorName, req.body.vendorAddr]);
+        const updateProc = 'CALL sp_update_vendor(?, ?, ?, ?);';
+        await db.query(updateProc, [req.params.vendorID, req.body.vendorName, req.body.vendorAddr, req.body.vendorEmail]);
         res.status(200).send(`Vendor ${req.params.vendorID} updated.`);
     } catch (error) {
         console.error("Error executing Update:", error);
@@ -324,8 +324,8 @@ app.put("/api/vendors/:vendorID", async function (req, res) {
 
 app.post("/api/vendors", async function (req, res) {
     try {
-        const addProc = 'CALL sp_add_vendor(?, ?);';
-        await db.query(addProc, [req.body.vendorName, req.body.vendorAddr]);
+        const addProc = 'CALL sp_add_vendor(?, ?, ?);';
+        await db.query(addProc, [req.body.vendorName, req.body.vendorAddr, req.body.vendorEmail]);
         res.status(201).send(`Vendor ${req.body.vendorName} added.`);
     } catch (error) {
         console.error("Error executing Add:", error);

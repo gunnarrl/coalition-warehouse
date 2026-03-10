@@ -251,6 +251,11 @@ stock, if we do it will be removed from the inventory, if
 not the user is alerted and told to select a smaller
 number, if all inventory of a product is sold the row
 should be deleted
+Result: Originally it said to add them to PL.sql, but that had
+an issue with reseting the db removing all triggers, moved them to 
+DDL.sql and hardcoded them into the resetdb route so they are remade
+everytime tables are dropped.
+// AI Source URL: https://marketplace.visualstudio.com/items?itemName=Google.geminicodeassist
 */
 
 DROP TRIGGER IF EXISTS tr_check_inventoryBeforeSale;
