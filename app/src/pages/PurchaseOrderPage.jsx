@@ -335,7 +335,7 @@ const PurchaseOrdersPage = () => {
                 {/* Find products specifically for the vendor of the target purchase order */}
                 <form key={currentItem?.purchaseOrderItemID || 'new-item'} onSubmit={handleSaveItem}>
                     <Dropdown
-                        label="Product"
+                        label="Product (from selected Vendor)"
                         name="productID"
                         options={catalogItems.filter(c => c.vendorID === purchaseOrders.find(o => o.purchaseOrderID === targetPurchaseID)?.vendorID)}
                         valueKey="productID"

@@ -336,7 +336,7 @@ const SalesOrdersPage = () => {
             >
                 <form key={currentItem?.saleOrderItemID || 'new-item'} onSubmit={handleSaveItem}>
                     <Dropdown
-                        label="Product"
+                        label="Product (from selected warehouse)"
                         name="productID"
                         options={inventoryItems.filter(i => i.warehouseID === salesOrders.find(o => o.saleOrderID === targetSaleID)?.warehouseID)}
                         valueKey="productID"
