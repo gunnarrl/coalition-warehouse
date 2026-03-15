@@ -1,3 +1,6 @@
+// Authors: Team 90 (Daniel Slay, Gunnar Larsen)
+// Course: CS340
+// Description: Purchase Order CRUD page - all code in this file is adapted from SaleOrderPage.jsx. In which we used AI to help bugfix.
 import React, { useState, useEffect } from 'react';
 import DetailTable from '../components/DetailTable';
 import SimpleTable from '../components/SimpleTable';

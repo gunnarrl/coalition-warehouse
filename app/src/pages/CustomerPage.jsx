@@ -1,3 +1,6 @@
+// Authors: Team 90 (Daniel Slay, Gunnar Larsen)
+// Course: CS340
+// Description: Customer entity CRUD page - all code in this file is original work by Team 90
 import React, { useState, useEffect } from 'react';
 import SimpleTable from '../components/SimpleTable';
 import { HiUserAdd } from "react-icons/hi";

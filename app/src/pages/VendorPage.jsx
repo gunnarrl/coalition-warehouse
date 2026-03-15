@@ -91,7 +91,6 @@ function VendorPage() {
     ];
 
     const renderCatalog = (row) => {
-        const specificCatalog = catalogItems;
 
         const catalogColumns = [
             { label: 'Product Name', key: 'productName' },

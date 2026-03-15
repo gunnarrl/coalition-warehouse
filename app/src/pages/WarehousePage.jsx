@@ -12,13 +12,6 @@ import PopupForm from '../components/PopupForm';
 import Dropdown from '../components/Dropdown';
 
 
-const mockProducts = [
-    { productID: 1, productName: 'Premium Keyboard 591' },
-    { productID: 2, productName: 'Plastic Drawer 653' },
-    { productID: 3, productName: 'Steel Desk 473' },
-    { productID: 4, productName: 'Ergonomic Mouse 654' },
-];
-
 function WarehousePage() {
 
     const [warehouses, setWarehouses] = useState([]);
@@ -125,8 +118,7 @@ function WarehousePage() {
             </div>
         );
     };
-    // Handlers for Add/Edit/Delete, 
-    // TODO: Connect these to the backend API and refresh the data after changes
+    // Handlers for Add/Edit/Delete
     const handleAdd = () => {
         setCurrentWarehouse(null);
         setIsPopupOpen(true);

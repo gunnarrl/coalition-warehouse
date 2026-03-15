@@ -39,7 +39,6 @@ const ProductPage = () => {
         { key: 'listCost', label: 'Price' },
     ];
 
-    // TODO: Implement API calls for edit, add, delete, then refresh the displayed data.
     const handleEdit = (row) => {
         setCurrentRow(row);
         setIsPopupOpen(true);

@@ -2,6 +2,28 @@
    Course: CS340
    Description: Coalition Warehouse Database Project
 */
+
+/* Citation for use of AI Tools: VS Code's Gemini Code Assist to help debug issues with npm run production not persisting and the database data not being displayed
+ Date: 03/09/2026
+ Prompt: Attached PL.sql. When I add an item + quantity to a
+purchase order it should show up in the warehouse inventory
+that is selected for that order. For example if I make a order
+to South Fulfillment of 12 plastic drawers (which it didn't
+have before), the inventory should update and add it. If it
+already had it then it should add the new quantity to the
+current amount. I tried to do this with the triggers in
+PL.sql but they are incorrect. The same should apply with
+sales, ideally it will check if we have that quantity in
+stock, if we do it will be removed from the inventory, if
+not the user is alerted and told to select a smaller
+number, if all inventory of a product is sold the row
+should be deleted
+Result: Originally it said to add them to PL.sql, but that had
+an issue with reseting the db removing all triggers, moved them to 
+DDL.sql and hardcoded them into the resetdb route so they are remade
+everytime tables are dropped.
+AI Source URL: https://marketplace.visualstudio.com/items?itemName=Google.geminicodeassist
+*/
 -- RESET DATABASE BUTTON --
 DROP PROCEDURE IF EXISTS sp_load_coalitiondb;
 DELIMITER //
@@ -235,28 +257,6 @@ BEGIN
 
 END //
 DELIMITER ;
-
-/* Citation for use of AI Tools: VS Code's Gemini Code Assist to help debug issues with npm run production not persisting and the database data not being displayed
- Date: 03/09/2026
- Prompt: Attached PL.sql. When I add an item + quantity to a
-purchase order it should show up in the warehouse inventory
-that is selected for that order. For example if I make a order
-to South Fulfillment of 12 plastic drawers (which it didn't
-have before), the inventory should update and add it. If it
-already had it then it should add the new quantity to the
-current amount. I tried to do this with the triggers in
-PL.sql but they are incorrect. The same should apply with
-sales, ideally it will check if we have that quantity in
-stock, if we do it will be removed from the inventory, if
-not the user is alerted and told to select a smaller
-number, if all inventory of a product is sold the row
-should be deleted
-Result: Originally it said to add them to PL.sql, but that had
-an issue with reseting the db removing all triggers, moved them to 
-DDL.sql and hardcoded them into the resetdb route so they are remade
-everytime tables are dropped.
-// AI Source URL: https://marketplace.visualstudio.com/items?itemName=Google.geminicodeassist
-*/
 
 DROP TRIGGER IF EXISTS tr_check_inventoryBeforeSale;
 

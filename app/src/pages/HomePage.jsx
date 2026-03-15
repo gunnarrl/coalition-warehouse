@@ -30,8 +30,8 @@ const HomePage = () => {
                 <li><Link to="/vendors">Manage Vendors</Link> - View vendors and manage the products they supply.</li>
                 <li><Link to="/warehouses">Manage Warehouses</Link> - Track warehouse locations and their inventory on hand.</li>
                 <li><Link to="/customers">Manage Customers</Link> - Add and update customer records.</li>
-                <li><Link to="/purchase-orders">Purchase Orders</Link> - Create and review orders placed with vendors.</li>
-                <li><Link to="/sale-orders">Sales Orders</Link> - Create and review orders fulfilled to customers.</li>
+                <li><Link to="/purchases">Purchase Orders</Link> - Create and review orders placed with vendors.</li>
+                <li><Link to="/sales">Sales Orders</Link> - Create and review orders fulfilled to customers.</li>
             </ul>
             <button className='danger' onClick={handleReset}>Reset Sample Data</button>
         </div>
