@@ -33,6 +33,13 @@ setting up the DetailTable component in `DetailTable.jsx`, debugging sales order
 - Originality: Referenced for syntax
 - Source URL: https://www.geeksforgeeks.org/sql/date_sub-function-in-mysql/
 
+### Sample Data generation
+- Scope: `DDL.sql` sample data
+- Date: 01/23/2026
+- Originality: Generated using Gemini
+- Prompt: Gave it the Schema and asked it to generate sample data for each table
+- Source URL: https://gemini.google.com/app
+
 ## Original Work
 All CRUD pages (CustomerPage, ProductPage, PurchaseOrderPage), all React components (NavBar, SimpleTable, DetailTable, PopupForm, Dropdown), all stored procedures in `PL.sql`, the database schema in `DDL.sql`, and the DML queries were authored by Team 90. All pages were adapted from patterns established in earlier pages (mainly ProductPage and WarehousePage) with AI-assisted debugging as cited above.
 
