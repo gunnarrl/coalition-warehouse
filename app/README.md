@@ -16,7 +16,7 @@ Internal management system for tracking products, vendors, warehouses, customers
 
 ### Gemini Code Assist (VS Code Extension)
 - **Scope**: Debugging `app.js` (ESM issues, static serving), setting up CUD for inner tables in `WarehousePage.jsx` (logic reused in `VendorPage.jsx`, and both order pages), 
-setting up the DetailTable component in `DetailTable.jsx`, debugging sales order item operations in `SaleOrderPage.jsx`, filtering product dropdowns by warehouse inventory in `SaleOrderPage.jsx`, trigger logic in `DDL.sql`, `app.js` and `SaleOrderPage.jsx` (logic was then copied to `PurchaseOrderPage.jsx`)
+setting up the DetailTable component in `DetailTable.jsx`, debugging sales order item operations in `SaleOrderPage.jsx`, filtering product dropdowns by warehouse inventory in `SaleOrderPage.jsx`, trigger logic in `DDL.sql`, `app.js` and `SaleOrderPage.jsx` (logic was then copied to `PurchaseOrderPage.jsx`). AI was also used to create `App.css`.
 - **Date**: 02/11/2026 – 03/09/2026
 - **Originality**: Used iteratively for debugging and feature implementation. AI-generated suggestions were reviewed, adapted, and integrated. Specific prompts and results are documented in the relevant source files.
 - **Source URL**: https://marketplace.visualstudio.com/items?itemName=Google.geminicodeassist
